@@ -17,6 +17,13 @@ type Lexer struct {
 	ch           byte
 }
 
+func (l *Lexer) peekChar() byte {
+	if l.readPosition >= len(l.input) {
+		return 0
+	}
+	return l.input[l.readPosition]
+}
+
 func (l *Lexer) readChar() {
 	if l.readPosition >= len(l.input) {
 		l.ch = 0
@@ -36,7 +43,13 @@ func (l *Lexer) NextToken() token.Token {
 	l.skipWhitespace()
 	switch l.ch {
 	case '=':
-		tok = l.charToken(token.ASSIGN)
+		if l.peekChar() == '=' {
+			l.readChar()
+			tok.Type = token.EQ
+			tok.Literal = "=="
+		} else {
+			tok = l.charToken(token.ASSIGN)
+		}
 	case ';':
 		tok = l.charToken(token.SEMICOLON)
 	case '(':
@@ -52,7 +65,13 @@ func (l *Lexer) NextToken() token.Token {
 	case '-':
 		tok = l.charToken(token.MINUS)
 	case '!':
-		tok = l.charToken(token.BANG)
+		if l.peekChar() == '=' {
+			l.readChar()
+			tok.Type = token.NE
+			tok.Literal = "!="
+		} else {
+			tok = l.charToken(token.BANG)
+		}
 	case '*':
 		tok = l.charToken(token.ASTERISK)
 	case '/':

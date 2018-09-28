@@ -30,6 +30,8 @@ const (
 	SLASH    = "/"
 	GT       = "GT"
 	LT       = "LT"
+	EQ       = "EQ"
+	NE       = "NE"
 
 	// Delimiters
 	COMMA     = "COMMA"
@@ -48,8 +50,6 @@ const (
 	IF       = "IF"
 	ELSE     = "ELSE"
 	RETURN   = "RETURN"
-
-	// Operators
 )
 
 var keywords = map[string]TokenType{

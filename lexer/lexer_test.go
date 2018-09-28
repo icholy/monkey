@@ -124,4 +124,23 @@ func TestNextToken(t *testing.T) {
 		})
 	})
 
+	t.Run("two char operators", func(t *testing.T) {
+		input := `if (x == 10) { y != 3; }`
+		ExpectTokens(t, input, []token.Token{
+			{token.IF, "if"},
+			{token.LPAREN, "("},
+			{token.IDENT, "x"},
+			{token.EQ, "=="},
+			{token.INT, "10"},
+			{token.RPAREN, ")"},
+			{token.LBRACE, "{"},
+			{token.IDENT, "y"},
+			{token.NE, "!="},
+			{token.INT, "3"},
+			{token.SEMICOLON, ";"},
+			{token.RBRACE, "}"},
+			{token.EOF, ""},
+		})
+	})
+
 }
