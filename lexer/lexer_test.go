@@ -82,4 +82,15 @@ func TestNextToken(t *testing.T) {
 		})
 	})
 
+	t.Run("one character operators", func(t *testing.T) {
+		input := `!-/*5`
+		ExpectTokens(t, input, []token.Token{
+			{token.BANG, "!"},
+			{token.MINUS, "-"},
+			{token.SLASH, "/"},
+			{token.ASTERISK, "*"},
+			{token.INT, "5"},
+		})
+	})
+
 }
