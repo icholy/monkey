@@ -93,4 +93,32 @@ func TestNextToken(t *testing.T) {
 		})
 	})
 
+	t.Run("more keywords", func(t *testing.T) {
+		input := `
+			if (true) {
+				return false;
+			} else {
+				return 5;
+			}
+		`
+		ExpectTokens(t, input, []token.Token{
+			{token.IF, "if"},
+			{token.LPAREN, "("},
+			{token.TRUE, "true"},
+			{token.RPAREN, ")"},
+			{token.LBRACE, "{"},
+			{token.RETURN, "return"},
+			{token.FALSE, "false"},
+			{token.SEMICOLON, ";"},
+			{token.RBRACE, "}"},
+			{token.ELSE, "else"},
+			{token.LBRACE, "{"},
+			{token.RETURN, "return"},
+			{token.INT, "5"},
+			{token.SEMICOLON, ";"},
+			{token.RBRACE, "}"},
+			{token.EOF, ""},
+		})
+	})
+
 }
