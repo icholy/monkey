@@ -59,6 +59,10 @@ func (l *Lexer) NextToken() token.Token {
 		tok = l.charToken(token.SLASH)
 	case ',':
 		tok = l.charToken(token.COMMA)
+	case '<':
+		tok = l.charToken(token.LT)
+	case '>':
+		tok = l.charToken(token.GT)
 	case 0:
 		tok = token.Token{Type: token.EOF}
 	default:
