@@ -55,8 +55,15 @@ func (p *Parser) parseStatement() ast.Statement {
 	case token.RETURN:
 		return p.parseReturnStatement()
 	default:
-		return nil
+		return p.parseExpressionStatement()
 	}
+}
+
+func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
+	stmt := &ast.ExpressionStatement{}
+	stmt.Token = p.curToken
+	stmt.Expression = p.parseExpression()
+	return stmt
 }
 
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
