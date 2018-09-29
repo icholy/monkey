@@ -57,10 +57,16 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
+	stmt.Value = p.parseExpression()
+	return stmt
+}
+
+func (p *Parser) parseExpression() ast.Expression {
+	// TODO: skipping expressions for now
 	for !p.curTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
-	return stmt
+	return nil
 }
 
 func (p *Parser) curTokenIs(t token.TokenType) bool {
