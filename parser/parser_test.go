@@ -11,43 +11,50 @@ import (
 )
 
 func TestLetStatement(t *testing.T) {
-	input := `
-		let x = 5;
-		let y = 10;
-		let foobar = 838383;
-	`
 
+	t.Run("let statements", func(t *testing.T) {
+
+		input := `
+			let x = 5;
+			let y = 10;
+			let foobar = 838383;
+		`
+
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.LetStatement{
+					Token: token.Token{token.LET, "let"},
+					Name: &ast.Identifier{
+						Token: token.Token{token.IDENT, "x"},
+						Value: "x",
+					},
+					Value: nil,
+				},
+				&ast.LetStatement{
+					Token: token.Token{token.LET, "let"},
+					Name: &ast.Identifier{
+						Token: token.Token{token.IDENT, "y"},
+						Value: "y",
+					},
+					Value: nil,
+				},
+				&ast.LetStatement{
+					Token: token.Token{token.LET, "let"},
+					Name: &ast.Identifier{
+						Token: token.Token{token.IDENT, "foobar"},
+						Value: "foobar",
+					},
+					Value: nil,
+				},
+			},
+		})
+	})
+}
+
+func RequireEqualAST(t *testing.T, input string, expected *ast.Program) {
 	l := lexer.New(input)
 	p := New(l)
-
 	program := p.ParseProgram()
-
-	require.EqualValues(t, program, &ast.Program{
-		Statements: []ast.Statement{
-			&ast.LetStatement{
-				Token: token.Token{token.LET, "let"},
-				Name: &ast.Identifier{
-					Token: token.Token{token.IDENT, "x"},
-					Value: "x",
-				},
-				Value: nil,
-			},
-			&ast.LetStatement{
-				Token: token.Token{token.LET, "let"},
-				Name: &ast.Identifier{
-					Token: token.Token{token.IDENT, "y"},
-					Value: "y",
-				},
-				Value: nil,
-			},
-			&ast.LetStatement{
-				Token: token.Token{token.LET, "let"},
-				Name: &ast.Identifier{
-					Token: token.Token{token.IDENT, "foobar"},
-					Value: "foobar",
-				},
-				Value: nil,
-			},
-		},
-	})
+	require.Empty(t, p.Errors(), "parser errors")
+	require.EqualValues(t, expected, program)
 }
