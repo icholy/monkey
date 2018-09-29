@@ -49,6 +49,30 @@ func TestLetStatement(t *testing.T) {
 			},
 		})
 	})
+
+	t.Run("return", func(t *testing.T) {
+		input := `
+			return 5;
+			return 10;
+			return 993322;
+		`
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ReturnStatement{
+					Token:       token.Token{token.RETURN, "return"},
+					ReturnValue: nil,
+				},
+				&ast.ReturnStatement{
+					Token:       token.Token{token.RETURN, "return"},
+					ReturnValue: nil,
+				},
+				&ast.ReturnStatement{
+					Token:       token.Token{token.RETURN, "return"},
+					ReturnValue: nil,
+				},
+			},
+		})
+	})
 }
 
 func RequireEqualAST(t *testing.T, input string, expected *ast.Program) {
