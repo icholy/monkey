@@ -177,7 +177,10 @@ func (p *Parser) parseFunctionLiteral() ast.Expression {
 	}
 	for p.peekTokenIs(token.IDENT) {
 		p.nextToken()
-		expr.Parameters = append(expr.Parameters, p.curToken.Literal)
+		expr.Parameters = append(expr.Parameters, &ast.Identifier{
+			Token: p.curToken,
+			Value: p.curToken.Literal,
+		})
 		if p.peekTokenIs(token.COMMA) {
 			p.nextToken()
 		}

@@ -261,8 +261,17 @@ func TestLetStatement(t *testing.T) {
 				&ast.ExpressionStatement{
 					Token: token.Token{token.FUNCTION, "fn"},
 					Expression: &ast.FunctionLiteral{
-						Token:      token.Token{token.FUNCTION, "fn"},
-						Parameters: []string{"x", "y"},
+						Token: token.Token{token.FUNCTION, "fn"},
+						Parameters: []*ast.Identifier{
+							{
+								Token: token.Token{token.IDENT, "x"},
+								Value: "x",
+							},
+							{
+								Token: token.Token{token.IDENT, "y"},
+								Value: "y",
+							},
+						},
 						Body: &ast.BlockStatement{
 							Token: token.Token{token.LBRACE, "{"},
 							Statements: []ast.Statement{

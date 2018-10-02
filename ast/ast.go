@@ -194,12 +194,20 @@ func (b *BlockStatement) TokenLiteral() string {
 
 type FunctionLiteral struct {
 	Token      token.Token
-	Parameters []string
+	Parameters []*Identifier
 	Body       *BlockStatement
 }
 
+func (f *FunctionLiteral) ParameterNames() []string {
+	var names []string
+	for _, p := range f.Parameters {
+		names = append(names, p.Value)
+	}
+	return names
+}
+
 func (f *FunctionLiteral) String() string {
-	return fmt.Sprintf("fn(%s) %s", strings.Join(f.Parameters, ", "), f.Body)
+	return fmt.Sprintf("fn(%s) %s", strings.Join(f.ParameterNames(), ", "), f.Body)
 }
 func (FunctionLiteral) expressionNode() {}
 func (f *FunctionLiteral) TokenLiteral() string {
