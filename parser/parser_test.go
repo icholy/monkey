@@ -11,7 +11,7 @@ import (
 	"github.com/icholy/monkey/token"
 )
 
-func TestLetStatement(t *testing.T) {
+func TestMonkey(t *testing.T) {
 
 	t.Run("let statements", func(t *testing.T) {
 
