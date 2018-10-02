@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -124,6 +125,35 @@ func TestLetStatement(t *testing.T) {
 				},
 			},
 		})
+	})
+
+	t.Run("infix expressions", func(t *testing.T) {
+		operators := []string{"+", "-", "*", "/", ">", "<", "==", "!="}
+		for _, op := range operators {
+			five := token.Token{token.INT, "5"}
+			input := fmt.Sprintf("5 %s 5", op)
+			t.Run(input, func(t *testing.T) {
+				RequireEqualAST(t, input, &ast.Program{
+					Statements: []ast.Statement{
+						&ast.ExpressionStatement{
+							Token: five,
+							Expression: &ast.InfixExpression{
+								Token: five,
+								Left: &ast.IntegerLiteral{
+									Token: five,
+									Value: 5,
+								},
+								Operator: op,
+								Right: &ast.IntegerLiteral{
+									Token: five,
+									Value: 5,
+								},
+							},
+						},
+					},
+				})
+			})
+		}
 	})
 }
 
