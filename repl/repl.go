@@ -19,6 +19,9 @@ func Run(in io.Reader, out io.Writer) {
 	fmt.Fprint(out, Prefix)
 	for scanner.Scan() {
 		line := scanner.Text()
+		if line == "exit" {
+			break
+		}
 		l := lexer.New(line)
 		p := parser.New(l)
 		program := p.ParseProgram()
