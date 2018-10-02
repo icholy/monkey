@@ -38,6 +38,12 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, "if (false) { 123 } else { 4 }", &object.Integer{4})
 		RequireEqualEval(t, "if (false) { 123 }", NULL)
 	})
+
+	t.Run("returns", func(t *testing.T) {
+		RequireEqualEval(t, "return 10;", &object.Integer{10})
+		RequireEqualEval(t, "return 1 + 2; false;", &object.Integer{3})
+		RequireEqualEval(t, "123; return 1 + 2; false;", &object.Integer{3})
+	})
 }
 
 func RequireEqualEval(t *testing.T, input string, expected object.Object) {
