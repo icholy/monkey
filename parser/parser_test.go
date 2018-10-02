@@ -95,6 +95,36 @@ func TestLetStatement(t *testing.T) {
 			},
 		})
 	})
+
+	t.Run("prefix expression", func(t *testing.T) {
+		input := "!5; - foo;"
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ExpressionStatement{
+					Token: token.Token{token.BANG, "!"},
+					Expression: &ast.PrefixExpression{
+						Token:    token.Token{token.BANG, "!"},
+						Operator: "!",
+						Expression: &ast.IntegerLiteral{
+							Token: token.Token{token.IDENT, "5"},
+							Value: 5,
+						},
+					},
+				},
+				&ast.ExpressionStatement{
+					Token: token.Token{token.MINUS, "-"},
+					Expression: &ast.PrefixExpression{
+						Token:    token.Token{token.MINUS, "-"},
+						Operator: "-",
+						Expression: &ast.Identifier{
+							Token: token.Token{token.IDENT, "foo"},
+							Value: "foo",
+						},
+					},
+				},
+			},
+		})
+	})
 }
 
 func RequireEqualAST(t *testing.T, input string, expected *ast.Program) {

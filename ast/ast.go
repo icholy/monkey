@@ -113,3 +113,17 @@ func (IntegerLiteral) expressionNode() {}
 func (i *IntegerLiteral) TokenLiteral() string {
 	return i.Token.Literal
 }
+
+type PrefixExpression struct {
+	Token      token.Token
+	Operator   string
+	Expression Expression
+}
+
+func (p *PrefixExpression) String() string {
+	return fmt.Sprint("%s%s", p.Operator, p.Expression)
+}
+func (PrefixExpression) expressionNode() {}
+func (p *PrefixExpression) TokenLiteral() string {
+	return p.Token.Literal
+}
