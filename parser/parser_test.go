@@ -29,7 +29,6 @@ func TestMonkey(t *testing.T) {
 						Token: token.Token{token.IDENT, "x"},
 						Value: "x",
 					},
-					Value: nil,
 				},
 				&ast.LetStatement{
 					Token: token.Token{token.LET, "let"},
@@ -54,22 +53,31 @@ func TestMonkey(t *testing.T) {
 	t.Run("return", func(t *testing.T) {
 		input := `
 			return 5;
-			return 10;
-			return 993322;
+			return foo;
+			return (true);
 		`
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ReturnStatement{
-					Token:       token.Token{token.RETURN, "return"},
-					ReturnValue: nil,
+					Token: token.Token{token.RETURN, "return"},
+					ReturnValue: &ast.IntegerLiteral{
+						Token: token.Token{token.INT, "5"},
+						Value: 5,
+					},
 				},
 				&ast.ReturnStatement{
-					Token:       token.Token{token.RETURN, "return"},
-					ReturnValue: nil,
+					Token: token.Token{token.RETURN, "return"},
+					ReturnValue: &ast.Identifier{
+						Token: token.Token{token.IDENT, "foo"},
+						Value: "foo",
+					},
 				},
 				&ast.ReturnStatement{
-					Token:       token.Token{token.RETURN, "return"},
-					ReturnValue: nil,
+					Token: token.Token{token.RETURN, "return"},
+					ReturnValue: &ast.BooleanExpression{
+						Token: token.Token{token.TRUE, "true"},
+						Value: true,
+					},
 				},
 			},
 		})
