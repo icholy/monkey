@@ -114,6 +114,19 @@ func (i *IntegerLiteral) TokenLiteral() string {
 	return i.Token.Literal
 }
 
+type StringLiteral struct {
+	Token token.Token
+	Value string
+}
+
+func (StringLiteral) expressionNode() {}
+func (s *StringLiteral) TokenLiteral() string {
+	return s.Token.Literal
+}
+func (s *StringLiteral) String() string {
+	return fmt.Sprintf("%v", s.Value)
+}
+
 type PrefixExpression struct {
 	Token    token.Token
 	Operator string

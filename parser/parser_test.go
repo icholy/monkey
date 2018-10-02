@@ -19,6 +19,7 @@ func TestMonkey(t *testing.T) {
 			let x = 5;
 			let y = 10;
 			let foobar = 838383;
+			let str = "testing";
 		`
 
 		RequireEqualAST(t, input, &ast.Program{
@@ -54,6 +55,17 @@ func TestMonkey(t *testing.T) {
 					Value: &ast.IntegerLiteral{
 						Token: token.Token{token.INT, "838383"},
 						Value: 838383,
+					},
+				},
+				&ast.LetStatement{
+					Token: token.Token{token.LET, "let"},
+					Name: &ast.Identifier{
+						Token: token.Token{token.IDENT, "str"},
+						Value: "str",
+					},
+					Value: &ast.StringLiteral{
+						Token: token.Token{token.STRING, "testing"},
+						Value: "testing",
 					},
 				},
 			},
