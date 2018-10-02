@@ -167,6 +167,33 @@ func TestLetStatement(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("operator precedence", func(t *testing.T) {
+		tests := []struct {
+			input    string
+			expected string
+		}{
+			{"-a * b", "((-a) * b)"},
+			{"!-a", "(!(-a))"},
+			{"a + b + c", "((a + b) + c)"},
+			{"a + b - c", "((a + b) - c)"},
+			{"a + b * c", "(a + (b * c))"},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.input, func(t *testing.T) {
+				RequireEqualString(t, tt.input, tt.expected)
+			})
+		}
+	})
+}
+
+func RequireEqualString(t *testing.T, input, expected string) {
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	require.Empty(t, p.Errors(), "parser errors")
+	require.Equal(t, expected, program.String())
 }
 
 func RequireEqualAST(t *testing.T, input string, expected *ast.Program) {

@@ -136,7 +136,7 @@ type InfixExpression struct {
 }
 
 func (i *InfixExpression) String() string {
-	return fmt.Sprintf("(%s%s%s)", i.Left, i.Operator, i.Right)
+	return fmt.Sprintf("(%s %s %s)", i.Left, i.Operator, i.Right)
 }
 func (InfixExpression) expressionNode() {}
 func (i *InfixExpression) TokenLiteral() string {
