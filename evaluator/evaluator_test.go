@@ -44,6 +44,18 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, "return 1 + 2; false;", &object.Integer{3})
 		RequireEqualEval(t, "123; return 1 + 2; false;", &object.Integer{3})
 	})
+
+	t.Run("nested returns", func(t *testing.T) {
+		input := `
+			if (10 > 1) {
+				if (10 > 1) {
+					return 10;
+				}
+				return 1;
+			}
+		`
+		RequireEqualEval(t, input, &object.Integer{10})
+	})
 }
 
 func RequireEqualEval(t *testing.T, input string, expected object.Object) {

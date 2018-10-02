@@ -14,11 +14,11 @@ var (
 func Eval(node ast.Node) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
-		return evalStatements(node.Statements)
+		return evalProgram(node)
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression)
 	case *ast.BlockStatement:
-		return evalStatements(node.Statements)
+		return evalBlockStatement(node)
 	case *ast.IfExpression:
 		return evalIfExpression(node)
 	case *ast.ReturnStatement:
@@ -37,6 +37,17 @@ func Eval(node ast.Node) object.Object {
 	default:
 		return NULL
 	}
+}
+
+func evalProgram(p *ast.Program) object.Object {
+	var last object.Object
+	for _, stmt := range p.Statements {
+		last = Eval(stmt)
+		if ret, ok := last.(*object.ReturnValue); ok {
+			return ret.Value
+		}
+	}
+	return last
 }
 
 func evalInfixExpression(operator string, left, right object.Object) object.Object {
@@ -148,12 +159,12 @@ func boolToObject(b bool) object.Object {
 	return FALSE
 }
 
-func evalStatements(stmts []ast.Statement) object.Object {
+func evalBlockStatement(block *ast.BlockStatement) object.Object {
 	var last object.Object
-	for _, stmt := range stmts {
+	for _, stmt := range block.Statements {
 		last = Eval(stmt)
-		if ret, ok := last.(*object.ReturnValue); ok {
-			return ret.Value
+		if last != nil && last.Type() == object.RETURN {
+			return last
 		}
 	}
 	return last
