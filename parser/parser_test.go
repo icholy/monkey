@@ -186,6 +186,28 @@ func TestLetStatement(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("boolean expression", func(t *testing.T) {
+		input := "true; false"
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ExpressionStatement{
+					Token: token.Token{token.TRUE, "true"},
+					Expression: &ast.BooleanExpression{
+						Token: token.Token{token.TRUE, "true"},
+						Value: true,
+					},
+				},
+				&ast.ExpressionStatement{
+					Token: token.Token{token.FALSE, "false"},
+					Expression: &ast.BooleanExpression{
+						Token: token.Token{token.FALSE, "false"},
+						Value: false,
+					},
+				},
+			},
+		})
+	})
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {
