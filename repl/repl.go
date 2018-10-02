@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/icholy/monkey/evaluator"
 	"github.com/icholy/monkey/lexer"
 	"github.com/icholy/monkey/parser"
 )
@@ -19,13 +20,13 @@ func Run(in io.Reader, out io.Writer) {
 		l := lexer.New(line)
 		p := parser.New(l)
 		program := p.ParseProgram()
-
 		if errs := p.Errors(); len(errs) > 0 {
 			for _, err := range errs {
 				fmt.Println(err)
 			}
 		} else {
-			fmt.Fprintln(out, program)
+			obj := evaluator.Eval(program)
+			fmt.Fprintln(out, obj.Inspect())
 		}
 		fmt.Fprint(out, Prefix)
 	}
