@@ -89,6 +89,9 @@ type ExpressionStatement struct {
 }
 
 func (e *ExpressionStatement) String() string {
+	if e.Expression == nil {
+		return ""
+	}
 	return e.Expression.String()
 }
 func (ExpressionStatement) statementNode() {}
