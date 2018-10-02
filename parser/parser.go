@@ -8,19 +8,53 @@ import (
 	"github.com/icholy/monkey/token"
 )
 
+const (
+	_ int = iota
+	LOWEST
+	EQUALS
+	LESSGREATER
+	SUM
+	PRODUCT
+	PREFIX
+	CALL
+)
+
+type (
+	prefixParseFn func() ast.Expression
+	infixParseFn  func(ast.Expression) ast.Expression
+)
+
 type Parser struct {
 	l *lexer.Lexer
 
 	curToken  token.Token
 	peekToken token.Token
 	errors    []string
+
+	prefixParseFns map[token.TokenType]prefixParseFn
+	infixParseFns  map[token.TokenType]infixParseFn
 }
 
 func New(l *lexer.Lexer) *Parser {
-	p := &Parser{l: l}
+	p := &Parser{
+		l:              l,
+		prefixParseFns: map[token.TokenType]prefixParseFn{},
+		infixParseFns:  map[token.TokenType]infixParseFn{},
+	}
+
+	p.registerPrefixFn(token.IDENT, p.parseIdentifier)
+
 	p.nextToken()
 	p.nextToken()
 	return p
+}
+
+func (p *Parser) registerPrefixFn(typ token.TokenType, fn prefixParseFn) {
+	p.prefixParseFns[typ] = fn
+}
+
+func (p *Parser) registerInfixFn(typ token.TokenType, fn infixParseFn) {
+	p.infixParseFns[typ] = fn
 }
 
 func (p *Parser) Errors() []string {
@@ -48,6 +82,10 @@ func (p *Parser) ParseProgram() *ast.Program {
 	return program
 }
 
+func (p *Parser) parseIdentifier() ast.Expression {
+	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+}
+
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.LET:
@@ -62,14 +100,17 @@ func (p *Parser) parseStatement() ast.Statement {
 func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	stmt := &ast.ExpressionStatement{}
 	stmt.Token = p.curToken
-	stmt.Expression = p.parseExpression()
+	stmt.Expression = p.parseExpression(LOWEST)
 	return stmt
 }
 
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	stmt := &ast.ReturnStatement{}
 	stmt.Token = p.curToken
-	stmt.ReturnValue = p.parseExpression()
+	// skip expression
+	for !p.curTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
 	return stmt
 }
 
@@ -85,16 +126,22 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
-	stmt.Value = p.parseExpression()
-	return stmt
-}
 
-func (p *Parser) parseExpression() ast.Expression {
-	// TODO: skipping expressions for now
+	// skip expression
 	for !p.curTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
-	return nil
+	return stmt
+}
+
+func (p *Parser) parseExpression(precedence int) ast.Expression {
+	prefix, ok := p.prefixParseFns[p.curToken.Type]
+	if !ok {
+		return nil
+	}
+	leftExpr := prefix()
+
+	return leftExpr
 }
 
 func (p *Parser) curTokenIs(t token.TokenType) bool {

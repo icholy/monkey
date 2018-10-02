@@ -73,6 +73,20 @@ func TestLetStatement(t *testing.T) {
 			},
 		})
 	})
+
+	t.Run("identifier expression", func(t *testing.T) {
+		input := `foobar;`
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ExpressionStatement{
+					Expression: &ast.Identifier{
+						Token: token.Token{token.IDENT, "foobar"},
+						Value: "foobar",
+					},
+				},
+			},
+		})
+	})
 }
 
 func RequireEqualAST(t *testing.T, input string, expected *ast.Program) {
