@@ -68,6 +68,7 @@ func TestEvaluator(t *testing.T) {
 
 	t.Run("let statement", func(t *testing.T) {
 		RequireEqualEval(t, "let a = 5; a;", &object.Integer{5})
+		RequireEqualEval(t, "let a = 2; let b = 5; let c = a * b; c", &object.Integer{10})
 	})
 }
 

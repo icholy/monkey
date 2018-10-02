@@ -21,12 +21,17 @@ func Eval(node ast.Node, env *object.Env) object.Object {
 		return evalBlockStatement(node, env)
 	case *ast.IfExpression:
 		return evalIfExpression(node, env)
-	case *ast.ReturnStatement:
-		obj := Eval(node.ReturnValue, env)
-		if isError(obj) {
-			return obj
+	case *ast.Identifier:
+		if val, ok := env.Get(node.Value); ok {
+			return val
 		}
-		return &object.ReturnValue{Value: obj}
+		return object.Errorf("identifier not found: %s", node.Value)
+	case *ast.ReturnStatement:
+		val := Eval(node.ReturnValue, env)
+		if isError(val) {
+			return val
+		}
+		return &object.ReturnValue{Value: val}
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
 	case *ast.BooleanExpression:
@@ -45,10 +50,11 @@ func Eval(node ast.Node, env *object.Env) object.Object {
 		}
 		return evalInfixExpression(node.Operator, left, right)
 	case *ast.LetStatement:
-		obj := Eval(node.Value, env)
-		if isError(obj) {
-			return obj
+		val := Eval(node.Value, env)
+		if isError(val) {
+			return val
 		}
+		env.Set(node.Name.Value, val)
 		return NULL
 	default:
 		return NULL
