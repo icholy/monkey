@@ -128,22 +128,34 @@ func TestLetStatement(t *testing.T) {
 	})
 
 	t.Run("infix expressions", func(t *testing.T) {
-		operators := []string{"+", "-", "*", "/", ">", "<", "==", "!="}
-		for _, op := range operators {
+
+		tests := []struct {
+			operator    string
+			opTokenType token.TokenType
+		}{
+			{"+", token.PLUS},
+			{"-", token.MINUS},
+			{">", token.GT},
+			{"<", token.LT},
+			{"!=", token.NE},
+			{"==", token.EQ},
+		}
+
+		for _, tt := range tests {
 			five := token.Token{token.INT, "5"}
-			input := fmt.Sprintf("5 %s 5", op)
+			input := fmt.Sprintf("5 %s 5", tt.operator)
 			t.Run(input, func(t *testing.T) {
 				RequireEqualAST(t, input, &ast.Program{
 					Statements: []ast.Statement{
 						&ast.ExpressionStatement{
 							Token: five,
 							Expression: &ast.InfixExpression{
-								Token: five,
+								Token: token.Token{tt.opTokenType, tt.operator},
 								Left: &ast.IntegerLiteral{
 									Token: five,
 									Value: 5,
 								},
-								Operator: op,
+								Operator: tt.operator,
 								Right: &ast.IntegerLiteral{
 									Token: five,
 									Value: 5,
