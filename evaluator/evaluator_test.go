@@ -70,6 +70,12 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, "let a = 5; a;", &object.Integer{5})
 		RequireEqualEval(t, "let a = 2; let b = 5; let c = a * b; c", &object.Integer{10})
 	})
+
+	t.Run("functions", func(t *testing.T) {
+		RequireEqualEval(t, "let id = fn(x) { x }; id(1)", &object.Integer{1})
+		RequireEqualEval(t, "let add = fn(a, b) { return a + b; }; add(2, 8)", &object.Integer{10})
+		RequireEqualEval(t, "let twice = fn(f, x) { return f(f(x)) }; let inc = fn(x) { x + 1}; twice(inc, 0)", &object.Integer{2})
+	})
 }
 
 func RequireEqualEval(t *testing.T, input string, expected object.Object) {
@@ -77,7 +83,7 @@ func RequireEqualEval(t *testing.T, input string, expected object.Object) {
 	p := parser.New(l)
 	program := p.ParseProgram()
 	require.Empty(t, p.Errors(), "parser error")
-	env := object.NewEnv()
+	env := object.NewEnv(nil)
 	actual := Eval(program, env)
 	require.Equal(t, expected, actual)
 }

@@ -15,7 +15,7 @@ var Prefix = ">> "
 
 func Run(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
-	env := object.NewEnv()
+	env := object.NewEnv(nil)
 	fmt.Fprint(out, Prefix)
 	for scanner.Scan() {
 		line := scanner.Text()

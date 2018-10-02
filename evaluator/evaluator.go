@@ -21,6 +21,26 @@ func Eval(node ast.Node, env *object.Env) object.Object {
 		return evalBlockStatement(node, env)
 	case *ast.IfExpression:
 		return evalIfExpression(node, env)
+	case *ast.CallExpression:
+		fn := Eval(node.Function, env)
+		if isError(fn) {
+			return fn
+		}
+		var params []object.Object
+		for _, arg := range node.Arguments {
+			val := Eval(arg, env)
+			if isError(val) {
+				return val
+			}
+			params = append(params, val)
+		}
+		return applyFunction(fn, params)
+	case *ast.FunctionLiteral:
+		return &object.Function{
+			Parameters: node.Parameters,
+			Body:       node.Body,
+			Env:        env,
+		}
 	case *ast.Identifier:
 		return evalIdent(node, env)
 	case *ast.ReturnStatement:
@@ -56,6 +76,18 @@ func Eval(node ast.Node, env *object.Env) object.Object {
 	default:
 		return NULL
 	}
+}
+
+func applyFunction(fn object.Object, args []object.Object) object.Object {
+	function, ok := fn.(*object.Function)
+	if !ok {
+		return object.Errorf("not a function: %s", fn.Type())
+	}
+	env := object.NewEnv(function.Env)
+	for i, param := range function.Parameters {
+		env.Set(param.Value, args[i])
+	}
+	return Eval(function.Body, env)
 }
 
 func evalIdent(i *ast.Identifier, env *object.Env) object.Object {

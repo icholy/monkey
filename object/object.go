@@ -3,16 +3,20 @@ package object
 import (
 	"fmt"
 	"strconv"
+	"strings"
+
+	"github.com/icholy/monkey/ast"
 )
 
 type ObjectType string
 
 const (
-	INTEGER = "INTEGER"
-	NULL    = "NULL"
-	BOOLEAN = "BOOLEAN"
-	RETURN  = "RETURN"
-	ERROR   = "ERROR"
+	INTEGER  = "INTEGER"
+	NULL     = "NULL"
+	BOOLEAN  = "BOOLEAN"
+	RETURN   = "RETURN"
+	ERROR    = "ERROR"
+	FUNCTION = "FUNCTION"
 )
 
 type Object interface {
@@ -58,4 +62,20 @@ func Errorf(format string, args ...interface{}) *Error {
 	return &Error{
 		Message: fmt.Sprintf(format, args...),
 	}
+}
+
+type Function struct {
+	Parameters []*ast.Identifier
+	Body       *ast.BlockStatement
+	Env        *Env
+}
+
+func (f *Function) Type() ObjectType { return FUNCTION }
+
+func (f *Function) Inspect() string {
+	var params []string
+	for _, p := range f.Parameters {
+		params = append(params, p.Value)
+	}
+	return fmt.Sprintf("fn(%s) %s", strings.Join(params, ", "), f.Body)
 }

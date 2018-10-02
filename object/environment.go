@@ -1,18 +1,25 @@
 package object
 
 type Env struct {
-	store map[string]Object
+	parent *Env
+	store  map[string]Object
 }
 
-func NewEnv() *Env {
+func NewEnv(parent *Env) *Env {
 	return &Env{
-		store: map[string]Object{},
+		parent: parent,
+		store:  map[string]Object{},
 	}
 }
 
 func (e *Env) Get(name string) (Object, bool) {
-	obj, ok := e.store[name]
-	return obj, ok
+	if obj, ok := e.store[name]; ok {
+		return obj, true
+	}
+	if e.parent != nil {
+		return e.parent.Get(name)
+	}
+	return nil, true
 }
 
 func (e *Env) Set(name string, val Object) {
