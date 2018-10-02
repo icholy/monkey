@@ -87,7 +87,11 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 	for i, param := range function.Parameters {
 		env.Set(param.Value, args[i])
 	}
-	return Eval(function.Body, env)
+	val := Eval(function.Body, env)
+	if ret, ok := val.(*object.ReturnValue); ok {
+		return ret.Value
+	}
+	return val
 }
 
 func evalIdent(i *ast.Identifier, env *object.Env) object.Object {
