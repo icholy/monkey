@@ -79,6 +79,7 @@ func TestLetStatement(t *testing.T) {
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{
+					Token: token.Token{token.IDENT, "foobar"},
 					Expression: &ast.Identifier{
 						Token: token.Token{token.IDENT, "foobar"},
 						Value: "foobar",
@@ -92,7 +93,7 @@ func TestLetStatement(t *testing.T) {
 func RequireEqualAST(t *testing.T, input string, expected *ast.Program) {
 	l := lexer.New(input)
 	p := New(l)
-	program := p.ParseProgram()
+	actual := p.ParseProgram()
 	require.Empty(t, p.Errors(), "parser errors")
-	require.EqualValues(t, expected, program)
+	require.Equal(t, expected, actual)
 }
