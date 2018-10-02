@@ -289,6 +289,34 @@ func TestLetStatement(t *testing.T) {
 			},
 		})
 	})
+
+	t.Run("call expression", func(t *testing.T) {
+		input := "foo(x, 1)"
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ExpressionStatement{
+					Token: token.Token{token.IDENT, "foo"},
+					Expression: &ast.CallExpression{
+						Token: token.Token{token.LPAREN, "("},
+						Function: &ast.Identifier{
+							Token: token.Token{token.IDENT, "foo"},
+							Value: "foo",
+						},
+						Arguments: []ast.Expression{
+							&ast.Identifier{
+								Token: token.Token{token.IDENT, "x"},
+								Value: "x",
+							},
+							&ast.IntegerLiteral{
+								Token: token.Token{token.INT, "1"},
+								Value: 1,
+							},
+						},
+					},
+				},
+			},
+		})
+	})
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {
