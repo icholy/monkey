@@ -22,7 +22,11 @@ func Eval(node ast.Node) object.Object {
 	case *ast.IfExpression:
 		return evalIfExpression(node)
 	case *ast.ReturnStatement:
-		return &object.ReturnValue{Value: Eval(node.ReturnValue)}
+		obj := Eval(node.ReturnValue)
+		if isError(obj) {
+			return obj
+		}
+		return &object.ReturnValue{Value: obj}
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
 	case *ast.BooleanExpression:
@@ -32,7 +36,13 @@ func Eval(node ast.Node) object.Object {
 		return evalPrefixExpression(node.Operator, right)
 	case *ast.InfixExpression:
 		left := Eval(node.Left)
+		if isError(left) {
+			return left
+		}
 		right := Eval(node.Right)
+		if isError(right) {
+			return right
+		}
 		return evalInfixExpression(node.Operator, left, right)
 	default:
 		return NULL
@@ -43,8 +53,25 @@ func evalProgram(p *ast.Program) object.Object {
 	var last object.Object
 	for _, stmt := range p.Statements {
 		last = Eval(stmt)
+		if isError(last) {
+			return last
+		}
 		if ret, ok := last.(*object.ReturnValue); ok {
 			return ret.Value
+		}
+	}
+	return last
+}
+
+func evalBlockStatement(block *ast.BlockStatement) object.Object {
+	var last object.Object
+	for _, stmt := range block.Statements {
+		last = Eval(stmt)
+		if isError(last) {
+			return last
+		}
+		if last.Type() == object.RETURN {
+			return last
 		}
 	}
 	return last
@@ -54,13 +81,16 @@ func evalInfixExpression(operator string, left, right object.Object) object.Obje
 	if left.Type() == object.INTEGER && right.Type() == object.INTEGER {
 		return evalIntegerInfixExpression(operator, left.(*object.Integer), right.(*object.Integer))
 	}
+	if left.Type() != right.Type() {
+		return object.Errorf("type mismatch: %s %s %s", left.Type(), operator, right.Type())
+	}
 	switch operator {
 	case "==":
 		return boolToObject(left == right)
 	case "!=":
 		return boolToObject(left != right)
 	default:
-		return NULL
+		return object.Errorf("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
 }
 
@@ -83,8 +113,13 @@ func evalIntegerInfixExpression(operator string, left, right *object.Integer) ob
 	case "!=":
 		return boolToObject(left.Value != right.Value)
 	default:
-		return NULL
+		return object.Errorf("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
+}
+
+func isError(obj object.Object) bool {
+	_, ok := obj.(*object.Error)
+	return ok
 }
 
 func isTruthy(obj object.Object) bool {
@@ -98,6 +133,9 @@ func isTruthy(obj object.Object) bool {
 
 func evalIfExpression(i *ast.IfExpression) object.Object {
 	cond := Eval(i.Condition)
+	if isError(cond) {
+		return cond
+	}
 	if isTruthy(cond) {
 		return Eval(i.Concequence)
 	}
@@ -128,7 +166,7 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 	case "-":
 		return evalMinusPrefixOperatorExpression(right)
 	default:
-		return NULL
+		return object.Errorf("unknown operator: %s%s", operator, right.Type())
 	}
 }
 
@@ -149,7 +187,7 @@ func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 	if obj, ok := right.(*object.Integer); ok {
 		return &object.Integer{Value: -obj.Value}
 	}
-	return NULL
+	return object.Errorf("unknown operator: -%s", right.Type())
 }
 
 func boolToObject(b bool) object.Object {
@@ -157,15 +195,4 @@ func boolToObject(b bool) object.Object {
 		return TRUE
 	}
 	return FALSE
-}
-
-func evalBlockStatement(block *ast.BlockStatement) object.Object {
-	var last object.Object
-	for _, stmt := range block.Statements {
-		last = Eval(stmt)
-		if last != nil && last.Type() == object.RETURN {
-			return last
-		}
-	}
-	return last
 }

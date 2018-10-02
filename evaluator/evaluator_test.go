@@ -56,6 +56,15 @@ func TestEvaluator(t *testing.T) {
 		`
 		RequireEqualEval(t, input, &object.Integer{10})
 	})
+
+	t.Run("errors", func(t *testing.T) {
+		RequireEqualEval(t, "-true", &object.Error{"unknown operator: -BOOLEAN"})
+		RequireEqualEval(t, "5 + true;", &object.Error{"type mismatch: INTEGER + BOOLEAN"})
+		RequireEqualEval(t, "5 + true; 5;", &object.Error{"type mismatch: INTEGER + BOOLEAN"})
+		RequireEqualEval(t, "true + false", &object.Error{"unknown operator: BOOLEAN + BOOLEAN"})
+		RequireEqualEval(t, "5; true + false; 5", &object.Error{"unknown operator: BOOLEAN + BOOLEAN"})
+		RequireEqualEval(t, "if (10 > 1) { true + false; }", &object.Error{"unknown operator: BOOLEAN + BOOLEAN"})
+	})
 }
 
 func RequireEqualEval(t *testing.T, input string, expected object.Object) {
