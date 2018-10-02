@@ -32,6 +32,12 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, "true == true", TRUE)
 		RequireEqualEval(t, "true == false", FALSE)
 	})
+
+	t.Run("if expressions", func(t *testing.T) {
+		RequireEqualEval(t, "if (2 > 1) { 123 } else { 4 }", &object.Integer{123})
+		RequireEqualEval(t, "if (false) { 123 } else { 4 }", &object.Integer{4})
+		RequireEqualEval(t, "if (false) { 123 }", NULL)
+	})
 }
 
 func RequireEqualEval(t *testing.T, input string, expected object.Object) {
