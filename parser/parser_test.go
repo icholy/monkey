@@ -29,6 +29,10 @@ func TestMonkey(t *testing.T) {
 						Token: token.Token{token.IDENT, "x"},
 						Value: "x",
 					},
+					Value: &ast.IntegerLiteral{
+						Token: token.Token{token.INT, "5"},
+						Value: 5,
+					},
 				},
 				&ast.LetStatement{
 					Token: token.Token{token.LET, "let"},
@@ -36,7 +40,10 @@ func TestMonkey(t *testing.T) {
 						Token: token.Token{token.IDENT, "y"},
 						Value: "y",
 					},
-					Value: nil,
+					Value: &ast.IntegerLiteral{
+						Token: token.Token{token.INT, "10"},
+						Value: 10,
+					},
 				},
 				&ast.LetStatement{
 					Token: token.Token{token.LET, "let"},
@@ -44,7 +51,10 @@ func TestMonkey(t *testing.T) {
 						Token: token.Token{token.IDENT, "foobar"},
 						Value: "foobar",
 					},
-					Value: nil,
+					Value: &ast.IntegerLiteral{
+						Token: token.Token{token.INT, "838383"},
+						Value: 838383,
+					},
 				},
 			},
 		})
