@@ -156,3 +156,21 @@ func (BooleanExpression) expressionNode() {}
 func (b *BooleanExpression) TokenLiteral() string {
 	return b.Token.Literal
 }
+
+type IfExpression struct {
+	Token       token.Token
+	Condition   Expression
+	Concequence Expression
+	Alternative Expression
+}
+
+func (i *IfExpression) String() string {
+	if i.Alternative == nil {
+		return fmt.Sprintf("if (%s) %s", i.Condition, i.Concequence)
+	}
+	return fmt.Sprintf("if (%s) %s else %s", i.Condition, i.Concequence, i.Alternative)
+}
+func (IfExpression) expressionNode() {}
+func (i *IfExpression) TokenLiteral() string {
+	return i.Token.Literal
+}

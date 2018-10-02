@@ -211,6 +211,28 @@ func TestLetStatement(t *testing.T) {
 			},
 		})
 	})
+
+	t.Run("if expressions", func(t *testing.T) {
+		input := "if (true) { x }"
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ExpressionStatement{
+					Token: token.Token{token.IF, "if"},
+					Expression: &ast.IfExpression{
+						Token: token.Token{token.IF, "if"},
+						Condition: &ast.BooleanExpression{
+							Token: token.Token{token.TRUE, "true"},
+							Value: true,
+						},
+						Concequence: &ast.Identifier{
+							Token: token.Token{token.IDENT, "x"},
+							Value: "x",
+						},
+					},
+				},
+			},
+		})
+	})
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {
