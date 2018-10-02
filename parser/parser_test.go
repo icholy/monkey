@@ -347,6 +347,29 @@ func TestMonkey(t *testing.T) {
 			},
 		})
 	})
+
+	t.Run("strings", func(t *testing.T) {
+		input := `"hello" + "world"`
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ExpressionStatement{
+					Token: token.Token{token.STRING, "hello"},
+					Expression: &ast.InfixExpression{
+						Token:    token.Token{token.PLUS, "+"},
+						Operator: "+",
+						Left: &ast.StringLiteral{
+							Token: token.Token{token.STRING, "hello"},
+							Value: "hello",
+						},
+						Right: &ast.StringLiteral{
+							Token: token.Token{token.STRING, "world"},
+							Value: "world",
+						},
+					},
+				},
+			},
+		})
+	})
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {

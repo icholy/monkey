@@ -1,6 +1,8 @@
 package evaluator
 
 import (
+	"strings"
+
 	"github.com/icholy/monkey/ast"
 	"github.com/icholy/monkey/object"
 )
@@ -51,6 +53,8 @@ func Eval(node ast.Node, env *object.Env) object.Object {
 		return &object.ReturnValue{Value: val}
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
+	case *ast.StringLiteral:
+		return &object.String{Value: node.Value}
 	case *ast.BooleanExpression:
 		return boolToObject(node.Value)
 	case *ast.PrefixExpression:
@@ -74,7 +78,7 @@ func Eval(node ast.Node, env *object.Env) object.Object {
 		env.Set(node.Name.Value, val)
 		return NULL
 	default:
-		return NULL
+		return object.Errorf("invalid node: %#v", node)
 	}
 }
 
@@ -130,17 +134,38 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Env) object.Objec
 }
 
 func evalInfixExpression(operator string, left, right object.Object) object.Object {
-	if left.Type() == object.INTEGER && right.Type() == object.INTEGER {
-		return evalIntegerInfixExpression(operator, left.(*object.Integer), right.(*object.Integer))
-	}
 	if left.Type() != right.Type() {
 		return object.Errorf("type mismatch: %s %s %s", left.Type(), operator, right.Type())
 	}
+	switch left.Type() {
+	case object.INTEGER:
+		return evalIntegerInfixExpression(operator, left.(*object.Integer), right.(*object.Integer))
+	case object.STRING:
+		return evalStringInfixExpression(operator, left.(*object.String), right.(*object.String))
+	}
+
 	switch operator {
 	case "==":
 		return boolToObject(left == right)
 	case "!=":
 		return boolToObject(left != right)
+	default:
+		return object.Errorf("unknown operator: %s %s %s", left.Type(), operator, right.Type())
+	}
+}
+
+func evalStringInfixExpression(operator string, left, right *object.String) object.Object {
+	switch operator {
+	case "+":
+		return &object.String{Value: left.Value + right.Value}
+	case "==":
+		return &object.Boolean{Value: left.Value == right.Value}
+	case "!=":
+		return &object.Boolean{Value: left.Value != right.Value}
+	case ">":
+		return &object.Boolean{Value: strings.Compare(left.Value, right.Value) > 0}
+	case "<":
+		return &object.Boolean{Value: strings.Compare(left.Value, right.Value) < 0}
 	default:
 		return object.Errorf("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}

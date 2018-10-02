@@ -76,6 +76,13 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, "let add = fn(a, b) { return a + b; }; add(2, 8)", &object.Integer{10})
 		RequireEqualEval(t, "let twice = fn(f, x) { return f(f(x)) }; let inc = fn(x) { x + 1}; twice(inc, 0)", &object.Integer{2})
 	})
+
+	t.Run("strings", func(t *testing.T) {
+		RequireEqualEval(t, `"hello" + "world"`, &object.String{"helloworld"})
+		RequireEqualEval(t, `"foo" != "bar"`, TRUE)
+		RequireEqualEval(t, `"bbb" > "aaa"`, TRUE)
+		RequireEqualEval(t, `"bbb" < "aaa"`, FALSE)
+	})
 }
 
 func RequireEqualEval(t *testing.T, input string, expected object.Object) {
