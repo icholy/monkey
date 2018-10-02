@@ -115,13 +115,13 @@ func (i *IntegerLiteral) TokenLiteral() string {
 }
 
 type PrefixExpression struct {
-	Token      token.Token
-	Operator   string
-	Expression Expression
+	Token    token.Token
+	Operator string
+	Right    Expression
 }
 
 func (p *PrefixExpression) String() string {
-	return fmt.Sprint("%s%s", p.Operator, p.Expression)
+	return fmt.Sprint("%s%s", p.Operator, p.Right)
 }
 func (PrefixExpression) expressionNode() {}
 func (p *PrefixExpression) TokenLiteral() string {

@@ -105,7 +105,7 @@ func TestLetStatement(t *testing.T) {
 					Expression: &ast.PrefixExpression{
 						Token:    token.Token{token.BANG, "!"},
 						Operator: "!",
-						Expression: &ast.IntegerLiteral{
+						Right: &ast.IntegerLiteral{
 							Token: token.Token{token.IDENT, "5"},
 							Value: 5,
 						},
@@ -116,7 +116,7 @@ func TestLetStatement(t *testing.T) {
 					Expression: &ast.PrefixExpression{
 						Token:    token.Token{token.MINUS, "-"},
 						Operator: "-",
-						Expression: &ast.Identifier{
+						Right: &ast.Identifier{
 							Token: token.Token{token.IDENT, "foo"},
 							Value: "foo",
 						},
