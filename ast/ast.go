@@ -29,7 +29,7 @@ type Program struct {
 func (p *Program) String() string {
 	var b strings.Builder
 	for _, s := range p.Statements {
-		fmt.Fprintln(&b, s)
+		fmt.Fprint(&b, s)
 	}
 	return b.String()
 }
