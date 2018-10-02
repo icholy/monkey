@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/icholy/monkey/lexer"
-	"github.com/icholy/monkey/token"
+	"github.com/icholy/monkey/parser"
 )
 
 var Prefix = ">> "
@@ -16,13 +16,16 @@ func Run(in io.Reader, out io.Writer) {
 	fmt.Fprint(out, Prefix)
 	for scanner.Scan() {
 		line := scanner.Text()
-		lex := lexer.New(line)
-		for {
-			tok := lex.NextToken()
-			if tok.Type == token.ILLEGAL || tok.Type == token.EOF {
-				break
+		l := lexer.New(line)
+		p := parser.New(l)
+		program := p.ParseProgram()
+
+		if errs := p.Errors(); len(errs) > 0 {
+			for _, err := range errs {
+				fmt.Println(err)
 			}
-			fmt.Fprintln(out, tok)
+		} else {
+			fmt.Fprintln(out, program)
 		}
 		fmt.Fprint(out, Prefix)
 	}
