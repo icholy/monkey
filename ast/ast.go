@@ -2,6 +2,7 @@ package ast
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/icholy/monkey/token"
@@ -97,4 +98,18 @@ func (e *ExpressionStatement) String() string {
 func (ExpressionStatement) statementNode() {}
 func (e *ExpressionStatement) TokenLiteral() string {
 	return e.Token.String()
+}
+
+type IntegerLiteral struct {
+	Token token.Token
+	Value int64
+}
+
+func (i *IntegerLiteral) String() string {
+	return strconv.FormatInt(i.Value, 10)
+}
+
+func (IntegerLiteral) expressionNode() {}
+func (i *IntegerLiteral) TokenLiteral() string {
+	return i.Token.Literal
 }

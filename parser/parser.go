@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/icholy/monkey/ast"
 	"github.com/icholy/monkey/lexer"
@@ -43,6 +44,7 @@ func New(l *lexer.Lexer) *Parser {
 	}
 
 	p.registerPrefixFn(token.IDENT, p.parseIdentifier)
+	p.registerPrefixFn(token.INT, p.parseInteger)
 
 	p.nextToken()
 	p.nextToken()
@@ -62,8 +64,7 @@ func (p *Parser) Errors() []string {
 }
 
 func (p *Parser) peekError(t token.TokenType) {
-	msg := fmt.Sprintf("expected %s, got %s instead", t, p.peekToken)
-	p.errors = append(p.errors, msg)
+	p.errorf("expected %s, got %s instead", t, p.peekToken)
 }
 
 func (p *Parser) nextToken() {
@@ -84,6 +85,17 @@ func (p *Parser) ParseProgram() *ast.Program {
 
 func (p *Parser) parseIdentifier() ast.Expression {
 	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+}
+
+func (p *Parser) parseInteger() ast.Expression {
+	expr := &ast.IntegerLiteral{Token: p.curToken}
+	v, err := strconv.ParseInt(p.curToken.Literal, 10, 64)
+	if err != nil {
+		p.errorf("invalid integer %s: %v", p.curToken, err)
+		return nil
+	}
+	expr.Value = v
+	return expr
 }
 
 func (p *Parser) parseStatement() ast.Statement {
@@ -162,4 +174,8 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 	}
 	p.peekError(t)
 	return false
+}
+
+func (p *Parser) errorf(format string, args ...interface{}) {
+	p.errors = append(p.errors, fmt.Sprintf(format, args...))
 }
