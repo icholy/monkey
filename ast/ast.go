@@ -191,3 +191,17 @@ func (BlockStatement) statementNode() {}
 func (b *BlockStatement) TokenLiteral() string {
 	return b.Token.Literal
 }
+
+type FunctionLiteral struct {
+	Token      token.Token
+	Parameters []string
+	Body       *BlockStatement
+}
+
+func (f *FunctionLiteral) String() string {
+	return fmt.Sprintf("fn(%s) %s", strings.Join(f.Parameters, ", "), f.Body)
+}
+func (FunctionLiteral) expressionNode() {}
+func (f *FunctionLiteral) TokenLiteral() string {
+	return f.Token.Literal
+}

@@ -253,6 +253,33 @@ func TestLetStatement(t *testing.T) {
 			},
 		})
 	})
+
+	t.Run("function literal", func(t *testing.T) {
+		input := "fn(x, y) { x }"
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ExpressionStatement{
+					Token: token.Token{token.FUNCTION, "fn"},
+					Expression: &ast.FunctionLiteral{
+						Token:      token.Token{token.FUNCTION, "fn"},
+						Parameters: []string{"x", "y"},
+						Body: &ast.BlockStatement{
+							Token: token.Token{token.LBRACE, "{"},
+							Statements: []ast.Statement{
+								&ast.ExpressionStatement{
+									Token: token.Token{token.IDENT, "x"},
+									Expression: &ast.Identifier{
+										Token: token.Token{token.IDENT, "x"},
+										Value: "x",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		})
+	})
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {
