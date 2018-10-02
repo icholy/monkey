@@ -13,8 +13,12 @@ import (
 func TestEvaluator(t *testing.T) {
 	t.Run("integer", func(t *testing.T) {
 		RequireEqualEval(t, "5", &object.Integer{5})
-		RequireEqualEval(t, "true", &object.Boolean{true})
-		RequireEqualEval(t, "false", &object.Boolean{false})
+		RequireEqualEval(t, "true", TRUE)
+		RequireEqualEval(t, "false", FALSE)
+		RequireEqualEval(t, "!true", FALSE)
+		RequireEqualEval(t, "!!true", TRUE)
+		RequireEqualEval(t, "!false", TRUE)
+		RequireEqualEval(t, "!!false", FALSE)
 	})
 }
 
