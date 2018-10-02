@@ -121,7 +121,7 @@ type PrefixExpression struct {
 }
 
 func (p *PrefixExpression) String() string {
-	return fmt.Sprint("(%s%s)", p.Operator, p.Right)
+	return fmt.Sprintf("(%s%s)", p.Operator, p.Right)
 }
 func (PrefixExpression) expressionNode() {}
 func (p *PrefixExpression) TokenLiteral() string {

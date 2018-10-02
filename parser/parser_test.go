@@ -106,7 +106,7 @@ func TestLetStatement(t *testing.T) {
 						Token:    token.Token{token.BANG, "!"},
 						Operator: "!",
 						Right: &ast.IntegerLiteral{
-							Token: token.Token{token.IDENT, "5"},
+							Token: token.Token{token.INT, "5"},
 							Value: 5,
 						},
 					},
