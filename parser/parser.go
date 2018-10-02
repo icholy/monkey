@@ -124,7 +124,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 func (p *Parser) parseBoolean() ast.Expression {
 	return &ast.BooleanExpression{
 		Token: p.curToken,
-		Value: p.curToken.Type == token.TRUE,
+		Value: p.curTokenIs(token.TRUE),
 	}
 }
 
