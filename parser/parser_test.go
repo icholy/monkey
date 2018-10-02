@@ -179,6 +179,7 @@ func TestLetStatement(t *testing.T) {
 			{"a + b - c", "((a + b) - c)"},
 			{"a + b * c", "(a + (b * c))"},
 			{"3 > 5 == true", "((3 > 5) == true)"},
+			{"true != false", "(true != false)"},
 		}
 
 		for _, tt := range tests {
