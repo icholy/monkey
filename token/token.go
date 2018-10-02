@@ -41,6 +41,7 @@ const (
 	RPAREN = "RPAREN"
 	LBRACE = "LBRACE"
 	RBRACE = "RBRACE"
+	STRING = "STRING"
 
 	// Keywords
 	FUNCTION = "FUNCTION"

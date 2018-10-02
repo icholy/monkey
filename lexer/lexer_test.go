@@ -143,4 +143,23 @@ func TestNextToken(t *testing.T) {
 		})
 	})
 
+	t.Run("strings", func(t *testing.T) {
+		ExpectTokens(t, `""`, []token.Token{
+			{token.STRING, ""},
+			{token.EOF, ""},
+		})
+		ExpectTokens(t, `"testing testing"`, []token.Token{
+			{token.STRING, "testing testing"},
+			{token.EOF, ""},
+		})
+		ExpectTokens(t, `"this is a \" test"`, []token.Token{
+			{token.STRING, `this is a " test`},
+			{token.EOF, ""},
+		})
+		ExpectTokens(t, `"\t\n\r"`, []token.Token{
+			{token.STRING, "\t\n\r"},
+			{token.EOF, ""},
+		})
+	})
+
 }

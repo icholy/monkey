@@ -1,6 +1,8 @@
 package lexer
 
 import (
+	"strings"
+
 	"github.com/icholy/monkey/token"
 )
 
@@ -85,6 +87,11 @@ func (l *Lexer) NextToken() token.Token {
 	case 0:
 		tok = token.Token{Type: token.EOF}
 	default:
+		if l.ch == '"' {
+			tok.Literal = l.readString()
+			tok.Type = token.STRING
+			return tok
+		}
 		if isLetter(l.ch) {
 			tok.Literal = l.readIdentifier()
 			tok.Type = token.LookupIdent(tok.Literal)
@@ -105,6 +112,39 @@ func (l *Lexer) skipWhitespace() {
 	for isWhitespace(l.ch) {
 		l.readChar()
 	}
+}
+
+func (l *Lexer) readString() string {
+	l.readChar()
+	var escaped bool
+	var b strings.Builder
+	for l.ch != 0 {
+		if escaped {
+			switch l.ch {
+			case 't':
+				b.WriteByte('\t')
+			case 'r':
+				b.WriteByte('\r')
+			case 'n':
+				b.WriteByte('\n')
+			default:
+				b.WriteByte(l.ch)
+			}
+			escaped = false
+		} else {
+			if l.ch == '"' {
+				break
+			}
+			if l.ch == '\\' {
+				escaped = true
+			} else {
+				b.WriteByte(l.ch)
+			}
+		}
+		l.readChar()
+	}
+	l.readChar()
+	return b.String()
 }
 
 func (l *Lexer) readIdentifier() string {
