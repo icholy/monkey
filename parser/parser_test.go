@@ -213,7 +213,7 @@ func TestLetStatement(t *testing.T) {
 	})
 
 	t.Run("if expressions", func(t *testing.T) {
-		input := "if (true) { x }"
+		input := "if (true) { x } else { foo }"
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{
@@ -224,9 +224,29 @@ func TestLetStatement(t *testing.T) {
 							Token: token.Token{token.TRUE, "true"},
 							Value: true,
 						},
-						Concequence: &ast.Identifier{
-							Token: token.Token{token.IDENT, "x"},
-							Value: "x",
+						Concequence: &ast.BlockStatement{
+							Token: token.Token{token.LBRACE, "{"},
+							Statements: []ast.Statement{
+								&ast.ExpressionStatement{
+									Token: token.Token{token.IDENT, "x"},
+									Expression: &ast.Identifier{
+										Token: token.Token{token.IDENT, "x"},
+										Value: "x",
+									},
+								},
+							},
+						},
+						Alternative: &ast.BlockStatement{
+							Token: token.Token{token.LBRACE, "{"},
+							Statements: []ast.Statement{
+								&ast.ExpressionStatement{
+									Token: token.Token{token.IDENT, "foo"},
+									Expression: &ast.Identifier{
+										Token: token.Token{token.IDENT, "foo"},
+										Value: "foo",
+									},
+								},
+							},
 						},
 					},
 				},

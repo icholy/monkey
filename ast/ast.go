@@ -160,8 +160,8 @@ func (b *BooleanExpression) TokenLiteral() string {
 type IfExpression struct {
 	Token       token.Token
 	Condition   Expression
-	Concequence Expression
-	Alternative Expression
+	Concequence *BlockStatement
+	Alternative *BlockStatement
 }
 
 func (i *IfExpression) String() string {
@@ -173,4 +173,21 @@ func (i *IfExpression) String() string {
 func (IfExpression) expressionNode() {}
 func (i *IfExpression) TokenLiteral() string {
 	return i.Token.Literal
+}
+
+type BlockStatement struct {
+	Token      token.Token
+	Statements []Statement
+}
+
+func (b *BlockStatement) String() string {
+	var sb strings.Builder
+	for _, s := range b.Statements {
+		fmt.Fprint(&sb, s)
+	}
+	return sb.String()
+}
+func (BlockStatement) statementNode() {}
+func (b *BlockStatement) TokenLiteral() string {
+	return b.Token.Literal
 }
