@@ -18,12 +18,23 @@ const (
 	ERROR    = "ERROR"
 	FUNCTION = "FUNCTION"
 	STRING   = "STRING"
+	BUILTIN  = "BUILTIN"
 )
 
 type Object interface {
 	Type() ObjectType
 	Inspect() string
 }
+
+type BuiltinFunc func(...Object)
+
+type Builtin struct {
+	Name string
+	Fn   BuiltinFunc
+}
+
+func (b *Builtin) Inspect() string  { return "builtin function" }
+func (b *Builtin) Type() ObjectType { return BUILTIN }
 
 type Integer struct {
 	Value int64

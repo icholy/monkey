@@ -83,6 +83,13 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, `"bbb" > "aaa"`, TRUE)
 		RequireEqualEval(t, `"bbb" < "aaa"`, FALSE)
 	})
+
+	t.Run("builtin", func(t *testing.T) {
+		RequireEqualEval(t, `len("hello world")`, &object.Integer{11})
+		RequireEqualEval(t, `len("")`, &object.Integer{0})
+		RequireEqualEval(t, `len(1)`, &object.Error{"len: invalid argument type INTEGER"})
+		RequireEqualEval(t, `len("one", "two")`, &object.Error{"len: wrong number of arguments"})
+	})
 }
 
 func RequireEqualEval(t *testing.T, input string, expected object.Object) {

@@ -13,13 +13,11 @@ func NewEnv(parent *Env) *Env {
 }
 
 func (e *Env) Get(name string) (Object, bool) {
-	if obj, ok := e.store[name]; ok {
-		return obj, true
+	obj, ok := e.store[name]
+	if !ok && e.parent != nil {
+		obj, ok = e.parent.Get(name)
 	}
-	if e.parent != nil {
-		return e.parent.Get(name)
-	}
-	return nil, true
+	return obj, ok
 }
 
 func (e *Env) Set(name string, val Object) {
