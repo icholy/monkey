@@ -7,6 +7,7 @@ import (
 
 	"github.com/icholy/monkey/evaluator"
 	"github.com/icholy/monkey/lexer"
+	"github.com/icholy/monkey/object"
 	"github.com/icholy/monkey/parser"
 )
 
@@ -14,6 +15,7 @@ var Prefix = ">> "
 
 func Run(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
+	env := object.NewEnv()
 	fmt.Fprint(out, Prefix)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -25,7 +27,7 @@ func Run(in io.Reader, out io.Writer) {
 				fmt.Println(err)
 			}
 		} else {
-			obj := evaluator.Eval(program)
+			obj := evaluator.Eval(program, env)
 			fmt.Fprintln(out, obj.Inspect())
 		}
 		fmt.Fprint(out, Prefix)

@@ -65,6 +65,10 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, "5; true + false; 5", &object.Error{"unknown operator: BOOLEAN + BOOLEAN"})
 		RequireEqualEval(t, "if (10 > 1) { true + false; }", &object.Error{"unknown operator: BOOLEAN + BOOLEAN"})
 	})
+
+	t.Run("let statement", func(t *testing.T) {
+		RequireEqualEval(t, "let a = 5; a;", &object.Integer{5})
+	})
 }
 
 func RequireEqualEval(t *testing.T, input string, expected object.Object) {
@@ -72,6 +76,7 @@ func RequireEqualEval(t *testing.T, input string, expected object.Object) {
 	p := parser.New(l)
 	program := p.ParseProgram()
 	require.Empty(t, p.Errors(), "parser error")
-	actual := Eval(program)
+	env := object.NewEnv()
+	actual := Eval(program, env)
 	require.Equal(t, expected, actual)
 }
