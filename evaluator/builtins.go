@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"fmt"
+	"io/ioutil"
 
 	"github.com/icholy/monkey/object"
 )
@@ -43,6 +44,24 @@ var builtins = map[string]object.Object{
 			}
 			fmt.Println(values...)
 			return &object.Null{}
+		},
+	},
+	"read": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return object.Errorf("read: requires one filename argument")
+			}
+			name, ok := args[0].(*object.String)
+			if !ok {
+				return object.Errorf("read: expected a string, got %s", args[0].Type())
+			}
+			data, err := ioutil.ReadFile(name.Value)
+			if err != nil {
+				return object.Errorf("read: %v", err)
+			}
+			return &object.String{
+				Value: string(data),
+			}
 		},
 	},
 }
