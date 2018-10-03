@@ -2,6 +2,7 @@ package repl
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 
@@ -35,4 +36,23 @@ func Run(in io.Reader, out io.Writer) {
 		}
 		fmt.Fprint(out, Prefix)
 	}
+}
+
+func Exec(in io.Reader) error {
+	scanner := bufio.NewScanner(in)
+	env := object.NewEnv(nil)
+	for scanner.Scan() {
+		line := scanner.Text()
+		l := lexer.New(line)
+		p := parser.New(l)
+		program := p.ParseProgram()
+		if errs := p.Errors(); len(errs) > 0 {
+			for _, err := range errs {
+				return errors.New(err)
+			}
+		} else {
+			evaluator.Eval(program, env)
+		}
+	}
+	return scanner.Err()
 }
