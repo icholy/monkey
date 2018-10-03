@@ -188,6 +188,23 @@ func (i *IfExpression) TokenLiteral() string {
 	return i.Token.Literal
 }
 
+type ArrayLiteral struct {
+	Token    token.Token
+	Elements []Expression
+}
+
+func (ArrayLiteral) expressionNode() {}
+func (a *ArrayLiteral) TokenLiteral() string {
+	return a.Token.Literal
+}
+func (a *ArrayLiteral) String() string {
+	var values []string
+	for _, v := range a.Elements {
+		values = append(values, v.String())
+	}
+	return fmt.Sprintf("[%s]", strings.Join(values, ", "))
+}
+
 type BlockStatement struct {
 	Token      token.Token
 	Statements []Statement

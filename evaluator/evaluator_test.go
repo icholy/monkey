@@ -90,6 +90,7 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, `len(1)`, &object.Error{"len: invalid argument type INTEGER"})
 		RequireEqualEval(t, `len("one", "two")`, &object.Error{"len: wrong number of arguments"})
 	})
+
 }
 
 func RequireEqualEval(t *testing.T, input string, expected object.Object) {

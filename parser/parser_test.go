@@ -370,6 +370,34 @@ func TestMonkey(t *testing.T) {
 			},
 		})
 	})
+
+	t.Run("arrays", func(t *testing.T) {
+		input := `["test", 1, hello]`
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ExpressionStatement{
+					Token: token.Token{token.LBRACKET, "["},
+					Expression: &ast.ArrayLiteral{
+						Token: token.Token{token.LBRACKET, "["},
+						Elements: []ast.Expression{
+							&ast.StringLiteral{
+								Token: token.Token{token.STRING, "test"},
+								Value: "test",
+							},
+							&ast.IntegerLiteral{
+								Token: token.Token{token.INT, "1"},
+								Value: 1,
+							},
+							&ast.Identifier{
+								Token: token.Token{token.IDENT, "hello"},
+								Value: "hello",
+							},
+						},
+					},
+				},
+			},
+		})
+	})
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {
