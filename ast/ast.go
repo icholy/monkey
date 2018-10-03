@@ -278,7 +278,7 @@ func (c *CallExpression) TokenLiteral() string {
 
 type HashLiteral struct {
 	Token token.Token
-	Pairs []HashPair
+	Pairs []*HashPair
 }
 
 type HashPair struct {
@@ -286,7 +286,7 @@ type HashPair struct {
 	Value Expression
 }
 
-func (hp HashPair) String() string {
+func (hp *HashPair) String() string {
 	return fmt.Sprintf("%s: %s", hp.Key, hp.Value)
 }
 

@@ -421,6 +421,21 @@ func TestMonkey(t *testing.T) {
 		})
 	})
 
+	t.Run("empty hash", func(t *testing.T) {
+		input := `{}`
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ExpressionStatement{
+					Token: token.Token{token.LBRACE, "{"},
+					Expression: &ast.HashLiteral{
+						Token: token.Token{token.LBRACE, "{"},
+						Pairs: nil,
+					},
+				},
+			},
+		})
+	})
+
 	t.Run("hash", func(t *testing.T) {
 		input := `{ true: 1, 1:"yes" }`
 		RequireEqualAST(t, input, &ast.Program{
@@ -429,7 +444,7 @@ func TestMonkey(t *testing.T) {
 					Token: token.Token{token.LBRACE, "{"},
 					Expression: &ast.HashLiteral{
 						Token: token.Token{token.LBRACE, "{"},
-						Pairs: []ast.HashPair{
+						Pairs: []*ast.HashPair{
 							{
 								Key: &ast.BooleanExpression{
 									Token: token.Token{token.TRUE, "true"},
