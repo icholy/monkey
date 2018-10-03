@@ -89,6 +89,8 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, `len("")`, &object.Integer{0})
 		RequireEqualEval(t, `len(1)`, &object.Error{"len: invalid argument type INTEGER"})
 		RequireEqualEval(t, `len("one", "two")`, &object.Error{"len: wrong number of arguments"})
+		RequireEqualEval(t, `len([])`, &object.Integer{0})
+		RequireEqualEval(t, `let x = append([], 1, 2); x[(len(x) - 1)]`, &object.Integer{2})
 	})
 
 	t.Run("array", func(t *testing.T) {
