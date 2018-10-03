@@ -83,6 +83,9 @@ func Eval(node ast.Node, env *object.Env) object.Object {
 }
 
 func applyFunction(fn object.Object, args []object.Object) object.Object {
+	if builtin, ok := fn.(*object.Builtin); ok {
+		return builtin.Fn(args...)
+	}
 	function, ok := fn.(*object.Function)
 	if !ok {
 		return object.Errorf("not a function: %s", fn.Type())
@@ -99,6 +102,9 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 }
 
 func evalIdent(i *ast.Identifier, env *object.Env) object.Object {
+	if val, ok := builtins[i.Value]; ok {
+		return val
+	}
 	if val, ok := env.Get(i.Value); ok {
 		return val
 	}

@@ -26,7 +26,7 @@ type Object interface {
 	Inspect() string
 }
 
-type BuiltinFunc func(...Object)
+type BuiltinFunc func(...Object) Object
 
 type Builtin struct {
 	Name string
