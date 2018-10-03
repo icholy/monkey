@@ -275,3 +275,13 @@ func (CallExpression) expressionNode() {}
 func (c *CallExpression) TokenLiteral() string {
 	return c.Token.Literal
 }
+
+type HashLiteral struct {
+	Token token.Token
+	Paris map[Expression]Expression
+}
+
+func (h *HashLiteral) expressionNode() {}
+func (h *HashLiteral) TokenLiteral() string {
+	return h.Token.Literal
+}
