@@ -278,10 +278,26 @@ func (c *CallExpression) TokenLiteral() string {
 
 type HashLiteral struct {
 	Token token.Token
-	Paris map[Expression]Expression
+	Pairs []HashPair
+}
+
+type HashPair struct {
+	Key   Expression
+	Value Expression
+}
+
+func (hp HashPair) String() string {
+	return fmt.Sprintf("%s: %s", hp.Key, hp.Value)
 }
 
 func (h *HashLiteral) expressionNode() {}
 func (h *HashLiteral) TokenLiteral() string {
 	return h.Token.Literal
+}
+func (h *HashLiteral) String() string {
+	var pairs []string
+	for _, p := range h.Pairs {
+		pairs = append(pairs, p.String())
+	}
+	return fmt.Sprintf("{ %s }", strings.Join(pairs, ", "))
 }

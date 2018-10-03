@@ -421,6 +421,42 @@ func TestMonkey(t *testing.T) {
 		})
 	})
 
+	t.Run("hash", func(t *testing.T) {
+		input := `{ true: 1, 1:"yes" }`
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ExpressionStatement{
+					Token: token.Token{token.LBRACE, "{"},
+					Expression: &ast.HashLiteral{
+						Token: token.Token{token.LBRACE, "{"},
+						Pairs: []ast.HashPair{
+							{
+								Key: &ast.BooleanExpression{
+									Token: token.Token{token.TRUE, "true"},
+									Value: true,
+								},
+								Value: &ast.IntegerLiteral{
+									Token: token.Token{token.INT, "1"},
+									Value: 1,
+								},
+							},
+							{
+								Key: &ast.IntegerLiteral{
+									Token: token.Token{token.INT, "1"},
+									Value: 1,
+								},
+								Value: &ast.StringLiteral{
+									Token: token.Token{token.STRING, "yes"},
+									Value: "yes",
+								},
+							},
+						},
+					},
+				},
+			},
+		})
+	})
+
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {
