@@ -19,6 +19,7 @@ const (
 	FUNCTION = "FUNCTION"
 	STRING   = "STRING"
 	BUILTIN  = "BUILTIN"
+	ARRAY    = "ARRAY"
 )
 
 type Object interface {
@@ -97,4 +98,17 @@ func (f *Function) Inspect() string {
 		params = append(params, p.Value)
 	}
 	return fmt.Sprintf("fn(%s) %s", strings.Join(params, ", "), f.Body)
+}
+
+type Array struct {
+	Elements []Object
+}
+
+func (Array) Type() ObjectType { return ARRAY }
+func (a *Array) Inspect() string {
+	var vals []string
+	for _, e := range a.Elements {
+		vals = append(vals, e.Inspect())
+	}
+	return strings.Join(vals, ", ")
 }

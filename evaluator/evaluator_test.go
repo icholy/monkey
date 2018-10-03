@@ -91,6 +91,16 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, `len("one", "two")`, &object.Error{"len: wrong number of arguments"})
 	})
 
+	t.Run("array", func(t *testing.T) {
+		RequireEqualEval(t, "[1, 2, 3]", &object.Array{
+			Elements: []object.Object{
+				&object.Integer{1},
+				&object.Integer{2},
+				&object.Integer{3},
+			},
+		})
+	})
+
 }
 
 func RequireEqualEval(t *testing.T, input string, expected object.Object) {
