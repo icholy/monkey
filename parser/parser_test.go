@@ -398,6 +398,28 @@ func TestMonkey(t *testing.T) {
 			},
 		})
 	})
+
+	t.Run("index", func(t *testing.T) {
+		input := `foo[123]`
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ExpressionStatement{
+					Token: token.Token{token.IDENT, "foo"},
+					Expression: &ast.IndexExpression{
+						Token: token.Token{token.LBRACKET, "["},
+						Value: &ast.Identifier{
+							Token: token.Token{token.IDENT, "foo"},
+							Value: "foo",
+						},
+						Index: &ast.IntegerLiteral{
+							Token: token.Token{token.INT, "123"},
+							Value: 123,
+						},
+					},
+				},
+			},
+		})
+	})
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {

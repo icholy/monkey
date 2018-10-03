@@ -205,6 +205,20 @@ func (a *ArrayLiteral) String() string {
 	return fmt.Sprintf("[%s]", strings.Join(values, ", "))
 }
 
+type IndexExpression struct {
+	Token token.Token
+	Value Expression
+	Index Expression
+}
+
+func (i *IndexExpression) expressionNode() {}
+func (i *IndexExpression) TokenLiteral() string {
+	return i.Token.Literal
+}
+func (i *IndexExpression) String() string {
+	return fmt.Sprintf("%s[%s]", i.Value, i.Index)
+}
+
 type BlockStatement struct {
 	Token      token.Token
 	Statements []Statement
