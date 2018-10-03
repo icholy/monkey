@@ -1,6 +1,8 @@
 package evaluator
 
 import (
+	"fmt"
+
 	"github.com/icholy/monkey/object"
 )
 
@@ -31,6 +33,16 @@ var builtins = map[string]object.Object{
 			}
 			arr.Elements = append(arr.Elements, args[1:]...)
 			return arr
+		},
+	},
+	"puts": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			var values []interface{}
+			for _, a := range args {
+				values = append(values, a.Inspect())
+			}
+			fmt.Println(values...)
+			return &object.Null{}
 		},
 	},
 }
