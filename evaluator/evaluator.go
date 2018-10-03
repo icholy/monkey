@@ -77,6 +77,8 @@ func Eval(node ast.Node, env *object.Env) object.Object {
 		}
 		env.Set(node.Name.Value, val)
 		return NULL
+	case *ast.ArrayLiteral:
+		return evalArray(node, env)
 	default:
 		return object.Errorf("invalid node: %#v", node)
 	}
@@ -99,6 +101,18 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 		return ret.Value
 	}
 	return val
+}
+
+func evalArray(a *ast.ArrayLiteral, env *object.Env) object.Object {
+	var elements []object.Object
+	for _, e := range a.Elements {
+		val := Eval(e, env)
+		if isError(val) {
+			return val
+		}
+		elements = append(elements, val)
+	}
+	return &object.Array{Elements: elements}
 }
 
 func evalIdent(i *ast.Identifier, env *object.Env) object.Object {
