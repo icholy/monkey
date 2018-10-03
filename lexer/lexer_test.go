@@ -162,4 +162,13 @@ func TestNextToken(t *testing.T) {
 		})
 	})
 
+	t.Run("array", func(t *testing.T) {
+		ExpectTokens(t, `[1]`, []token.Token{
+			{token.LBRACKET, "["},
+			{token.INT, "1"},
+			{token.RBRACKET, "]"},
+			{token.EOF, ""},
+		})
+	})
+
 }
