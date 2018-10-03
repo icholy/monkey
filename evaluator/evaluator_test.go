@@ -99,6 +99,7 @@ func TestEvaluator(t *testing.T) {
 				&object.Integer{3},
 			},
 		})
+		RequireEqualEval(t, "let x = [1]; x[0]", &object.Integer{1})
 	})
 
 }

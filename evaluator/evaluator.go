@@ -79,6 +79,16 @@ func Eval(node ast.Node, env *object.Env) object.Object {
 		return NULL
 	case *ast.ArrayLiteral:
 		return evalArray(node, env)
+	case *ast.IndexExpression:
+		left := Eval(node.Value, env)
+		if isError(left) {
+			return left
+		}
+		index := Eval(node.Index, env)
+		if isError(index) {
+			return index
+		}
+		return evalIndex(left, index)
 	default:
 		return object.Errorf("invalid node: %#v", node)
 	}
@@ -101,6 +111,21 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 		return ret.Value
 	}
 	return val
+}
+
+func evalIndex(left, index object.Object) object.Object {
+	arr, ok := left.(*object.Array)
+	if !ok {
+		return object.Errorf("cannot index into %s", arr.Type())
+	}
+	idx, ok := index.(*object.Integer)
+	if !ok {
+		return object.Errorf("index must be an integer %s", idx.Type())
+	}
+	if idx.Value < 0 || idx.Value >= int64(len(arr.Elements)) {
+		return object.Errorf("index out of range %d", idx.Value)
+	}
+	return arr.Elements[idx.Value]
 }
 
 func evalArray(a *ast.ArrayLiteral, env *object.Env) object.Object {
