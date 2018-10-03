@@ -36,6 +36,7 @@ const (
 	// Delimiters
 	COMMA     = "COMMA"
 	SEMICOLON = "SEMICOLON"
+	COLON     = "COLON"
 
 	LPAREN   = "LPAREN"
 	RPAREN   = "RPAREN"

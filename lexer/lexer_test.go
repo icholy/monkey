@@ -171,4 +171,15 @@ func TestNextToken(t *testing.T) {
 		})
 	})
 
+	t.Run("hash", func(t *testing.T) {
+		ExpectTokens(t, `{ "test": 123 }`, []token.Token{
+			token.Token{token.LBRACE, "{"},
+			token.Token{token.STRING, "test"},
+			token.Token{token.COLON, ":"},
+			token.Token{token.INT, "123"},
+			token.Token{token.RBRACE, "}"},
+			token.Token{token.EOF, ""},
+		})
+	})
+
 }
