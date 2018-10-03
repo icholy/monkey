@@ -104,14 +104,36 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, "let x = [1]; x[0]", &object.Integer{1})
 	})
 
+	t.Run("empty hash", func(t *testing.T) {
+		hash, ok := ParseEval(t, "{}").(*object.Hash)
+		require.True(t, ok, "should be hash")
+		require.Empty(t, hash.Pairs())
+	})
+
+	t.Run("hash", func(t *testing.T) {
+		expected := []*object.HashPair{
+			{
+				Key:   &object.Integer{123},
+				Value: TRUE,
+			},
+		}
+		hash, ok := ParseEval(t, "{ 123: true }").(*object.Hash)
+		require.True(t, ok, "should be hash")
+		require.Equal(t, expected, hash.Pairs())
+	})
+
 }
 
-func RequireEqualEval(t *testing.T, input string, expected object.Object) {
+func ParseEval(t *testing.T, input string) object.Object {
 	l := lexer.New(input)
 	p := parser.New(l)
 	program := p.ParseProgram()
 	require.Empty(t, p.Errors(), "parser error")
 	env := object.NewEnv(nil)
-	actual := Eval(program, env)
+	return Eval(program, env)
+}
+
+func RequireEqualEval(t *testing.T, input string, expected object.Object) {
+	actual := ParseEval(t, input)
 	require.Equal(t, expected, actual)
 }

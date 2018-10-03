@@ -79,6 +79,8 @@ func Eval(node ast.Node, env *object.Env) object.Object {
 		return NULL
 	case *ast.ArrayLiteral:
 		return evalArray(node, env)
+	case *ast.HashLiteral:
+		return evalHash(node, env)
 	case *ast.IndexExpression:
 		left := Eval(node.Value, env)
 		if isError(left) {
@@ -126,6 +128,22 @@ func evalIndex(left, index object.Object) object.Object {
 		return object.Errorf("index out of range %d", idx.Value)
 	}
 	return arr.Elements[idx.Value]
+}
+
+func evalHash(h *ast.HashLiteral, env *object.Env) object.Object {
+	hash := object.NewHash()
+	for _, p := range h.Pairs {
+		key := Eval(p.Key, env)
+		if isError(key) {
+			return key
+		}
+		value := Eval(p.Value, env)
+		if isError(value) {
+			return value
+		}
+		hash.Set(key, value)
+	}
+	return hash
 }
 
 func evalArray(a *ast.ArrayLiteral, env *object.Env) object.Object {

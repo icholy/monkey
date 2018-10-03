@@ -20,63 +20,73 @@ const (
 	STRING   = "STRING"
 	BUILTIN  = "BUILTIN"
 	ARRAY    = "ARRAY"
+	HASH     = "HASH"
 )
 
 type Object interface {
 	Type() ObjectType
 	Inspect() string
+	KeyValue() KeyValue
 }
 
 type BuiltinFunc func(...Object) Object
 
 type Builtin struct {
-	Name string
-	Fn   BuiltinFunc
+	Fn BuiltinFunc
 }
 
-func (b *Builtin) Inspect() string  { return "builtin function" }
-func (b *Builtin) Type() ObjectType { return BUILTIN }
+func (b *Builtin) KeyValue() KeyValue { return b.Fn }
+func (b *Builtin) Inspect() string    { return "builtin function" }
+func (b *Builtin) Type() ObjectType   { return BUILTIN }
 
 type Integer struct {
 	Value int64
 }
 
-func (i *Integer) Inspect() string  { return fmt.Sprintf("%d", i.Value) }
-func (i *Integer) Type() ObjectType { return INTEGER }
+func (i *Integer) KeyValue() KeyValue { return i.Value }
+func (i *Integer) Inspect() string    { return fmt.Sprintf("%d", i.Value) }
+func (i *Integer) Type() ObjectType   { return INTEGER }
 
 type Boolean struct {
 	Value bool
 }
 
-func (b *Boolean) Inspect() string  { return strconv.FormatBool(b.Value) }
-func (b *Boolean) Type() ObjectType { return BOOLEAN }
+func (b *Boolean) KeyValue() KeyValue { return b.Value }
+func (b *Boolean) Inspect() string    { return strconv.FormatBool(b.Value) }
+func (b *Boolean) Type() ObjectType   { return BOOLEAN }
 
 type String struct {
 	Value string
 }
 
-func (s *String) Inspect() string  { return fmt.Sprintf("%v", s.Value) }
-func (s *String) Type() ObjectType { return STRING }
+func (s *String) KeyValue() KeyValue { return s.Value }
+func (s *String) Inspect() string    { return fmt.Sprintf("%v", s.Value) }
+func (s *String) Type() ObjectType   { return STRING }
 
 type Null struct{}
 
-func (n *Null) Inspect() string  { return "null" }
-func (n *Null) Type() ObjectType { return NULL }
+func (n *Null) KeyValue() KeyValue { return nil }
+func (n *Null) Inspect() string    { return "null" }
+func (n *Null) Type() ObjectType   { return NULL }
 
 type ReturnValue struct {
 	Value Object
 }
 
-func (r *ReturnValue) Inspect() string  { return r.Value.Inspect() }
-func (r *ReturnValue) Type() ObjectType { return RETURN }
+func (r *ReturnValue) KeyValue() KeyValue { return r.Value.KeyValue() }
+func (r *ReturnValue) Inspect() string    { return r.Value.Inspect() }
+func (r *ReturnValue) Type() ObjectType   { return RETURN }
 
 type Error struct {
 	Message string
 }
 
-func (e *Error) Error() string    { return e.Message }
-func (e *Error) Type() ObjectType { return ERROR }
-func (e *Error) Inspect() string  { return fmt.Sprintf("ERROR: %s", e.Message) }
+type ErrorMessage string
+
+func (e *Error) KeyValue() KeyValue { return ErrorMessage(e.Message) }
+func (e *Error) Error() string      { return e.Message }
+func (e *Error) Type() ObjectType   { return ERROR }
+func (e *Error) Inspect() string    { return fmt.Sprintf("ERROR: %s", e.Message) }
 
 func Errorf(format string, args ...interface{}) *Error {
 	return &Error{
@@ -89,6 +99,8 @@ type Function struct {
 	Body       *ast.BlockStatement
 	Env        *Env
 }
+
+func (f *Function) KeyValue() KeyValue { return f }
 
 func (f *Function) Type() ObjectType { return FUNCTION }
 
@@ -104,11 +116,72 @@ type Array struct {
 	Elements []Object
 }
 
-func (Array) Type() ObjectType { return ARRAY }
+func (a *Array) KeyValue() KeyValue { return a }
+func (Array) Type() ObjectType      { return ARRAY }
 func (a *Array) Inspect() string {
 	var vals []string
 	for _, e := range a.Elements {
 		vals = append(vals, e.Inspect())
 	}
 	return strings.Join(vals, ", ")
+}
+
+type KeyValue interface{}
+
+type HashPair struct {
+	Key   Object
+	Value Object
+}
+
+type Hash struct {
+	pairs map[KeyValue]*HashPair
+}
+
+func NewHash() *Hash {
+	return &Hash{
+		pairs: map[KeyValue]*HashPair{},
+	}
+}
+
+func (h *Hash) Set(key, value Object) {
+	h.pairs[key.KeyValue()] = &HashPair{
+		Key:   key,
+		Value: value,
+	}
+}
+
+func (h *Hash) SetPairs(pairs ...*HashPair) {
+	for _, p := range pairs {
+		h.Set(p.Key, p.Value)
+	}
+}
+
+func (h *Hash) Get(key Object) (Object, bool) {
+	p, ok := h.pairs[key.KeyValue()]
+	if !ok {
+		return nil, false
+	}
+	return p.Value, true
+}
+
+func (h *Hash) Delete(key Object) {
+	delete(h.pairs, key.KeyValue())
+}
+
+func (h *Hash) Pairs() []*HashPair {
+	var pairs []*HashPair
+	for _, p := range h.pairs {
+		pairs = append(pairs, p)
+	}
+	return pairs
+}
+
+func (h *Hash) KeyValue() KeyValue { return h }
+func (Hash) Type() ObjectType      { return HASH }
+func (h *Hash) Inspect() string {
+	var pairs []string
+	for _, p := range h.pairs {
+		pairs = append(pairs, fmt.Sprintf("%s: %s", p.Key, p.Value))
+	}
+	return fmt.Sprintf("{ %s }", strings.Join(pairs, ", "))
 }
