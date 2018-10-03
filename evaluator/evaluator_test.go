@@ -122,6 +122,11 @@ func TestEvaluator(t *testing.T) {
 		require.Equal(t, expected, hash.Pairs())
 	})
 
+	t.Run("hash index", func(t *testing.T) {
+		RequireEqualEval(t, "{}[0]", NULL)
+		RequireEqualEval(t, "let x = { true: 123, false: 321 }; x[false]", &object.Integer{321})
+	})
+
 }
 
 func ParseEval(t *testing.T, input string) object.Object {

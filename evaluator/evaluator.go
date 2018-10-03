@@ -116,6 +116,12 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 }
 
 func evalIndex(left, index object.Object) object.Object {
+	if hash, ok := left.(*object.Hash); ok {
+		if value, ok := hash.Get(index); ok {
+			return value
+		}
+		return NULL
+	}
 	arr, ok := left.(*object.Array)
 	if !ok {
 		return object.Errorf("cannot index into %s", arr.Type())
