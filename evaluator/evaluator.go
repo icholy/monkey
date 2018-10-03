@@ -124,11 +124,11 @@ func evalIndex(left, index object.Object) object.Object {
 	}
 	arr, ok := left.(*object.Array)
 	if !ok {
-		return object.Errorf("cannot index into %s", arr.Type())
+		return object.Errorf("cannot index into %s", left.Type())
 	}
 	idx, ok := index.(*object.Integer)
 	if !ok {
-		return object.Errorf("index must be an integer %s", idx.Type())
+		return object.Errorf("index must be an integer %s", index.Type())
 	}
 	if idx.Value < 0 || idx.Value >= int64(len(arr.Elements)) {
 		return object.Errorf("index out of range %d", idx.Value)
