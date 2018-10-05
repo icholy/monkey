@@ -134,6 +134,10 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, "function add(x, y) { x + y }; add(1, 1)", &object.Integer{2})
 	})
 
+	t.Run("assignment", func(t *testing.T) {
+		RequireEqualEval(t, "let x = 1; x = 2; x", &object.Integer{2})
+	})
+
 }
 
 func ParseEval(t *testing.T, input string) (object.Object, error) {
