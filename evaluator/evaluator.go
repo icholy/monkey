@@ -139,6 +139,18 @@ func applyFunction(fn object.Object, args []object.Object) (object.Object, error
 }
 
 func evalAssign(a *ast.AssignmentExpression, env *object.Env) (object.Object, error) {
+	value, err := Eval(a.Value, env)
+	if err != nil {
+		return nil, err
+	}
+	switch node := a.Left.(type) {
+	case *ast.Identifier:
+		if !env.Update(node.Value, value) {
+			return nil, fmt.Errorf("'%s' is not defined", node.Value)
+		}
+	default:
+		return nil, fmt.Errorf("invalid assignment target")
+	}
 	return NULL, nil
 }
 

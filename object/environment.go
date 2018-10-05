@@ -25,6 +25,7 @@ func (e *Env) Update(name string, val Object) bool {
 	if !ok && e.parent != nil {
 		return e.parent.Update(name, val)
 	}
+	e.store[name] = val
 	return ok
 }
 
