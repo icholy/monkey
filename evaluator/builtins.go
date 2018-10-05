@@ -23,6 +23,19 @@ var builtins = map[string]object.Object{
 			}
 		},
 	},
+	"delete": &object.Builtin{
+		Fn: func(args ...object.Object) (object.Object, error) {
+			if len(args) != 2 {
+				return nil, fmt.Errorf("delete: expecting two arguments")
+			}
+			hash, ok := args[0].(*object.Hash)
+			if !ok {
+				return nil, fmt.Errorf("delete: expecting first parameter to be hash")
+			}
+			hash.Delete(args[1])
+			return NULL, nil
+		},
+	},
 	"append": &object.Builtin{
 		Fn: func(args ...object.Object) (object.Object, error) {
 			if len(args) < 1 {
