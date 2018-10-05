@@ -149,10 +149,14 @@ func (p *Parser) whileStmt() *ast.WhileStatement {
 	}
 	p.next()
 	while.Body = p.blockStmt()
-	if p.peek.Is(token.SEMICOLON) {
+	p.semicolon()
+	return while
+}
+
+func (p *Parser) semicolon() {
+	for p.peek.Is(token.SEMICOLON) {
 		p.next()
 	}
-	return while
 }
 
 func (p *Parser) blockStmt() *ast.BlockStatement {
@@ -249,9 +253,7 @@ func (p *Parser) functionStmt() ast.Statement {
 		return nil
 	}
 	stmt.Body = p.blockStmt()
-	if p.peek.Is(token.SEMICOLON) {
-		p.next()
-	}
+	p.semicolon()
 	return stmt
 }
 
@@ -396,9 +398,7 @@ func (p *Parser) expressionStmt() *ast.ExpressionStatement {
 	stmt := &ast.ExpressionStatement{}
 	stmt.Token = p.cur
 	stmt.Expression = p.expression(LOWEST)
-	if p.peek.Is(token.SEMICOLON) {
-		p.next()
-	}
+	p.semicolon()
 	return stmt
 }
 
@@ -453,9 +453,7 @@ func (p *Parser) letStmt() *ast.LetStatement {
 	}
 	p.next()
 	stmt.Value = p.expression(LOWEST)
-	if p.peek.Is(token.SEMICOLON) {
-		p.next()
-	}
+	p.semicolon()
 	return stmt
 }
 
