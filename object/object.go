@@ -60,7 +60,7 @@ type String struct {
 }
 
 func (s *String) KeyValue() KeyValue { return s.Value }
-func (s *String) Inspect() string    { return fmt.Sprintf("%v", s.Value) }
+func (s *String) Inspect() string    { return fmt.Sprintf("%q", s.Value) }
 func (s *String) Type() ObjectType   { return STRING }
 
 type Null struct{}
@@ -177,6 +177,10 @@ func (h *Hash) Delete(key Object) {
 	delete(h.pairs, key.KeyValue())
 }
 
+func (h *Hash) Len() int {
+	return len(h.pairs)
+}
+
 func (h *Hash) Pairs() []*HashPair {
 	var pairs []*HashPair
 	for _, p := range h.pairs {
@@ -188,6 +192,9 @@ func (h *Hash) Pairs() []*HashPair {
 func (h *Hash) KeyValue() KeyValue { return h }
 func (Hash) Type() ObjectType      { return HASH }
 func (h *Hash) Inspect() string {
+	if h.Len() == 0 {
+		return "{}"
+	}
 	var pairs []string
 	for _, p := range h.pairs {
 		pairs = append(pairs, fmt.Sprintf("%s: %s", p.Key.Inspect(), p.Value.Inspect()))
