@@ -602,7 +602,7 @@ func TestMonkey(t *testing.T) {
 		})
 	})
 
-	t.Run("dot index access", func(t *testing.T) {
+	t.Run("property access", func(t *testing.T) {
 		RequireEqualAST(t, "foo.bar", &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{

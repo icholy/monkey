@@ -97,6 +97,12 @@ func Eval(node ast.Node, env *object.Env) (object.Object, error) {
 		}
 		env.Set(node.Name.Value, val)
 		return NULL, nil
+	case *ast.PropertyExpression:
+		left, err := Eval(node.Value, env)
+		if err != nil {
+			return nil, err
+		}
+		return evalProperty(left, node.Name, env)
 	case *ast.ArrayLiteral:
 		return evalArray(node, env)
 	case *ast.HashLiteral:
@@ -211,6 +217,18 @@ func evalImport(i *ast.ImportStatement, env *object.Env) (object.Object, error) 
 		i.Program = p
 	}
 	return Eval(i.Program, env)
+}
+
+func evalProperty(left object.Object, name *ast.Identifier, env *object.Env) (object.Object, error) {
+	hash, ok := left.(*object.Hash)
+	if !ok {
+		return nil, fmt.Errorf("cannot access '%s' of %s", name, left.Type())
+	}
+	val, ok := hash.Get(&object.String{Value: name.Value})
+	if !ok {
+		return nil, fmt.Errorf("property not found: %s", name)
+	}
+	return val, nil
 }
 
 func evalIndex(left, index object.Object) (object.Object, error) {
