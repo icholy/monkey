@@ -20,6 +20,7 @@ const (
 	PREFIX
 	CALL
 	INDEX
+	ASSIGN
 )
 
 type (
@@ -64,6 +65,7 @@ func New(l *lexer.Lexer) *Parser {
 		token.ASTERISK: PRODUCT,
 		token.LPAREN:   CALL,
 		token.LBRACKET: INDEX,
+		token.ASSIGN:   ASSIGN,
 	}
 	p.prefixFns = map[token.TokenType]prefixFn{
 		token.IDENT:    p.identExpr,
@@ -90,6 +92,7 @@ func New(l *lexer.Lexer) *Parser {
 		token.GT:       p.infixExpr,
 		token.LPAREN:   p.callExpr,
 		token.LBRACKET: p.indexExpr,
+		token.ASSIGN:   p.assignExpr,
 	}
 	p.next()
 	p.next()
@@ -401,6 +404,16 @@ func (p *Parser) returnStmt() *ast.ReturnStatement {
 		p.next()
 	}
 	return stmt
+}
+
+func (p *Parser) assignExpr(left ast.Expression) ast.Expression {
+	expr := &ast.AssignmentExpression{
+		Token: p.cur,
+		Left:  left,
+	}
+	p.next()
+	expr.Value = p.expression(LOWEST)
+	return expr
 }
 
 func (p *Parser) importStmt() *ast.ImportStatement {

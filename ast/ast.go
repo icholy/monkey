@@ -128,6 +128,21 @@ func (i *IntegerLiteral) TokenText() string {
 	return i.Token.Text
 }
 
+type AssignmentExpression struct {
+	Token token.Token
+	Left  Expression
+	Value Expression
+}
+
+func (a *AssignmentExpression) String() string {
+	return fmt.Sprintf("%s = %s", a.Left, a.Value)
+}
+
+func (AssignmentExpression) expressionNode() {}
+func (a *AssignmentExpression) TokenText() string {
+	return a.Token.Text
+}
+
 type StringLiteral struct {
 	Token token.Token
 	Value string
