@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/sanity-io/litter"
 	"github.com/stretchr/testify/require"
 
 	"github.com/icholy/monkey/ast"
@@ -543,6 +545,36 @@ func TestMonkey(t *testing.T) {
 				},
 			},
 		})
+
+		RequireEqualAST(t, "foo[123] = bar()", &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ExpressionStatement{
+					Token: token.New(token.IDENT, "foo"),
+					Expression: &ast.AssignmentExpression{
+						Token: token.New(token.ASSIGN, "="),
+						Left: &ast.IndexExpression{
+							Token: token.New(token.LBRACKET, "["),
+							Value: &ast.Identifier{
+								Token: token.New(token.IDENT, "foo"),
+								Value: "foo",
+							},
+							Index: &ast.IntegerLiteral{
+								Token: token.New(token.INT, "123"),
+								Value: 123,
+							},
+						},
+						Value: &ast.CallExpression{
+							Token: token.New(token.LPAREN, "("),
+							Function: &ast.Identifier{
+								Token: token.New(token.IDENT, "bar"),
+								Value: "bar",
+							},
+							Arguments: nil,
+						},
+					},
+				},
+			},
+		})
 	})
 
 }
@@ -556,5 +588,9 @@ func RequireEqualString(t *testing.T, input, expected string) {
 func RequireEqualAST(t *testing.T, input string, expected *ast.Program) {
 	actual, err := Parse(input)
 	require.NoError(t, err)
-	require.Equal(t, expected, actual)
+	if !cmp.Equal(expected, actual) {
+		litter.Dump(expected)
+		litter.Dump(actual)
+		t.Fatal(cmp.Diff(expected, actual))
+	}
 }
