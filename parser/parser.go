@@ -65,6 +65,7 @@ func New(l *lexer.Lexer) *Parser {
 		token.ASTERISK: PRODUCT,
 		token.LPAREN:   CALL,
 		token.LBRACKET: INDEX,
+		token.DOT:      INDEX,
 		token.ASSIGN:   ASSIGN,
 	}
 	p.prefixFns = map[token.TokenType]prefixFn{
@@ -93,6 +94,7 @@ func New(l *lexer.Lexer) *Parser {
 		token.LPAREN:   p.callExpr,
 		token.LBRACKET: p.indexExpr,
 		token.ASSIGN:   p.assignExpr,
+		token.DOT:      p.propertyExpr,
 	}
 	p.next()
 	p.next()
@@ -308,6 +310,16 @@ func (p *Parser) prefixExpr() ast.Expression {
 	}
 	p.next()
 	expr.Right = p.expression(PREFIX)
+	return expr
+}
+
+func (p *Parser) propertyExpr(left ast.Expression) ast.Expression {
+	expr := &ast.PropertyExpression{
+		Token: p.cur,
+		Value: left,
+	}
+	p.next()
+	expr.Name = &ast.Identifier{Token: p.cur, Value: p.cur.Text}
 	return expr
 }
 

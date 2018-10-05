@@ -602,6 +602,27 @@ func TestMonkey(t *testing.T) {
 		})
 	})
 
+	t.Run("dot index access", func(t *testing.T) {
+		RequireEqualAST(t, "foo.bar", &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ExpressionStatement{
+					Token: token.New(token.IDENT, "foo"),
+					Expression: &ast.PropertyExpression{
+						Token: token.New(token.DOT, "."),
+						Value: &ast.Identifier{
+							Token: token.New(token.IDENT, "foo"),
+							Value: "foo",
+						},
+						Name: &ast.Identifier{
+							Token: token.New(token.IDENT, "bar"),
+							Value: "bar",
+						},
+					},
+				},
+			},
+		})
+	})
+
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {

@@ -263,6 +263,21 @@ func (i *IndexExpression) String() string {
 	return fmt.Sprintf("%s[%s]", i.Value, i.Index)
 }
 
+type PropertyExpression struct {
+	Token token.Token
+	Value Expression
+	Name  *Identifier
+}
+
+func (p *PropertyExpression) String() string {
+	return fmt.Sprintf("%s.%s", p.Value, p.Name.Value)
+}
+
+func (p *PropertyExpression) expressionNode() {}
+func (p *PropertyExpression) TokenText() string {
+	return p.Token.Text
+}
+
 type BlockStatement struct {
 	Token      token.Token
 	Statements []Statement
