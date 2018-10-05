@@ -81,6 +81,9 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, `"foo" != "bar"`, TRUE)
 		RequireEqualEval(t, `"bbb" > "aaa"`, TRUE)
 		RequireEqualEval(t, `"bbb" < "aaa"`, FALSE)
+		RequireEqualEval(t, `"bbb" >= "aaa"`, TRUE)
+		RequireEqualEval(t, `"aaa" >= "aaa"`, TRUE)
+		RequireEqualEval(t, `"aaa" == "aaa"`, TRUE)
 	})
 
 	t.Run("builtin", func(t *testing.T) {

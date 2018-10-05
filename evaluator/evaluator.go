@@ -371,6 +371,10 @@ func evalStringInfixExpression(operator string, left, right *object.String) (obj
 		return &object.Boolean{Value: strings.Compare(left.Value, right.Value) > 0}, nil
 	case "<":
 		return &object.Boolean{Value: strings.Compare(left.Value, right.Value) < 0}, nil
+	case "<=":
+		return &object.Boolean{Value: strings.Compare(left.Value, right.Value) <= 0}, nil
+	case ">=":
+		return &object.Boolean{Value: strings.Compare(left.Value, right.Value) >= 0}, nil
 	default:
 		return nil, fmt.Errorf("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
