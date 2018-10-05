@@ -182,4 +182,16 @@ func TestNextToken(t *testing.T) {
 		})
 	})
 
+	t.Run("while loop", func(t *testing.T) {
+		ExpectTokens(t, `while (true) {}`, []token.Token{
+			token.New(token.WHILE, "while"),
+			token.New(token.LPAREN, "("),
+			token.New(token.TRUE, "true"),
+			token.New(token.RPAREN, ")"),
+			token.New(token.LBRACE, "{"),
+			token.New(token.RBRACE, "}"),
+			token.New(token.EOF, ""),
+		})
+	})
+
 }
