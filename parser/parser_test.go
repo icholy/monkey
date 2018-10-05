@@ -578,13 +578,13 @@ func TestMonkey(t *testing.T) {
 	})
 
 	t.Run("while loop", func(t *testing.T) {
-		RequireEqualAST(t, "while (1 > x) {}", &ast.Program{
+		RequireEqualAST(t, "while (1 >= x) {}", &ast.Program{
 			Statements: []ast.Statement{
 				&ast.WhileStatement{
 					Token: token.New(token.WHILE, "while"),
 					Condition: &ast.InfixExpression{
-						Token:    token.New(token.GT, ">"),
-						Operator: ">",
+						Token:    token.New(token.GT_EQ, ">="),
+						Operator: ">=",
 						Left: &ast.IntegerLiteral{
 							Token: token.New(token.INT, "1"),
 							Value: 1,
