@@ -44,6 +44,7 @@ const (
 	LT       = "LT"
 	EQ       = "EQ"
 	NE       = "NE"
+	DOT      = "DOT"
 
 	// Delimiters
 	COMMA     = "COMMA"

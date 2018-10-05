@@ -56,6 +56,7 @@ var bytetokens = map[byte]token.TokenType{
 	',': token.COMMA,
 	'<': token.LT,
 	'>': token.GT,
+	'.': token.DOT,
 	0:   token.EOF,
 }
 

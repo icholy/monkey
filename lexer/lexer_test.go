@@ -194,4 +194,15 @@ func TestNextToken(t *testing.T) {
 		})
 	})
 
+	t.Run("dot access", func(t *testing.T) {
+		ExpectTokens(t, `foo.bar()`, []token.Token{
+			token.New(token.IDENT, "foo"),
+			token.New(token.DOT, "."),
+			token.New(token.IDENT, "bar"),
+			token.New(token.LPAREN, "("),
+			token.New(token.RPAREN, ")"),
+			token.New(token.EOF, ""),
+		})
+	})
+
 }
