@@ -1,26 +1,31 @@
 package repl
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
+
+	"github.com/chzyer/readline"
 
 	"github.com/icholy/monkey/evaluator"
 	"github.com/icholy/monkey/object"
 	"github.com/icholy/monkey/parser"
 )
 
-var Prefix = ">> "
+var Prompt = ">> "
 
 func Run(in io.Reader, out io.Writer) {
-	scanner := bufio.NewScanner(in)
+	rl, err := readline.New(Prompt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rl.Close()
 	env := object.NewEnv(nil)
-	fmt.Fprint(out, Prefix)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if line == "exit" {
-			break
+	for {
+		line, err := rl.Readline()
+		if err != nil {
+			log.Fatal(err)
 		}
 		program, err := parser.Parse(line)
 		if err != nil {
@@ -33,7 +38,6 @@ func Run(in io.Reader, out io.Writer) {
 				fmt.Fprintln(out, obj.Inspect())
 			}
 		}
-		fmt.Fprint(out, Prefix)
 	}
 }
 
