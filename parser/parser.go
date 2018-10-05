@@ -137,6 +137,21 @@ func (p *Parser) booleanExpr() ast.Expression {
 	}
 }
 
+func (p *Parser) whileStmt() *ast.WhileStatement {
+	while := &ast.WhileStatement{Token: p.cur}
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+	p.next()
+	while.Condition = p.expression(LOWEST)
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+	p.next()
+	while.Body = p.blockStmt()
+	return while
+}
+
 func (p *Parser) blockStmt() *ast.BlockStatement {
 	block := &ast.BlockStatement{Token: p.cur}
 	p.next()
@@ -148,15 +163,6 @@ func (p *Parser) blockStmt() *ast.BlockStatement {
 		p.next()
 	}
 	return block
-}
-
-func (p *Parser) parseHashPair() *ast.HashPair {
-	key := p.expression(LOWEST)
-	if !p.expectPeek(token.COLON) {
-		return nil
-	}
-	value := p.expression(LOWEST)
-	return &ast.HashPair{Key: key, Value: value}
 }
 
 func (p *Parser) hashExpr() ast.Expression {
@@ -376,6 +382,8 @@ func (p *Parser) stmt() ast.Statement {
 		return p.returnStmt()
 	case token.IMPORT:
 		return p.importStmt()
+	case token.WHILE:
+		return p.whileStmt()
 	default:
 		return p.expressionStmt()
 	}
