@@ -137,6 +137,7 @@ func TestEvaluator(t *testing.T) {
 	t.Run("assignment", func(t *testing.T) {
 		RequireEqualEval(t, "let x = 1; x = 2; x", &object.Integer{2})
 		RequireEqualEval(t, "let x = [1]; x[0] = 2; x[0]", &object.Integer{2})
+		RequireEqualEval(t, "let x = {}; x[true] = 123; x[true]", &object.Integer{123})
 	})
 
 }

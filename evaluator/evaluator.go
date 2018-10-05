@@ -172,6 +172,8 @@ func evalAssignIndex(dest, index, val object.Object, env *object.Env) (object.Ob
 			return nil, fmt.Errorf("index must be an integer %s", index.Type())
 		}
 		obj.SetAt(int(idx.Value), val)
+	case *object.Hash:
+		obj.Set(index, val)
 	default:
 		return nil, fmt.Errorf("cannot index into %s", dest.Type())
 	}
