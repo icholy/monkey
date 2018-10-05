@@ -211,6 +211,12 @@ func TestNextToken(t *testing.T) {
 			token.New(token.PLUS, "+"),
 			token.New(token.LT_EQ, "<="),
 		})
+		ExpectTokens(t, "1 <= 2", []token.Token{
+			token.New(token.INT, "1"),
+			token.New(token.LT_EQ, "<="),
+			token.New(token.INT, "2"),
+			token.New(token.EOF, ""),
+		})
 	})
 
 }
