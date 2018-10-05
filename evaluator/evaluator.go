@@ -173,6 +173,17 @@ func evalAssign(left ast.Expression, val object.Object, env *object.Env) (object
 			return nil, fmt.Errorf("'%s' is not defined", node.Value)
 		}
 		return NULL, nil
+	case *ast.PropertyExpression:
+		dest, err := Eval(node.Value, env)
+		if err != nil {
+			return nil, err
+		}
+		hash, ok := dest.(*object.Hash)
+		if !ok {
+			return nil, fmt.Errorf("cannot access property on %s", dest.Type())
+		}
+		hash.Set(&object.String{Value: node.Name.Value}, val)
+		return NULL, nil
 	case *ast.IndexExpression:
 		dest, err := Eval(node.Value, env)
 		if err != nil {

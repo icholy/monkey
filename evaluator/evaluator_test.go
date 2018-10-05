@@ -148,6 +148,7 @@ func TestEvaluator(t *testing.T) {
 	t.Run("property access", func(t *testing.T) {
 		RequireEqualEval(t, `let x = { "foo": 123 }; x.foo`, &object.Integer{123})
 		RequireEqualEval(t, `let x = { "foo": { "bar": true } }; x.foo.bar`, TRUE)
+		RequireEqualEval(t, `let x = {}; x.foo = 123; x.foo`, &object.Integer{123})
 	})
 }
 
