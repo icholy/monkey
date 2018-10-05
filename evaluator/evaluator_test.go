@@ -140,6 +140,9 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, "let x = {}; x[true] = 123; x[true]", &object.Integer{123})
 	})
 
+	t.Run("while loop", func(t *testing.T) {
+		RequireEqualEval(t, "let x = true; while(x) { x = false }; x", FALSE)
+	})
 }
 
 func ParseEval(t *testing.T, input string) (object.Object, error) {

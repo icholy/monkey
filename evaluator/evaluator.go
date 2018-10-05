@@ -57,6 +57,8 @@ func Eval(node ast.Node, env *object.Env) (object.Object, error) {
 		return evalImport(node, env)
 	case *ast.Identifier:
 		return evalIdent(node, env)
+	case *ast.WhileStatement:
+		return evalWhile(node, env)
 	case *ast.ReturnStatement:
 		if node.ReturnValue == nil {
 			return &object.ReturnValue{Value: NULL}, nil
@@ -140,6 +142,22 @@ func applyFunction(fn object.Object, args []object.Object) (object.Object, error
 		return nil, err
 	}
 	return object.UnwrapReturn(val), nil
+}
+
+func evalWhile(w *ast.WhileStatement, env *object.Env) (object.Object, error) {
+	for {
+		ok, err := Eval(w.Condition, env)
+		if err != nil {
+			return nil, err
+		}
+		if !isTruthy(ok) {
+			break
+		}
+		if _, err := Eval(w.Body, env); err != nil {
+			return nil, err
+		}
+	}
+	return NULL, nil
 }
 
 func evalAssign(left ast.Expression, val object.Object, env *object.Env) (object.Object, error) {
