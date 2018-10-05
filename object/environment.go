@@ -13,6 +13,9 @@ func NewEnv(parent *Env) *Env {
 }
 
 func (e *Env) Get(name string) (Object, bool) {
+	if name == "locals" {
+		return e.Locals(), true
+	}
 	obj, ok := e.store[name]
 	if !ok && e.parent != nil {
 		return e.parent.Get(name)
@@ -31,4 +34,12 @@ func (e *Env) Update(name string, val Object) bool {
 
 func (e *Env) Set(name string, val Object) {
 	e.store[name] = val
+}
+
+func (e *Env) Locals() Object {
+	hash := NewHash()
+	for k, v := range e.store {
+		hash.Set(&String{Value: k}, v)
+	}
+	return hash
 }

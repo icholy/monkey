@@ -1,24 +1,34 @@
 
 
-function empty(array) {
-  return len(array) == 0
-}
+function NewLexer(input) {
 
-function reduce(array, f, acc) {
-  let inner = fn(array, acc) {
-    if (empty(array)) {
-      return acc;
+  let pos = 0;
+  let ch = input[0];
+  let export = {};
+
+  export.next = fn() {
+    pos = pos + 1;
+    if (pos >= len(input)) {
+      ch = "";
+    } else {
+      ch = input[pos];
     }
-    return inner(rest(array), f(first(array), acc))
+  };
+
+  export.char = fn() {
+    return ch;
   }
-  return inner(array, acc)
+
+  export.done = fn() {
+    return ch == "";
+  }
+
+  return export;
 }
 
-function map(array, f) {
-  reduce(array, fn(x, acc) { append(acc, f(x)) }, [])
-}
+let lex = NewLexer(read("std.monkey"))
 
-function foreach(array, callback) {
-  reduce(array, fn(x, _) { callback(x) }, 0)
-  return;
+while (!lex.done()) {
+  print(lex.char())
+  lex.next()
 }
