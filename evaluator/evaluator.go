@@ -100,7 +100,11 @@ func Eval(node ast.Node, env *object.Env) (object.Object, error) {
 	case *ast.HashLiteral:
 		return evalHash(node, env)
 	case *ast.AssignmentExpression:
-		return evalAssign(node, env)
+		value, err := Eval(node.Value, env)
+		if err != nil {
+			return nil, err
+		}
+		return evalAssign(node.Left, value, env)
 	case *ast.IndexExpression:
 		left, err := Eval(node.Value, env)
 		if err != nil {
@@ -138,18 +142,38 @@ func applyFunction(fn object.Object, args []object.Object) (object.Object, error
 	return object.UnwrapReturn(val), nil
 }
 
-func evalAssign(a *ast.AssignmentExpression, env *object.Env) (object.Object, error) {
-	value, err := Eval(a.Value, env)
-	if err != nil {
-		return nil, err
-	}
-	switch node := a.Left.(type) {
+func evalAssign(left ast.Expression, val object.Object, env *object.Env) (object.Object, error) {
+	switch node := left.(type) {
 	case *ast.Identifier:
-		if !env.Update(node.Value, value) {
+		if !env.Update(node.Value, val) {
 			return nil, fmt.Errorf("'%s' is not defined", node.Value)
 		}
+		return NULL, nil
+	case *ast.IndexExpression:
+		dest, err := Eval(node.Value, env)
+		if err != nil {
+			return nil, err
+		}
+		index, err := Eval(node.Index, env)
+		if err != nil {
+			return nil, err
+		}
+		return evalAssignIndex(dest, index, val, env)
 	default:
 		return nil, fmt.Errorf("invalid assignment target")
+	}
+}
+
+func evalAssignIndex(dest, index, val object.Object, env *object.Env) (object.Object, error) {
+	switch obj := dest.(type) {
+	case *object.Array:
+		idx, ok := index.(*object.Integer)
+		if !ok {
+			return nil, fmt.Errorf("index must be an integer %s", index.Type())
+		}
+		obj.SetAt(int(idx.Value), val)
+	default:
+		return nil, fmt.Errorf("cannot index into %s", dest.Type())
 	}
 	return NULL, nil
 }
@@ -184,10 +208,7 @@ func evalIndex(left, index object.Object) (object.Object, error) {
 	if !ok {
 		return nil, fmt.Errorf("index must be an integer %s", index.Type())
 	}
-	if idx.Value < 0 || idx.Value >= int64(len(arr.Elements)) {
-		return nil, fmt.Errorf("index out of range %d", idx.Value)
-	}
-	return arr.Elements[idx.Value], nil
+	return arr.At(int(idx.Value))
 }
 
 func evalHash(h *ast.HashLiteral, env *object.Env) (object.Object, error) {

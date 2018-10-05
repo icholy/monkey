@@ -106,6 +106,25 @@ type Array struct {
 	Elements []Object
 }
 
+func (a *Array) InRange(i int) bool {
+	return i >= 0 && i < len(a.Elements)
+}
+
+func (a *Array) At(i int) (Object, error) {
+	if !a.InRange(i) {
+		return nil, fmt.Errorf("%d not in range", i)
+	}
+	return a.Elements[i], nil
+}
+
+func (a *Array) SetAt(i int, v Object) error {
+	if !a.InRange(i) {
+		return fmt.Errorf("%d not in range", i)
+	}
+	a.Elements[i] = v
+	return nil
+}
+
 func (a *Array) KeyValue() KeyValue { return a }
 func (Array) Type() ObjectType      { return ARRAY }
 func (a *Array) Inspect() string {
