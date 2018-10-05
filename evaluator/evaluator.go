@@ -214,21 +214,27 @@ func evalImport(i *ast.ImportStatement, env *object.Env) (object.Object, error) 
 }
 
 func evalIndex(left, index object.Object) (object.Object, error) {
-	if hash, ok := left.(*object.Hash); ok {
-		if value, ok := hash.Get(index); ok {
+	switch obj := left.(type) {
+	case *object.Hash:
+		if value, ok := obj.Get(index); ok {
 			return value, nil
 		}
 		return NULL, nil
-	}
-	arr, ok := left.(*object.Array)
-	if !ok {
+	case *object.Array:
+		idx, ok := index.(*object.Integer)
+		if !ok {
+			return nil, fmt.Errorf("index must be an integer %s", index.Type())
+		}
+		return obj.At(int(idx.Value))
+	case *object.String:
+		idx, ok := index.(*object.Integer)
+		if !ok {
+			return nil, fmt.Errorf("index must be an integer %s", index.Type())
+		}
+		return obj.At(int(idx.Value))
+	default:
 		return nil, fmt.Errorf("cannot index into %s", left.Type())
 	}
-	idx, ok := index.(*object.Integer)
-	if !ok {
-		return nil, fmt.Errorf("index must be an integer %s", index.Type())
-	}
-	return arr.At(int(idx.Value))
 }
 
 func evalHash(h *ast.HashLiteral, env *object.Env) (object.Object, error) {

@@ -59,6 +59,13 @@ type String struct {
 	Value string
 }
 
+func (s *String) At(i int) (Object, error) {
+	if i < 0 || i >= len(s.Value) {
+		return nil, fmt.Errorf("%d out of range", i)
+	}
+	return &String{Value: string(s.Value[i])}, nil
+}
+
 func (s *String) KeyValue() KeyValue { return s.Value }
 func (s *String) Inspect() string    { return fmt.Sprintf("%q", s.Value) }
 func (s *String) Type() ObjectType   { return STRING }
