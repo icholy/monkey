@@ -18,6 +18,8 @@ var builtins = map[string]object.Object{
 				return &object.Integer{Value: int64(len(obj.Value))}, nil
 			case *object.Array:
 				return &object.Integer{Value: int64(len(obj.Elements))}, nil
+			case *object.Hash:
+				return &object.Integer{Value: int64(obj.Len())}, nil
 			default:
 				return nil, fmt.Errorf("len: invalid argument type %s", args[0].Type())
 			}
