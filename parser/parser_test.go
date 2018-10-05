@@ -577,6 +577,31 @@ func TestMonkey(t *testing.T) {
 		})
 	})
 
+	t.Run("while loop", func(t *testing.T) {
+		RequireEqualAST(t, "while (1 > x) {}", &ast.Program{
+			Statements: []ast.Statement{
+				&ast.WhileStatement{
+					Token: token.New(token.WHILE, "while"),
+					Condition: &ast.InfixExpression{
+						Token:    token.New(token.GT, ">"),
+						Operator: ">",
+						Left: &ast.IntegerLiteral{
+							Token: token.New(token.INT, "1"),
+							Value: 1,
+						},
+						Right: &ast.Identifier{
+							Token: token.New(token.IDENT, "x"),
+							Value: "x",
+						},
+					},
+					Body: &ast.BlockStatement{
+						Token: token.New(token.LBRACE, "{"),
+					},
+				},
+			},
+		})
+	})
+
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {

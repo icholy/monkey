@@ -82,6 +82,21 @@ func (l *LetStatement) TokenText() string {
 	return l.Token.Text
 }
 
+type WhileStatement struct {
+	Token     token.Token
+	Condition Expression
+	Body      *BlockStatement
+}
+
+func (w *WhileStatement) String() string {
+	return fmt.Sprintf("while (%s) { %s}", w.Condition, w.Body)
+}
+
+func (WhileStatement) statementNode() {}
+func (w *WhileStatement) TokenText() string {
+	return w.Token.Text
+}
+
 type ReturnStatement struct {
 	Token       token.Token
 	ReturnValue Expression
