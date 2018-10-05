@@ -219,4 +219,12 @@ func TestNextToken(t *testing.T) {
 		})
 	})
 
+	t.Run("package", func(t *testing.T) {
+		ExpectTokens(t, "package foo", []token.Token{
+			token.New(token.PACKAGE, "package"),
+			token.New(token.IDENT, "foo"),
+			token.New(token.EOF, ""),
+		})
+	})
+
 }

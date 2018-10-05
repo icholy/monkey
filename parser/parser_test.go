@@ -625,6 +625,20 @@ func TestMonkey(t *testing.T) {
 		})
 	})
 
+	t.Run("package", func(t *testing.T) {
+		RequireEqualAST(t, "package foo", &ast.Program{
+			Statements: []ast.Statement{
+				&ast.PackageStatement{
+					Token: token.New(token.PACKAGE, "package"),
+					Name: &ast.Identifier{
+						Token: token.New(token.IDENT, "foo"),
+						Value: "foo",
+					},
+				},
+			},
+		})
+	})
+
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {

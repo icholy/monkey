@@ -72,6 +72,7 @@ const (
 	RETURN   = "RETURN"
 	IMPORT   = "IMPORT"
 	WHILE    = "WHILE"
+	PACKAGE  = "PACKAGE"
 )
 
 var keywords = map[string]TokenType{
@@ -85,6 +86,7 @@ var keywords = map[string]TokenType{
 	"function": FUNCTION,
 	"import":   IMPORT,
 	"while":    WHILE,
+	"package":  PACKAGE,
 }
 
 func LookupIdent(ident string) TokenType {

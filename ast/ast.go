@@ -42,6 +42,20 @@ func (p *Program) TokenText() string {
 	return p.Statements[0].TokenText()
 }
 
+type PackageStatement struct {
+	Token token.Token
+	Name  *Identifier
+}
+
+func (p *PackageStatement) String() string {
+	return fmt.Sprintf("package %s", p.Name)
+}
+
+func (p *PackageStatement) statementNode() {}
+func (p *PackageStatement) TokenText() string {
+	return p.Token.Text
+}
+
 type ImportStatement struct {
 	Token   token.Token
 	Value   string

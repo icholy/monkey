@@ -403,6 +403,8 @@ func (p *Parser) stmt() ast.Statement {
 		return p.returnStmt()
 	case token.IMPORT:
 		return p.importStmt()
+	case token.PACKAGE:
+		return p.packageStmt()
 	case token.WHILE:
 		return p.whileStmt()
 	default:
@@ -449,9 +451,17 @@ func (p *Parser) importStmt() *ast.ImportStatement {
 		return nil
 	}
 	stmt.Value = p.cur.Text
-	if p.peek.Is(token.SEMICOLON) {
-		p.next()
+	p.semicolon()
+	return stmt
+}
+
+func (p *Parser) packageStmt() *ast.PackageStatement {
+	stmt := &ast.PackageStatement{Token: p.cur}
+	if !p.expectPeek(token.IDENT) {
+		return nil
 	}
+	stmt.Name = &ast.Identifier{Token: p.cur, Value: p.cur.Text}
+	p.semicolon()
 	return stmt
 }
 
