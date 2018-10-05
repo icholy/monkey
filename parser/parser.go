@@ -92,7 +92,7 @@ func New(l *lexer.Lexer) *Parser {
 		token.EQ:       p.infixExpr,
 		token.NE:       p.infixExpr,
 		token.LT:       p.infixExpr,
-		token.LT_EQ:    p.indexExpr,
+		token.LT_EQ:    p.infixExpr,
 		token.GT:       p.infixExpr,
 		token.GT_EQ:    p.infixExpr,
 		token.LPAREN:   p.callExpr,

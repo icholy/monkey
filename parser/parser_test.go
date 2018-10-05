@@ -174,6 +174,8 @@ func TestMonkey(t *testing.T) {
 			{"<", token.LT},
 			{"!=", token.NE},
 			{"==", token.EQ},
+			{">=", token.GT_EQ},
+			{"<=", token.LT_EQ},
 		}
 
 		for _, tt := range tests {
