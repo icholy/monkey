@@ -149,6 +149,9 @@ func (p *Parser) whileStmt() *ast.WhileStatement {
 	}
 	p.next()
 	while.Body = p.blockStmt()
+	if p.peek.Is(token.SEMICOLON) {
+		p.next()
+	}
 	return while
 }
 
