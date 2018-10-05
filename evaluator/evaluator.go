@@ -99,6 +99,8 @@ func Eval(node ast.Node, env *object.Env) (object.Object, error) {
 		return evalArray(node, env)
 	case *ast.HashLiteral:
 		return evalHash(node, env)
+	case *ast.AssignmentExpression:
+		return evalAssign(node, env)
 	case *ast.IndexExpression:
 		left, err := Eval(node.Value, env)
 		if err != nil {
@@ -134,6 +136,10 @@ func applyFunction(fn object.Object, args []object.Object) (object.Object, error
 		return nil, err
 	}
 	return object.UnwrapReturn(val), nil
+}
+
+func evalAssign(a *ast.AssignmentExpression, env *object.Env) (object.Object, error) {
+	return NULL, nil
 }
 
 func evalImport(i *ast.ImportStatement, env *object.Env) (object.Object, error) {

@@ -15,9 +15,17 @@ func NewEnv(parent *Env) *Env {
 func (e *Env) Get(name string) (Object, bool) {
 	obj, ok := e.store[name]
 	if !ok && e.parent != nil {
-		obj, ok = e.parent.Get(name)
+		return e.parent.Get(name)
 	}
 	return obj, ok
+}
+
+func (e *Env) Update(name string, val Object) bool {
+	_, ok := e.store[name]
+	if !ok && e.parent != nil {
+		return e.parent.Update(name, val)
+	}
+	return ok
 }
 
 func (e *Env) Set(name string, val Object) {
