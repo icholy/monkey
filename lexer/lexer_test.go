@@ -205,4 +205,12 @@ func TestNextToken(t *testing.T) {
 		})
 	})
 
+	t.Run(">= AND <=", func(t *testing.T) {
+		ExpectTokens(t, ">=+<=", []token.Token{
+			token.New(token.GT_EQ, ">="),
+			token.New(token.PLUS, "+"),
+			token.New(token.LT_EQ, "<="),
+		})
+	})
+
 }

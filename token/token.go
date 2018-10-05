@@ -44,6 +44,8 @@ const (
 	LT       = "LT"
 	EQ       = "EQ"
 	NE       = "NE"
+	GT_EQ    = "GT_EQ"
+	LT_EQ    = "LT_EQ"
 	DOT      = "DOT"
 
 	// Delimiters

@@ -54,8 +54,6 @@ var bytetokens = map[byte]token.TokenType{
 	'*': token.ASTERISK,
 	'/': token.SLASH,
 	',': token.COMMA,
-	'<': token.LT,
-	'>': token.GT,
 	'.': token.DOT,
 	0:   token.EOF,
 }
@@ -75,6 +73,22 @@ func (l *Lexer) NextToken() token.Token {
 	}
 
 	switch l.ch {
+	case '<':
+		if l.peek() == '=' {
+			l.read()
+			tok.Type = token.LT_EQ
+			tok.Text = "<="
+		} else {
+			tok = l.charToken(token.LT)
+		}
+	case '>':
+		if l.peek() == '=' {
+			l.read()
+			tok.Type = token.GT_EQ
+			tok.Text = ">="
+		} else {
+			tok = l.charToken(token.GT)
+		}
 	case '=':
 		if l.peek() == '=' {
 			l.read()
