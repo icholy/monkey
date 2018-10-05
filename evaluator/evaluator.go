@@ -394,6 +394,10 @@ func evalIntegerInfixExpression(operator string, left, right *object.Integer) (o
 		return boolToObject(left.Value < right.Value), nil
 	case ">":
 		return boolToObject(left.Value > right.Value), nil
+	case ">=":
+		return boolToObject(left.Value >= right.Value), nil
+	case "<=":
+		return boolToObject(left.Value <= right.Value), nil
 	case "==":
 		return boolToObject(left.Value == right.Value), nil
 	case "!=":

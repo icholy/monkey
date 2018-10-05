@@ -25,11 +25,7 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, "!false", TRUE)
 		RequireEqualEval(t, "!!false", FALSE)
 		RequireEqualEval(t, "1 < 2", TRUE)
-		RequireEqualEval(t, "2 != 2", FALSE)
-		RequireEqualEval(t, "1 == 2", FALSE)
-		RequireEqualEval(t, "1 + 2 == 3", TRUE)
-		RequireEqualEval(t, "true == true", TRUE)
-		RequireEqualEval(t, "true == false", FALSE)
+		RequireEqualEval(t, "1 <= 2", TRUE)
 	})
 
 	t.Run("if expressions", func(t *testing.T) {
