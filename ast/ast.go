@@ -89,9 +89,9 @@ type ReturnStatement struct {
 
 func (r *ReturnStatement) String() string {
 	if r.ReturnValue == nil {
-		return fmt.Sprint("return;")
+		return fmt.Sprint("return")
 	}
-	return fmt.Sprintf("return %s;", r.ReturnValue)
+	return fmt.Sprintf("return %s", r.ReturnValue)
 }
 func (ReturnStatement) statementNode() {}
 func (r *ReturnStatement) TokenText() string {
@@ -256,7 +256,7 @@ type BlockStatement struct {
 func (b *BlockStatement) String() string {
 	var sb strings.Builder
 	for _, s := range b.Statements {
-		fmt.Fprint(&sb, s)
+		fmt.Fprintf(&sb, "%s; ", s)
 	}
 	return sb.String()
 }
@@ -280,7 +280,7 @@ func (f *FunctionLiteral) ParameterNames() []string {
 }
 
 func (f *FunctionLiteral) String() string {
-	return fmt.Sprintf("fn(%s) %s", strings.Join(f.ParameterNames(), ", "), f.Body)
+	return fmt.Sprintf("fn(%s) { %s}", strings.Join(f.ParameterNames(), ", "), f.Body)
 }
 func (FunctionLiteral) expressionNode() {}
 func (f *FunctionLiteral) TokenText() string {
