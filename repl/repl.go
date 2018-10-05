@@ -2,12 +2,11 @@ package repl
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 
 	"github.com/icholy/monkey/evaluator"
-	"github.com/icholy/monkey/lexer"
 	"github.com/icholy/monkey/object"
 	"github.com/icholy/monkey/parser"
 )
@@ -23,36 +22,30 @@ func Run(in io.Reader, out io.Writer) {
 		if line == "exit" {
 			break
 		}
-		l := lexer.New(line)
-		p := parser.New(l)
-		program := p.ParseProgram()
-		if errs := p.Errors(); len(errs) > 0 {
-			for _, err := range errs {
-				fmt.Println(err)
-			}
+		program, err := parser.Parse(line)
+		if err != nil {
+			fmt.Println(err)
 		} else {
-			obj := evaluator.Eval(program, env)
-			fmt.Fprintln(out, obj.Inspect())
+			obj, err := evaluator.Eval(program, env)
+			if err != nil {
+				fmt.Fprintf(out, "ERROR: %s\n", err)
+			} else {
+				fmt.Fprintln(out, obj.Inspect())
+			}
 		}
 		fmt.Fprint(out, Prefix)
 	}
 }
 
 func Exec(in io.Reader) error {
-	scanner := bufio.NewScanner(in)
-	env := object.NewEnv(nil)
-	for scanner.Scan() {
-		line := scanner.Text()
-		l := lexer.New(line)
-		p := parser.New(l)
-		program := p.ParseProgram()
-		if errs := p.Errors(); len(errs) > 0 {
-			for _, err := range errs {
-				return errors.New(err)
-			}
-		} else {
-			evaluator.Eval(program, env)
-		}
+	data, err := ioutil.ReadAll(in)
+	if err != nil {
+		return err
 	}
-	return scanner.Err()
+	program, err := parser.Parse(string(data))
+	if err != nil {
+		return err
+	}
+	_, err = evaluator.Eval(program, object.NewEnv(nil))
+	return err
 }

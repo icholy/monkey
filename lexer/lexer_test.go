@@ -56,7 +56,7 @@ func TestNextToken(t *testing.T) {
 			{token.LET, "let"},
 			{token.IDENT, "add"},
 			{token.ASSIGN, "="},
-			{token.FUNCTION, "fn"},
+			{token.FN, "fn"},
 			{token.LPAREN, "("},
 			{token.IDENT, "x"},
 			{token.COMMA, ","},

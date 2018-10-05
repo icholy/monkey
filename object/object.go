@@ -29,7 +29,7 @@ type Object interface {
 	KeyValue() KeyValue
 }
 
-type BuiltinFunc func(...Object) Object
+type BuiltinFunc func(...Object) (Object, error)
 
 type Builtin struct {
 	Fn BuiltinFunc
@@ -77,21 +77,11 @@ func (r *ReturnValue) KeyValue() KeyValue { return r.Value.KeyValue() }
 func (r *ReturnValue) Inspect() string    { return r.Value.Inspect() }
 func (r *ReturnValue) Type() ObjectType   { return RETURN }
 
-type Error struct {
-	Message string
-}
-
-type ErrorMessage string
-
-func (e *Error) KeyValue() KeyValue { return ErrorMessage(e.Message) }
-func (e *Error) Error() string      { return e.Message }
-func (e *Error) Type() ObjectType   { return ERROR }
-func (e *Error) Inspect() string    { return fmt.Sprintf("ERROR: %s", e.Message) }
-
-func Errorf(format string, args ...interface{}) *Error {
-	return &Error{
-		Message: fmt.Sprintf(format, args...),
+func UnwrapReturn(obj Object) Object {
+	if ret, ok := obj.(*ReturnValue); ok {
+		return ret.Value
 	}
+	return obj
 }
 
 type Function struct {
@@ -109,7 +99,7 @@ func (f *Function) Inspect() string {
 	for _, p := range f.Parameters {
 		params = append(params, p.Value)
 	}
-	return fmt.Sprintf("fn(%s) %s", strings.Join(params, ", "), f.Body)
+	return fmt.Sprintf("fn(%s) { %s }", strings.Join(params, ", "), f.Body)
 }
 
 type Array struct {
@@ -123,7 +113,7 @@ func (a *Array) Inspect() string {
 	for _, e := range a.Elements {
 		vals = append(vals, e.Inspect())
 	}
-	return strings.Join(vals, ", ")
+	return fmt.Sprintf("[%s]", strings.Join(vals, ", "))
 }
 
 type KeyValue interface{}
@@ -181,7 +171,7 @@ func (Hash) Type() ObjectType      { return HASH }
 func (h *Hash) Inspect() string {
 	var pairs []string
 	for _, p := range h.pairs {
-		pairs = append(pairs, fmt.Sprintf("%s: %s", p.Key, p.Value))
+		pairs = append(pairs, fmt.Sprintf("%s: %s", p.Key.Inspect(), p.Value.Inspect()))
 	}
 	return fmt.Sprintf("{ %s }", strings.Join(pairs, ", "))
 }

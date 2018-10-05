@@ -5,7 +5,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/icholy/monkey/lexer"
 	"github.com/icholy/monkey/object"
 	"github.com/icholy/monkey/parser"
 )
@@ -58,12 +57,12 @@ func TestEvaluator(t *testing.T) {
 	})
 
 	t.Run("errors", func(t *testing.T) {
-		RequireEqualEval(t, "-true", &object.Error{"unknown operator: -BOOLEAN"})
-		RequireEqualEval(t, "5 + true;", &object.Error{"type mismatch: INTEGER + BOOLEAN"})
-		RequireEqualEval(t, "5 + true; 5;", &object.Error{"type mismatch: INTEGER + BOOLEAN"})
-		RequireEqualEval(t, "true + false", &object.Error{"unknown operator: BOOLEAN + BOOLEAN"})
-		RequireEqualEval(t, "5; true + false; 5", &object.Error{"unknown operator: BOOLEAN + BOOLEAN"})
-		RequireEqualEval(t, "if (10 > 1) { true + false; }", &object.Error{"unknown operator: BOOLEAN + BOOLEAN"})
+		RequireEvalError(t, "-true", "unknown operator: -BOOLEAN")
+		RequireEvalError(t, "5 + true;", "type mismatch: INTEGER + BOOLEAN")
+		RequireEvalError(t, "5 + true; 5;", "type mismatch: INTEGER + BOOLEAN")
+		RequireEvalError(t, "true + false", "unknown operator: BOOLEAN + BOOLEAN")
+		RequireEvalError(t, "5; true + false; 5", "unknown operator: BOOLEAN + BOOLEAN")
+		RequireEvalError(t, "if (10 > 1) { true + false; }", "unknown operator: BOOLEAN + BOOLEAN")
 	})
 
 	t.Run("let statement", func(t *testing.T) {
@@ -87,8 +86,8 @@ func TestEvaluator(t *testing.T) {
 	t.Run("builtin", func(t *testing.T) {
 		RequireEqualEval(t, `len("hello world")`, &object.Integer{11})
 		RequireEqualEval(t, `len("")`, &object.Integer{0})
-		RequireEqualEval(t, `len(1)`, &object.Error{"len: invalid argument type INTEGER"})
-		RequireEqualEval(t, `len("one", "two")`, &object.Error{"len: wrong number of arguments"})
+		RequireEvalError(t, `len(1)`, "len: invalid argument type INTEGER")
+		RequireEvalError(t, `len("one", "two")`, "len: wrong number of arguments")
 		RequireEqualEval(t, `len([])`, &object.Integer{0})
 		RequireEqualEval(t, `let x = append([], 1, 2); x[(len(x) - 1)]`, &object.Integer{2})
 	})
@@ -105,7 +104,9 @@ func TestEvaluator(t *testing.T) {
 	})
 
 	t.Run("empty hash", func(t *testing.T) {
-		hash, ok := ParseEval(t, "{}").(*object.Hash)
+		obj, err := ParseEval(t, "{}")
+		require.NoError(t, err)
+		hash, ok := obj.(*object.Hash)
 		require.True(t, ok, "should be hash")
 		require.Empty(t, hash.Pairs())
 	})
@@ -117,7 +118,9 @@ func TestEvaluator(t *testing.T) {
 				Value: TRUE,
 			},
 		}
-		hash, ok := ParseEval(t, "{ 123: true }").(*object.Hash)
+		obj, err := ParseEval(t, "{ 123: true }")
+		require.NoError(t, err)
+		hash, ok := obj.(*object.Hash)
 		require.True(t, ok, "should be hash")
 		require.Equal(t, expected, hash.Pairs())
 	})
@@ -127,18 +130,25 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, "let x = { true: 123, false: 321 }; x[false]", &object.Integer{321})
 	})
 
+	t.Run("function statement", func(t *testing.T) {
+		RequireEqualEval(t, "function add(x, y) { x + y }; add(1, 1)", &object.Integer{2})
+	})
+
 }
 
-func ParseEval(t *testing.T, input string) object.Object {
-	l := lexer.New(input)
-	p := parser.New(l)
-	program := p.ParseProgram()
-	require.Empty(t, p.Errors(), "parser error")
-	env := object.NewEnv(nil)
-	return Eval(program, env)
+func ParseEval(t *testing.T, input string) (object.Object, error) {
+	program, err := parser.Parse(input)
+	require.NoError(t, err)
+	return Eval(program, object.NewEnv(nil))
+}
+
+func RequireEvalError(t *testing.T, input string, message string) {
+	_, err := ParseEval(t, input)
+	require.EqualError(t, err, message)
 }
 
 func RequireEqualEval(t *testing.T, input string, expected object.Object) {
-	actual := ParseEval(t, input)
+	actual, err := ParseEval(t, input)
+	require.NoError(t, err)
 	require.Equal(t, expected, actual)
 }

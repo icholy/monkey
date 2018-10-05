@@ -7,12 +7,24 @@ import (
 type TokenType string
 
 type Token struct {
-	Type    TokenType
-	Literal string
+	Type TokenType
+	Text string
+}
+
+func New(typ TokenType, text string) Token {
+	return Token{Type: typ, Text: text}
+}
+
+func NewByte(typ TokenType, text byte) Token {
+	return New(typ, string(text))
+}
+
+func (t Token) Is(typ TokenType) bool {
+	return t.Type == typ
 }
 
 func (t Token) String() string {
-	return fmt.Sprintf("%s(\"%s\")", t.Type, t.Literal)
+	return fmt.Sprintf("%s(\"%s\")", t.Type, t.Text)
 }
 
 const (
@@ -47,6 +59,7 @@ const (
 	STRING   = "STRING"
 
 	// Keywords
+	FN       = "FN"
 	FUNCTION = "FUNCTION"
 	LET      = "LET"
 	TRUE     = "TRUE"
@@ -54,16 +67,19 @@ const (
 	IF       = "IF"
 	ELSE     = "ELSE"
 	RETURN   = "RETURN"
+	IMPORT   = "IMPORT"
 )
 
 var keywords = map[string]TokenType{
-	"fn":     FUNCTION,
-	"let":    LET,
-	"true":   TRUE,
-	"false":  FALSE,
-	"if":     IF,
-	"else":   ELSE,
-	"return": RETURN,
+	"fn":       FN,
+	"let":      LET,
+	"true":     TRUE,
+	"false":    FALSE,
+	"if":       IF,
+	"else":     ELSE,
+	"return":   RETURN,
+	"function": FUNCTION,
+	"import":   IMPORT,
 }
 
 func LookupIdent(ident string) TokenType {

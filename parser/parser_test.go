@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/icholy/monkey/ast"
-	"github.com/icholy/monkey/lexer"
 	"github.com/icholy/monkey/token"
 )
 
@@ -74,12 +73,16 @@ func TestMonkey(t *testing.T) {
 
 	t.Run("return", func(t *testing.T) {
 		input := `
+			return;
 			return 5;
 			return foo;
 			return (true);
 		`
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
+				&ast.ReturnStatement{
+					Token: token.Token{token.RETURN, "return"},
+				},
 				&ast.ReturnStatement{
 					Token: token.Token{token.RETURN, "return"},
 					ReturnValue: &ast.IntegerLiteral{
@@ -289,9 +292,9 @@ func TestMonkey(t *testing.T) {
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{
-					Token: token.Token{token.FUNCTION, "fn"},
+					Token: token.New(token.FN, "fn"),
 					Expression: &ast.FunctionLiteral{
-						Token: token.Token{token.FUNCTION, "fn"},
+						Token: token.Token{token.FN, "fn"},
 						Parameters: []*ast.Identifier{
 							{
 								Token: token.Token{token.IDENT, "x"},
@@ -472,20 +475,65 @@ func TestMonkey(t *testing.T) {
 		})
 	})
 
+	t.Run("function statement", func(t *testing.T) {
+		input := `
+			function foo(x) {}
+
+			x()
+		`
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.FunctionStatement{
+					Token: token.New(token.FUNCTION, "function"),
+					Name: &ast.Identifier{
+						Token: token.New(token.IDENT, "foo"),
+						Value: "foo",
+					},
+					Parameters: []*ast.Identifier{
+						{
+							Token: token.New(token.IDENT, "x"),
+							Value: "x",
+						},
+					},
+					Body: &ast.BlockStatement{
+						Token: token.New(token.LBRACE, "{"),
+					},
+				},
+				&ast.ExpressionStatement{
+					Token: token.New(token.IDENT, "x"),
+					Expression: &ast.CallExpression{
+						Token: token.New(token.LPAREN, "("),
+						Function: &ast.Identifier{
+							Token: token.New(token.IDENT, "x"),
+							Value: "x",
+						},
+					},
+				},
+			},
+		})
+	})
+
+	t.Run("import", func(t *testing.T) {
+		RequireEqualAST(t, `import "foo.monkey"`, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ImportStatement{
+					Token: token.New(token.IMPORT, "import"),
+					Value: "foo.monkey",
+				},
+			},
+		})
+	})
+
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {
-	l := lexer.New(input)
-	p := New(l)
-	program := p.ParseProgram()
-	require.Empty(t, p.Errors(), "parser errors")
+	program, err := Parse(input)
+	require.NoError(t, err)
 	require.Equal(t, expected, program.String())
 }
 
 func RequireEqualAST(t *testing.T, input string, expected *ast.Program) {
-	l := lexer.New(input)
-	p := New(l)
-	actual := p.ParseProgram()
-	require.Empty(t, p.Errors(), "parser errors")
+	actual, err := Parse(input)
+	require.NoError(t, err)
 	require.Equal(t, expected, actual)
 }
