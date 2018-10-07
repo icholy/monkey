@@ -185,8 +185,8 @@ func evalWhile(w *ast.WhileStatement, env *object.Env) (object.Object, error) {
 func evalAssign(left ast.Expression, val object.Object, env *object.Env) (object.Object, error) {
 	switch node := left.(type) {
 	case *ast.Identifier:
-		if !env.Update(node.Value, val) {
-			return nil, fmt.Errorf("'%s' is not defined", node.Value)
+		if err := env.Update(node.Value, val); err != nil {
+			return nil, err
 		}
 		return NULL, nil
 	case *ast.PropertyExpression:

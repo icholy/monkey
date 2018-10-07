@@ -42,6 +42,18 @@ type Object interface {
 	KeyValue() KeyValue
 }
 
+type TypedObject struct {
+	Object
+	ObjectType ObjectType
+}
+
+func (o *TypedObject) Set(val Object) error {
+	if val.Type() != o.ObjectType {
+		return fmt.Errorf("wrong type: expected %s, got %s", o.ObjectType, val.Type())
+	}
+	return nil
+}
+
 type BuiltinFunc func(...Object) (Object, error)
 
 type Builtin struct {
