@@ -474,6 +474,16 @@ func (p *Parser) letStmt() *ast.LetStatement {
 		Token: p.cur,
 		Value: p.cur.Text,
 	}
+	if p.peek.Is(token.COLON) {
+		p.next()
+		if !p.expectPeek(token.IDENT) {
+			return nil
+		}
+		stmt.Type = &ast.Identifier{
+			Token: p.cur,
+			Value: p.cur.Text,
+		}
+	}
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
