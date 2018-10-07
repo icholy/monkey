@@ -128,6 +128,17 @@ func Eval(node ast.Node, env *object.Env) (object.Object, error) {
 	}
 }
 
+func typeCheck(typeName *ast.Identifier, val object.Object) error {
+	typ, ok := object.LookupType(typeName.Value)
+	if !ok {
+		return fmt.Errorf("invalid type name: %s", typeName)
+	}
+	if val.Type() != typ {
+		return fmt.Errorf("wrong type: expected, %s, got %s", typ, val.Type())
+	}
+	return nil
+}
+
 func applyFunction(fn object.Object, args []object.Object) (object.Object, error) {
 	if builtin, ok := fn.(*object.Builtin); ok {
 		return builtin.Fn(args...)
@@ -141,6 +152,11 @@ func applyFunction(fn object.Object, args []object.Object) (object.Object, error
 	}
 	env := object.NewEnv(function.Env)
 	for i, param := range function.Parameters {
+		if param.Type != nil {
+			if err := typeCheck(param.Type, args[i]); err != nil {
+				return nil, err
+			}
+		}
 		env.Set(param.Name.Value, args[i])
 	}
 	val, err := Eval(function.Body, env)

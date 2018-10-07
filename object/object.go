@@ -15,13 +15,26 @@ const (
 	NULL     = "NULL"
 	BOOLEAN  = "BOOLEAN"
 	RETURN   = "RETURN"
-	ERROR    = "ERROR"
 	FUNCTION = "FUNCTION"
 	STRING   = "STRING"
 	BUILTIN  = "BUILTIN"
 	ARRAY    = "ARRAY"
 	HASH     = "HASH"
 )
+
+var types = map[string]ObjectType{
+	"integer":  INTEGER,
+	"boolean":  BOOLEAN,
+	"string":   STRING,
+	"array":    ARRAY,
+	"hash":     HASH,
+	"function": FUNCTION,
+}
+
+func LookupType(name string) (ObjectType, bool) {
+	t, ok := types[name]
+	return t, ok
+}
 
 type Object interface {
 	Type() ObjectType
