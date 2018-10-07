@@ -698,6 +698,28 @@ func TestMonkey(t *testing.T) {
 		})
 	})
 
+	t.Run("typed let", func(t *testing.T) {
+		RequireEqualAST(t, `let x: string = "test"`, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.LetStatement{
+					Token: token.New(token.LET, "let"),
+					Name: &ast.Identifier{
+						Token: token.New(token.IDENT, "x"),
+						Value: "x",
+					},
+					Type: &ast.Identifier{
+						Token: token.New(token.IDENT, "string"),
+						Value: "string",
+					},
+					Value: &ast.StringLiteral{
+						Token: token.New(token.STRING, "test"),
+						Value: "test",
+					},
+				},
+			},
+		})
+	})
+
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {
