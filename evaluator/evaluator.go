@@ -95,6 +95,16 @@ func Eval(node ast.Node, env *object.Env) (object.Object, error) {
 		if err != nil {
 			return nil, err
 		}
+		if node.Type != nil {
+			if err := typeCheck(node.Type, val); err != nil {
+				return nil, err
+			}
+			typ, _ := object.LookupType(node.Type.Value)
+			val = &object.TypedObject{
+				ObjectType: typ,
+				Object:     val,
+			}
+		}
 		env.Set(node.Name.Value, val)
 		return NULL, nil
 	case *ast.PropertyExpression:
@@ -134,7 +144,7 @@ func typeCheck(typeName *ast.Identifier, val object.Object) error {
 		return fmt.Errorf("invalid type name: %s", typeName)
 	}
 	if val.Type() != typ {
-		return fmt.Errorf("wrong type: expected, %s, got %s", typ, val.Type())
+		return fmt.Errorf("wrong type: expected %s, got %s", typ, val.Type())
 	}
 	return nil
 }

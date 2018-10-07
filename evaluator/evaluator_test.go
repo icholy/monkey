@@ -152,7 +152,8 @@ func TestEvaluator(t *testing.T) {
 
 	t.Run("type checking", func(t *testing.T) {
 		RequireEqualEval(t, "fn(x: integer){x}(123)", &object.Integer{123})
-		RequireEvalError(t, "fn(x: integer){x}(false)", "wrong type: expected, INTEGER, got BOOLEAN")
+		RequireEvalError(t, "fn(x: integer){x}(false)", "wrong type: expected INTEGER, got BOOLEAN")
+		RequireEvalError(t, "let x: boolean = 123", "wrong type: expected BOOLEAN, got INTEGER")
 		RequireEqualEval(t, "let x: integer = 123; x", &object.TypedObject{ObjectType: object.INTEGER, Object: &object.Integer{123}})
 		RequireEvalError(t, "let x: boolean = false; x = 123", "wrong type: expected BOOLEAN, got INTEGER")
 	})
