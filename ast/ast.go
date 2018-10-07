@@ -81,7 +81,10 @@ func (p *Parameter) TokenText() string {
 	return p.Token.Text
 }
 func (p *Parameter) String() string {
-	return fmt.Sprintf("%s: %s", p.Name, p.Type)
+	if p.Type != nil {
+		return fmt.Sprintf("%s: %s", p.Name, p.Type)
+	}
+	return p.Name.Value
 }
 
 type Identifier struct {
@@ -98,10 +101,14 @@ func (i *Identifier) TokenText() string {
 type LetStatement struct {
 	Token token.Token
 	Name  *Identifier
+	Type  *Identifier
 	Value Expression
 }
 
 func (l *LetStatement) String() string {
+	if l.Type != nil {
+		return fmt.Sprintf("let %s: %s = %s;", l.Name, l.Type, l.Value)
+	}
 	return fmt.Sprintf("let %s = %s;", l.Name, l.Value)
 }
 
