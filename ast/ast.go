@@ -70,23 +70,10 @@ func (i *ImportStatement) TokenText() string {
 	return i.Token.Text
 }
 
-type Type struct {
-	Token token.Token
-	Name  string
-}
-
-func (t *Type) expressionNode() {}
-func (t *Type) TokenText() string {
-	return t.Token.Text
-}
-func (t *Type) String() string {
-	return t.Name
-}
-
 type Parameter struct {
 	Token token.Token
 	Name  *Identifier
-	Type  *Type
+	Type  *Identifier
 }
 
 func (p *Parameter) expressionNode() {}

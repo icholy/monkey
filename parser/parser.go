@@ -229,17 +229,20 @@ func (p *Parser) ifExpr() ast.Expression {
 	return expr
 }
 
-func (p *Parser) fnParameterIdents() []*ast.Parameter {
+func (p *Parser) fnParameters() []*ast.Parameter {
 	var params []*ast.Parameter
 	for p.peek.Is(token.IDENT) {
 		p.next()
-		params = append(params, &ast.Parameter{
-			Token: p.cur,
-			Name: &ast.Identifier{
-				Token: p.cur,
-				Value: p.cur.Text,
-			},
-		})
+		param := &ast.Parameter{Token: p.cur}
+		param.Name = &ast.Identifier{Token: p.cur, Value: p.cur.Text}
+		if p.peek.Is(token.COLON) {
+			p.next()
+			if !p.expectPeek(token.IDENT) {
+				return nil
+			}
+			param.Type = &ast.Identifier{Token: p.cur, Value: p.cur.Text}
+		}
+		params = append(params, param)
 		if p.peek.Is(token.COMMA) {
 			p.next()
 		}
@@ -257,7 +260,7 @@ func (p *Parser) functionStmt() ast.Statement {
 	if !p.expectPeek(token.LPAREN) {
 		return nil
 	}
-	stmt.Parameters = p.fnParameterIdents()
+	stmt.Parameters = p.fnParameters()
 	if !p.expectPeek(token.LBRACE) {
 		return nil
 	}
@@ -271,7 +274,7 @@ func (p *Parser) fnExpr() ast.Expression {
 	if !p.expectPeek(token.LPAREN) {
 		return nil
 	}
-	expr.Parameters = p.fnParameterIdents()
+	expr.Parameters = p.fnParameters()
 	if !p.expectPeek(token.LBRACE) {
 		return nil
 	}

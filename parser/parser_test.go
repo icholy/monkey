@@ -648,6 +648,56 @@ func TestMonkey(t *testing.T) {
 		})
 	})
 
+	t.Run("function literal", func(t *testing.T) {
+		input := "fn(x: number, y: string) { x }"
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ExpressionStatement{
+					Token: token.New(token.FN, "fn"),
+					Expression: &ast.FunctionLiteral{
+						Token: token.Token{token.FN, "fn"},
+						Parameters: []*ast.Parameter{
+							{
+								Token: token.Token{token.IDENT, "x"},
+								Name: &ast.Identifier{
+									Token: token.Token{token.IDENT, "x"},
+									Value: "x",
+								},
+								Type: &ast.Identifier{
+									Token: token.New(token.IDENT, "number"),
+									Value: "number",
+								},
+							},
+							{
+								Token: token.Token{token.IDENT, "y"},
+								Name: &ast.Identifier{
+									Token: token.Token{token.IDENT, "y"},
+									Value: "y",
+								},
+								Type: &ast.Identifier{
+									Token: token.New(token.IDENT, "string"),
+									Value: "string",
+								},
+							},
+						},
+						Body: &ast.BlockStatement{
+							Token: token.Token{token.LBRACE, "{"},
+							Statements: []ast.Statement{
+								&ast.ExpressionStatement{
+									Token: token.Token{token.IDENT, "x"},
+									Expression: &ast.Identifier{
+										Token: token.Token{token.IDENT, "x"},
+										Value: "x",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		})
+	})
+
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {
