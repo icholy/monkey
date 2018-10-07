@@ -261,6 +261,13 @@ func (p *Parser) functionStmt() ast.Statement {
 		return nil
 	}
 	stmt.Parameters = p.fnParameters()
+	if p.peek.Is(token.COLON) {
+		p.next()
+		if !p.expectPeek(token.IDENT) {
+			return nil
+		}
+		stmt.ReturnType = &ast.Identifier{Token: p.cur, Value: p.cur.Text}
+	}
 	if !p.expectPeek(token.LBRACE) {
 		return nil
 	}
@@ -275,6 +282,13 @@ func (p *Parser) fnExpr() ast.Expression {
 		return nil
 	}
 	expr.Parameters = p.fnParameters()
+	if p.peek.Is(token.COLON) {
+		p.next()
+		if !p.expectPeek(token.IDENT) {
+			return nil
+		}
+		expr.ReturnType = &ast.Identifier{Token: p.cur, Value: p.cur.Text}
+	}
 	if !p.expectPeek(token.LBRACE) {
 		return nil
 	}

@@ -292,7 +292,7 @@ func TestMonkey(t *testing.T) {
 	})
 
 	t.Run("function literal", func(t *testing.T) {
-		input := "fn(x, y) { x }"
+		input := "fn(x, y): integer { x }"
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{
@@ -314,6 +314,10 @@ func TestMonkey(t *testing.T) {
 									Value: "y",
 								},
 							},
+						},
+						ReturnType: &ast.Identifier{
+							Token: token.New(token.IDENT, "integer"),
+							Value: "integer",
 						},
 						Body: &ast.BlockStatement{
 							Token: token.Token{token.LBRACE, "{"},
@@ -507,6 +511,51 @@ func TestMonkey(t *testing.T) {
 								Value: "x",
 							},
 						},
+					},
+					Body: &ast.BlockStatement{
+						Token: token.New(token.LBRACE, "{"),
+					},
+				},
+				&ast.ExpressionStatement{
+					Token: token.New(token.IDENT, "x"),
+					Expression: &ast.CallExpression{
+						Token: token.New(token.LPAREN, "("),
+						Function: &ast.Identifier{
+							Token: token.New(token.IDENT, "x"),
+							Value: "x",
+						},
+					},
+				},
+			},
+		})
+	})
+
+	t.Run("typed function statement", func(t *testing.T) {
+		input := `
+			function foo(x): string {}
+
+			x()
+		`
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.FunctionStatement{
+					Token: token.New(token.FUNCTION, "function"),
+					Name: &ast.Identifier{
+						Token: token.New(token.IDENT, "foo"),
+						Value: "foo",
+					},
+					Parameters: []*ast.Parameter{
+						{
+							Token: token.New(token.IDENT, "x"),
+							Name: &ast.Identifier{
+								Token: token.New(token.IDENT, "x"),
+								Value: "x",
+							},
+						},
+					},
+					ReturnType: &ast.Identifier{
+						Token: token.New(token.IDENT, "string"),
+						Value: "string",
 					},
 					Body: &ast.BlockStatement{
 						Token: token.New(token.LBRACE, "{"),

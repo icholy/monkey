@@ -333,6 +333,7 @@ func (b *BlockStatement) TokenText() string {
 type FunctionLiteral struct {
 	Token      token.Token
 	Parameters []*Parameter
+	ReturnType *Identifier
 	Body       *BlockStatement
 }
 
@@ -356,6 +357,7 @@ type FunctionStatement struct {
 	Token      token.Token
 	Name       *Identifier
 	Parameters []*Parameter
+	ReturnType *Identifier
 	Body       *BlockStatement
 }
 
