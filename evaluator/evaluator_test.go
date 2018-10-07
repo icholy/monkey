@@ -149,6 +149,11 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, `let x = { "foo": { "bar": true } }; x.foo.bar`, TRUE)
 		RequireEqualEval(t, `let x = {}; x.foo = 123; x.foo`, &object.Integer{123})
 	})
+
+	t.Run("type checking", func(t *testing.T) {
+		RequireEqualEval(t, "fn(x: integer){x}(123)", &object.Integer{123})
+		RequireEvalError(t, "fn(x: integer){x}(false)", "wrong type: expected, INTEGER, got BOOLEAN")
+	})
 }
 
 func ParseEval(t *testing.T, input string) (object.Object, error) {
