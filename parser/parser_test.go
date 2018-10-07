@@ -299,14 +299,20 @@ func TestMonkey(t *testing.T) {
 					Token: token.New(token.FN, "fn"),
 					Expression: &ast.FunctionLiteral{
 						Token: token.Token{token.FN, "fn"},
-						Parameters: []*ast.Identifier{
+						Parameters: []*ast.Parameter{
 							{
 								Token: token.Token{token.IDENT, "x"},
-								Value: "x",
+								Name: &ast.Identifier{
+									Token: token.Token{token.IDENT, "x"},
+									Value: "x",
+								},
 							},
 							{
 								Token: token.Token{token.IDENT, "y"},
-								Value: "y",
+								Name: &ast.Identifier{
+									Token: token.Token{token.IDENT, "y"},
+									Value: "y",
+								},
 							},
 						},
 						Body: &ast.BlockStatement{
@@ -493,10 +499,13 @@ func TestMonkey(t *testing.T) {
 						Token: token.New(token.IDENT, "foo"),
 						Value: "foo",
 					},
-					Parameters: []*ast.Identifier{
+					Parameters: []*ast.Parameter{
 						{
 							Token: token.New(token.IDENT, "x"),
-							Value: "x",
+							Name: &ast.Identifier{
+								Token: token.New(token.IDENT, "x"),
+								Value: "x",
+							},
 						},
 					},
 					Body: &ast.BlockStatement{

@@ -229,13 +229,16 @@ func (p *Parser) ifExpr() ast.Expression {
 	return expr
 }
 
-func (p *Parser) fnParameterIdents() []*ast.Identifier {
-	var params []*ast.Identifier
+func (p *Parser) fnParameterIdents() []*ast.Parameter {
+	var params []*ast.Parameter
 	for p.peek.Is(token.IDENT) {
 		p.next()
-		params = append(params, &ast.Identifier{
+		params = append(params, &ast.Parameter{
 			Token: p.cur,
-			Value: p.cur.Text,
+			Name: &ast.Identifier{
+				Token: p.cur,
+				Value: p.cur.Text,
+			},
 		})
 		if p.peek.Is(token.COMMA) {
 			p.next()
@@ -355,24 +358,18 @@ func (p *Parser) infixExpr(left ast.Expression) ast.Expression {
 func (p *Parser) delimitedExpr(term token.TokenType) []ast.Expression {
 	var args []ast.Expression
 
-	// empty list
-	if p.peek.Is(term) {
-		p.next()
-		return args
-	}
-
-	// first element of the list
-	p.next()
-	args = append(args, p.expression(LOWEST))
-
-	for p.peek.Is(token.COMMA) {
-		p.next()
+	for i := 0; true; i++ {
+		if p.peek.Is(term) {
+			p.next()
+			break
+		}
+		if i > 0 {
+			if !p.expectPeek(token.COMMA) {
+				return nil
+			}
+		}
 		p.next()
 		args = append(args, p.expression(LOWEST))
-	}
-
-	if !p.expectPeek(term) {
-		return nil
 	}
 
 	return args

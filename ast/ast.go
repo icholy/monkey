@@ -70,6 +70,33 @@ func (i *ImportStatement) TokenText() string {
 	return i.Token.Text
 }
 
+type Type struct {
+	Token token.Token
+	Name  string
+}
+
+func (t *Type) expressionNode() {}
+func (t *Type) TokenText() string {
+	return t.Token.Text
+}
+func (t *Type) String() string {
+	return t.Name
+}
+
+type Parameter struct {
+	Token token.Token
+	Name  *Identifier
+	Type  *Type
+}
+
+func (p *Parameter) expressionNode() {}
+func (p *Parameter) TokenText() string {
+	return p.Token.Text
+}
+func (p *Parameter) String() string {
+	return fmt.Sprintf("%s: %s", p.Name, p.Type)
+}
+
 type Identifier struct {
 	Token token.Token
 	Value string
@@ -311,14 +338,14 @@ func (b *BlockStatement) TokenText() string {
 
 type FunctionLiteral struct {
 	Token      token.Token
-	Parameters []*Identifier
+	Parameters []*Parameter
 	Body       *BlockStatement
 }
 
 func (f *FunctionLiteral) ParameterNames() []string {
 	var names []string
 	for _, p := range f.Parameters {
-		names = append(names, p.Value)
+		names = append(names, p.Name.Value)
 	}
 	return names
 }
@@ -334,14 +361,14 @@ func (f *FunctionLiteral) TokenText() string {
 type FunctionStatement struct {
 	Token      token.Token
 	Name       *Identifier
-	Parameters []*Identifier
+	Parameters []*Parameter
 	Body       *BlockStatement
 }
 
 func (f *FunctionStatement) ParameterNames() []string {
 	var names []string
 	for _, p := range f.Parameters {
-		names = append(names, p.Value)
+		names = append(names, p.Name.Value)
 	}
 	return names
 }
