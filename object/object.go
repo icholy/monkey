@@ -92,7 +92,7 @@ func UnwrapReturn(obj Object) Object {
 }
 
 type Function struct {
-	Parameters []*ast.Identifier
+	Parameters []*ast.Parameter
 	Body       *ast.BlockStatement
 	Env        *Env
 }
@@ -104,7 +104,7 @@ func (f *Function) Type() ObjectType { return FUNCTION }
 func (f *Function) Inspect() string {
 	var params []string
 	for _, p := range f.Parameters {
-		params = append(params, p.Value)
+		params = append(params, p.Name.Value)
 	}
 	return fmt.Sprintf("fn(%s) { %s }", strings.Join(params, ", "), f.Body)
 }

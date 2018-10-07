@@ -141,7 +141,7 @@ func applyFunction(fn object.Object, args []object.Object) (object.Object, error
 	}
 	env := object.NewEnv(function.Env)
 	for i, param := range function.Parameters {
-		env.Set(param.Value, args[i])
+		env.Set(param.Name.Value, args[i])
 	}
 	val, err := Eval(function.Body, env)
 	if err != nil {
