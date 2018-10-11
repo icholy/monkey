@@ -19,7 +19,30 @@ var (
 	NULL  = &object.Null{}
 )
 
+type Error struct {
+	Err  error
+	Node ast.Node
+}
+
+func (e Error) Error() string {
+	return fmt.Sprintf("%s: %s", e.Node.TokenPos(), e.Err)
+}
+
 func Eval(node ast.Node, env *object.Env) (object.Object, error) {
+	val, err := eval(node, env)
+	if err != nil {
+		if _, ok := err.(*Error); ok {
+			return nil, err
+		}
+		return nil, &Error{
+			Node: node,
+			Err:  err,
+		}
+	}
+	return val, nil
+}
+
+func eval(node ast.Node, env *object.Env) (object.Object, error) {
 	switch node := node.(type) {
 	case *ast.Program:
 		return evalProgram(node, env)

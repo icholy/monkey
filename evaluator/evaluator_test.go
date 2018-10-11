@@ -55,12 +55,12 @@ func TestEvaluator(t *testing.T) {
 	})
 
 	t.Run("errors", func(t *testing.T) {
-		RequireEvalError(t, "-true", "unknown operator: -BOOLEAN")
-		RequireEvalError(t, "5 + true;", "type mismatch: INTEGER + BOOLEAN")
-		RequireEvalError(t, "5 + true; 5;", "type mismatch: INTEGER + BOOLEAN")
-		RequireEvalError(t, "true + false", "unknown operator: BOOLEAN + BOOLEAN")
-		RequireEvalError(t, "5; true + false; 5", "unknown operator: BOOLEAN + BOOLEAN")
-		RequireEvalError(t, "if (10 > 1) { true + false; }", "unknown operator: BOOLEAN + BOOLEAN")
+		RequireEvalError(t, "-true", "1:1: unknown operator: -BOOLEAN")
+		RequireEvalError(t, "5 + true;", "1:3: type mismatch: INTEGER + BOOLEAN")
+		RequireEvalError(t, "5 + true; 5;", "1:3: type mismatch: INTEGER + BOOLEAN")
+		RequireEvalError(t, "true + false", "1:6: unknown operator: BOOLEAN + BOOLEAN")
+		RequireEvalError(t, "5; true + false; 5", "1:9: unknown operator: BOOLEAN + BOOLEAN")
+		RequireEvalError(t, "if (10 > 1) { true + false; }", "1:20: unknown operator: BOOLEAN + BOOLEAN")
 	})
 
 	t.Run("let statement", func(t *testing.T) {
@@ -87,8 +87,8 @@ func TestEvaluator(t *testing.T) {
 	t.Run("builtin", func(t *testing.T) {
 		RequireEqualEval(t, `len("hello world")`, &object.Integer{11})
 		RequireEqualEval(t, `len("")`, &object.Integer{0})
-		RequireEvalError(t, `len(1)`, "len: invalid argument type INTEGER")
-		RequireEvalError(t, `len("one", "two")`, "len: wrong number of arguments")
+		RequireEvalError(t, `len(1)`, "1:4: len: invalid argument type INTEGER")
+		RequireEvalError(t, `len("one", "two")`, "1:4: len: wrong number of arguments")
 		RequireEqualEval(t, `len([])`, &object.Integer{0})
 		RequireEqualEval(t, `let x = append([], 1, 2); x[(len(x) - 1)]`, &object.Integer{2})
 	})
@@ -154,25 +154,28 @@ func TestEvaluator(t *testing.T) {
 
 	t.Run("type checking", func(t *testing.T) {
 		RequireEqualEval(t, "fn(x: integer){x}(123)", &object.Integer{123})
-		RequireEvalError(t, "fn(x: integer){x}(false)", "wrong type: expected INTEGER, got BOOLEAN")
-		RequireEvalError(t, "let x: boolean = 123", "wrong type: expected BOOLEAN, got INTEGER")
+		RequireEvalError(t, "fn(x: integer){x}(false)", "1:18: wrong type: expected INTEGER, got BOOLEAN")
+		RequireEvalError(t, "let x: boolean = 123", "1:1: wrong type: expected BOOLEAN, got INTEGER")
 		RequireEqualEval(t, "let x: integer = 123; x", &object.TypedObject{ObjectType: object.INTEGER, Object: &object.Integer{123}})
-		RequireEvalError(t, "let x: boolean = false; x = 123", "wrong type: expected BOOLEAN, got INTEGER")
+		RequireEvalError(t, "let x: boolean = false; x = 123", "1:27: wrong type: expected BOOLEAN, got INTEGER")
 	})
 }
 
 func ParseEval(t *testing.T, input string) (object.Object, error) {
+	t.Helper()
 	program, err := parser.Parse(input)
 	require.NoError(t, err)
 	return Eval(program, object.NewEnv(nil))
 }
 
 func RequireEvalError(t *testing.T, input string, message string) {
+	t.Helper()
 	_, err := ParseEval(t, input)
 	require.EqualError(t, err, message)
 }
 
 func RequireEqualEval(t *testing.T, input string, expected object.Object) {
+	t.Helper()
 	actual, err := ParseEval(t, input)
 	require.NoError(t, err)
 	require.Equal(t, expected, actual)
