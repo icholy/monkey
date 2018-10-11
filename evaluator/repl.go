@@ -1,4 +1,4 @@
-package repl
+package evaluator
 
 import (
 	"fmt"
@@ -8,14 +8,13 @@ import (
 
 	"github.com/chzyer/readline"
 
-	"github.com/icholy/monkey/evaluator"
 	"github.com/icholy/monkey/object"
 	"github.com/icholy/monkey/parser"
 )
 
 var Prompt = ">> "
 
-func Run(in io.Reader, out io.Writer) {
+func REPL(in io.Reader, out io.Writer) {
 	rl, err := readline.New(Prompt)
 	if err != nil {
 		log.Fatal(err)
@@ -31,7 +30,7 @@ func Run(in io.Reader, out io.Writer) {
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			obj, err := evaluator.Eval(program, env)
+			obj, err := Eval(program, env)
 			if err != nil {
 				fmt.Fprintf(out, "ERROR: %s\n", err)
 			} else {
@@ -41,7 +40,7 @@ func Run(in io.Reader, out io.Writer) {
 	}
 }
 
-func Exec(in io.Reader) error {
+func Run(in io.Reader) error {
 	data, err := ioutil.ReadAll(in)
 	if err != nil {
 		return err
@@ -50,6 +49,6 @@ func Exec(in io.Reader) error {
 	if err != nil {
 		return err
 	}
-	_, err = evaluator.Eval(program, object.NewEnv(nil))
+	_, err = Eval(program, object.NewEnv(nil))
 	return err
 }

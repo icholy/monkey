@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/icholy/monkey/repl"
+	"github.com/icholy/monkey/evaluator"
 )
 
 func main() {
@@ -15,11 +15,11 @@ func main() {
 			log.Fatal(err)
 		}
 		defer f.Close()
-		if err := repl.Exec(f); err != nil {
+		if err := evaluator.Run(f); err != nil {
 			log.Fatal(err)
 		}
 		return
 	}
 
-	repl.Run(os.Stdin, os.Stdout)
+	evaluator.REPL(os.Stdin, os.Stdout)
 }
