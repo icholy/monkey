@@ -401,16 +401,19 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Env) (object.Obje
 }
 
 func evalInfixExpression(operator string, left, right object.Object) (object.Object, error) {
-
 	switch operator {
 	case "||":
 		return boolToObject(isTruthy(left) || isTruthy(right)), nil
 	case "&&":
 		return boolToObject(isTruthy(left) && isTruthy(right)), nil
 	}
-
 	if left == NULL || right == NULL {
-		return boolToObject(left == right), nil
+		switch operator {
+		case "==":
+			return boolToObject(left == right), nil
+		case "!=":
+			return boolToObject(left != right), nil
+		}
 	}
 	if left.Type() != right.Type() {
 		return nil, fmt.Errorf("type mismatch: %s %s %s", left.Type(), operator, right.Type())
