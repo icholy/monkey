@@ -13,6 +13,7 @@ import (
 const (
 	_ int = iota
 	LOWEST
+	ANDOR
 	EQUALS
 	LESSGREATER
 	SUM
@@ -61,6 +62,8 @@ func New(l *lexer.Lexer) *Parser {
 		token.LT_EQ:    LESSGREATER,
 		token.GT:       LESSGREATER,
 		token.GT_EQ:    LESSGREATER,
+		token.OR:       ANDOR,
+		token.AND:      ANDOR,
 		token.PLUS:     SUM,
 		token.MINUS:    SUM,
 		token.SLASH:    PRODUCT,
@@ -96,6 +99,8 @@ func New(l *lexer.Lexer) *Parser {
 		token.LT_EQ:    p.infixExpr,
 		token.GT:       p.infixExpr,
 		token.GT_EQ:    p.infixExpr,
+		token.OR:       p.infixExpr,
+		token.AND:      p.infixExpr,
 		token.LPAREN:   p.callExpr,
 		token.LBRACKET: p.indexExpr,
 		token.ASSIGN:   p.assignExpr,

@@ -782,6 +782,36 @@ func TestMonkey(t *testing.T) {
 		})
 	})
 
+	t.Run("or and", func(t *testing.T) {
+		RequireEqualAST(t, "x > 10 || true", &ast.Program{
+			Statements: []ast.Statement{
+				&ast.ExpressionStatement{
+					Token: token.New(token.IDENT, "x"),
+					Expression: &ast.InfixExpression{
+						Token:    token.New(token.OR, "||"),
+						Operator: "||",
+						Left: &ast.InfixExpression{
+							Token:    token.New(token.GT, ">"),
+							Operator: ">",
+							Left: &ast.Identifier{
+								Token: token.New(token.IDENT, "x"),
+								Value: "x",
+							},
+							Right: &ast.IntegerLiteral{
+								Token: token.New(token.INT, "10"),
+								Value: 10,
+							},
+						},
+						Right: &ast.BooleanExpression{
+							Token: token.New(token.TRUE, "true"),
+							Value: true,
+						},
+					},
+				},
+			},
+		})
+	})
+
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {
