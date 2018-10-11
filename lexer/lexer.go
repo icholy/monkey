@@ -109,6 +109,22 @@ func (l *Lexer) NextToken() token.Token {
 		tok.Text = l.str()
 		tok.Type = token.STRING
 		return tok
+	case '|':
+		if l.peek() == '|' {
+			l.read()
+			tok.Type = token.OR
+			tok.Text = "||"
+		} else {
+			tok = l.charToken(token.ILLEGAL)
+		}
+	case '&':
+		if l.peek() == '&' {
+			l.read()
+			tok.Type = token.AND
+			tok.Text = "&&"
+		} else {
+			tok = l.charToken(token.ILLEGAL)
+		}
 	default:
 		if isLetter(l.ch) {
 			tok.Text = l.ident()

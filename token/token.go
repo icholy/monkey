@@ -47,6 +47,8 @@ const (
 	GT_EQ    = "GT_EQ"
 	LT_EQ    = "LT_EQ"
 	DOT      = "DOT"
+	OR       = "OR"
+	AND      = "AND"
 
 	// Delimiters
 	COMMA     = "COMMA"

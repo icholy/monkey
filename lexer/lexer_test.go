@@ -227,4 +227,15 @@ func TestNextToken(t *testing.T) {
 		})
 	})
 
+	t.Run("|| and &&", func(t *testing.T) {
+		ExpectTokens(t, "true || false && true", []token.Token{
+			token.New(token.TRUE, "true"),
+			token.New(token.OR, "||"),
+			token.New(token.FALSE, "false"),
+			token.New(token.AND, "&&"),
+			token.New(token.TRUE, "true"),
+			token.New(token.EOF, ""),
+		})
+	})
+
 }
