@@ -250,7 +250,7 @@ func TestMonkey(t *testing.T) {
 	})
 
 	t.Run("if expressions", func(t *testing.T) {
-		input := "if (true) { x } else { foo }"
+		input := "if true { x } else { foo }"
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{
@@ -638,7 +638,7 @@ func TestMonkey(t *testing.T) {
 	})
 
 	t.Run("while loop", func(t *testing.T) {
-		RequireEqualAST(t, "while (1 >= x) {}", &ast.Program{
+		RequireEqualAST(t, "while 1 >= x {}", &ast.Program{
 			Statements: []ast.Statement{
 				&ast.WhileStatement{
 					Token: token.New(token.WHILE, "while"),

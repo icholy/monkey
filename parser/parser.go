@@ -145,15 +145,11 @@ func (p *Parser) booleanExpr() ast.Expression {
 
 func (p *Parser) whileStmt() *ast.WhileStatement {
 	while := &ast.WhileStatement{Token: p.cur}
-	if !p.expectPeek(token.LPAREN) {
-		return nil
-	}
 	p.next()
 	while.Condition = p.expression(LOWEST)
-	if !p.expectPeek(token.RPAREN) {
+	if !p.expectPeek(token.LBRACE) {
 		return nil
 	}
-	p.next()
 	while.Body = p.blockStmt()
 	p.semicolon()
 	return while
@@ -205,14 +201,8 @@ func (p *Parser) hashExpr() ast.Expression {
 
 func (p *Parser) ifExpr() ast.Expression {
 	expr := &ast.IfExpression{Token: p.cur}
-	if !p.expectPeek(token.LPAREN) {
-		return nil
-	}
 	p.next()
 	expr.Condition = p.expression(LOWEST)
-	if !p.expectPeek(token.RPAREN) {
-		return nil
-	}
 	if !p.expectPeek(token.LBRACE) {
 		return nil
 	}
