@@ -425,17 +425,17 @@ func evalStringInfixExpression(operator string, left, right *object.String) (obj
 	case "+":
 		return &object.String{Value: left.Value + right.Value}, nil
 	case "==":
-		return &object.Boolean{Value: left.Value == right.Value}, nil
+		return boolToObject(left.Value == right.Value), nil
 	case "!=":
-		return &object.Boolean{Value: left.Value != right.Value}, nil
+		return boolToObject(left.Value != right.Value), nil
 	case ">":
-		return &object.Boolean{Value: strings.Compare(left.Value, right.Value) > 0}, nil
+		return boolToObject(strings.Compare(left.Value, right.Value) > 0), nil
 	case "<":
-		return &object.Boolean{Value: strings.Compare(left.Value, right.Value) < 0}, nil
+		return boolToObject(strings.Compare(left.Value, right.Value) < 0), nil
 	case "<=":
-		return &object.Boolean{Value: strings.Compare(left.Value, right.Value) <= 0}, nil
+		return boolToObject(strings.Compare(left.Value, right.Value) <= 0), nil
 	case ">=":
-		return &object.Boolean{Value: strings.Compare(left.Value, right.Value) >= 0}, nil
+		return boolToObject(strings.Compare(left.Value, right.Value) >= 0), nil
 	default:
 		return nil, fmt.Errorf("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
