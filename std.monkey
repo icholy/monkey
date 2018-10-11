@@ -1,13 +1,55 @@
+
+let TokenType = {
+	"ILLEGAL":   "ILLEGAL",
+	"EOF":       "EOF",
+	"IDENT":     "IDENT",
+	"INT":       "INT",
+	"ASSIGN":    "ASSIGN",
+	"PLUS":      "PLUS",
+	"MINUS":     "MINUS",
+	"BANG":      "BANG",
+	"ASTERISK":  "ASTERISK",
+	"SLASH":     "SLASH",
+	"GT":        "GT",
+	"LT":        "LT",
+	"EQ":        "EQ",
+	"NE":        "NE",
+	"GT_EQ":     "GT_EQ",
+	"LT_EQ":     "LT_EQ",
+	"DOT":       "DOT",
+	"OR":        "OR",
+	"AND":       "AND",
+	"COMMA":     "COMMA",
+	"SEMICOLON": "SEMICOLON",
+	"COLON":     "COLON",
+	"LPAREN":    "LPAREN",
+	"RPAREN":    "RPAREN",
+	"LBRACE":    "LBRACE",
+	"RBRACE":    "RBRACE",
+	"LBRACKET":  "LBRACKET",
+	"RBRACKET":  "RBRACKET",
+	"STRING":    "STRING",
+	"FN":        "FN",
+	"FUNCTION":  "FUNCTION",
+	"LET":       "LET",
+	"TRUE":      "TRUE",
+	"FALSE":     "FALSE",
+	"IF":        "IF",
+	"ELSE":      "ELSE",
+	"RETURN":    "RETURN",
+	"IMPORT":    "IMPORT",
+	"WHILE":     "WHILE",
+	"PACKAGE":   "PACKAGE",
+	"DEBUGGER":  "DEBUGGER",
+	"NULL":      "NULL",
+}
+
 function NewToken(type, text) {
 
   let this = {
     "type": type,
     "text": text,
   };
-
-  this.is = fn(type) {
-    return this.type == type
-  }
 
   return this;
 }
@@ -18,22 +60,22 @@ function NewLexer(input) {
   let ch = input[0];
   let this = {};
 
-  let bytetokens = {
-    ";":  "SEMICOLON",
-    ":    ": "COLON",
-    "(":  "LPAREN",
-    ")":  "RPAREN",
-    "{":  "LBRACE",
-    "}":  "RBRACE",
-    "[":  "LBRACKET",
-    "]":  "RBRACKET",
-    "+":  "PLUS",
-    "-":  "MINUS",
-    "*":  "ASTERISK",
-    "/":  "SLASH",
-    ",":  "COMMA",
-    ".":  "DOT",
-    NULL: "EOF",
+  let simpletokens = {
+    ";":  TokenType.SEMICOLON,
+    ":":  TokenType.COLON,
+    "(":  TokenType.LPAREN,
+    ")":  TokenType.RPAREN,
+    "{":  TokenType.LBRACE,
+    "}":  TokenType.RBRACE,
+    "[":  TokenType.LBRACKET,
+    "]":  TokenType.RBRACKET,
+    "+":  TokenType.PLUS,
+    "-":  TokenType.MINUS,
+    "*":  TokenType.ASTERISK,
+    "/":  TokenType.SLASH,
+    ",":  TokenType.COMMA,
+    ".":  TokenType.DOT,
+    null: TokenType.EOF,
   }
 
   this.read = fn() {
@@ -61,12 +103,33 @@ function NewLexer(input) {
   }
 
   this.next = fn() {
+    let tok = null
     this.whitespace()
 
-    if bytetokens[ch] != NULL {
-      let tok = bytetokens
+    if simpletokens[ch] != null {
+      let type = simpletokens[ch]
+      tok = NewToken(type, ch)
+      this.read()
+      return tok
     }
+
+    if ch == "<" {
+      if this.peek() == "=" {
+        this.read()
+        tok.type = TokenType.GT_EQ
+        tok.text = "<="
+      } else {
+        tok = this.charTok(TokenType.GT)
+      }
+    } else {
+      tok = this.charTok(TokenType.ILLEGAL)
+    }
+
+    this.read()
+    return tok
   }
+
+  this.charTok = fn(type) { return NewToken(type, ch) }
 
   this.char = fn() { return ch }
 
@@ -75,9 +138,9 @@ function NewLexer(input) {
   return this;
 }
 
-let lex = NewLexer(read("std.monkey"))
+let source = read("lexer.cosby")
+let lex = NewLexer(source)
 
 while !lex.done() {
-  lex.read()
-  print(lex.char(), lex.peek())
+  print(lex.next())
 }
