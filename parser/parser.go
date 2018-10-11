@@ -78,6 +78,7 @@ func New(l *lexer.Lexer) *Parser {
 		token.MINUS:    p.prefixExpr,
 		token.TRUE:     p.booleanExpr,
 		token.FALSE:    p.booleanExpr,
+		token.NULL:     p.nullExpr,
 		token.LPAREN:   p.groupesExpr,
 		token.LBRACKET: p.arrayExpr,
 		token.IF:       p.ifExpr,
@@ -141,6 +142,10 @@ func (p *Parser) booleanExpr() ast.Expression {
 		Token: p.cur,
 		Value: p.cur.Is(token.TRUE),
 	}
+}
+
+func (p *Parser) nullExpr() ast.Expression {
+	return &ast.NullExpression{Token: p.cur}
 }
 
 func (p *Parser) whileStmt() *ast.WhileStatement {

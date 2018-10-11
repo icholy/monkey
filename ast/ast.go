@@ -247,6 +247,18 @@ func (i *InfixExpression) TokenText() string {
 	return i.Token.Text
 }
 
+type NullExpression struct {
+	Token token.Token
+}
+
+func (NullExpression) String() string {
+	return "null"
+}
+func (NullExpression) expressionNode() {}
+func (n *NullExpression) TokenText() string {
+	return n.Token.Text
+}
+
 type BooleanExpression struct {
 	Token token.Token
 	Value bool
