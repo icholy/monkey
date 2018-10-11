@@ -2,8 +2,11 @@ package evaluator
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"strings"
+
+	"github.com/chzyer/readline"
 
 	"github.com/icholy/monkey/ast"
 	"github.com/icholy/monkey/object"
@@ -20,6 +23,8 @@ func Eval(node ast.Node, env *object.Env) (object.Object, error) {
 	switch node := node.(type) {
 	case *ast.Program:
 		return evalProgram(node, env)
+	case *ast.DebuggerStatement:
+		return evalDebugger(env)
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression, env)
 	case *ast.BlockStatement:
@@ -174,6 +179,36 @@ func applyFunction(fn object.Object, args []object.Object) (object.Object, error
 		return nil, err
 	}
 	return object.UnwrapReturn(val), nil
+}
+
+func evalDebugger(env *object.Env) (object.Object, error) {
+	env = object.NewEnv(env)
+	rl, err := readline.New(Prompt)
+	if err != nil {
+		if err == io.EOF {
+			return NULL, nil
+		}
+		return nil, err
+	}
+	defer rl.Close()
+	for {
+		line, err := rl.Readline()
+		if err != nil {
+			return nil, err
+		}
+		program, err := parser.Parse(line)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			obj, err := Eval(program, env)
+			if err != nil {
+				fmt.Printf("ERROR: %s\n", err)
+			} else {
+				fmt.Println(obj.Inspect())
+			}
+		}
+	}
+	return NULL, nil
 }
 
 func evalWhile(w *ast.WhileStatement, env *object.Env) (object.Object, error) {
