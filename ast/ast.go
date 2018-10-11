@@ -9,7 +9,7 @@ import (
 )
 
 type Node interface {
-	TokenText() string
+	TokenPos() token.Pos
 	String() string
 }
 
@@ -35,11 +35,11 @@ func (p *Program) String() string {
 	return b.String()
 }
 
-func (p *Program) TokenText() string {
+func (p *Program) TokenPos() token.Pos {
 	if len(p.Statements) == 0 {
-		return ""
+		return token.Pos{}
 	}
-	return p.Statements[0].TokenText()
+	return p.Statements[0].TokenPos()
 }
 
 type PackageStatement struct {
@@ -52,8 +52,8 @@ func (p *PackageStatement) String() string {
 }
 
 func (p *PackageStatement) statementNode() {}
-func (p *PackageStatement) TokenText() string {
-	return p.Token.Text
+func (p *PackageStatement) TokenPos() token.Pos {
+	return p.Token.Pos
 }
 
 type ImportStatement struct {
@@ -66,8 +66,8 @@ func (i *ImportStatement) String() string {
 	return fmt.Sprintf("import(%s)", i.Value)
 }
 func (ImportStatement) statementNode() {}
-func (i *ImportStatement) TokenText() string {
-	return i.Token.Text
+func (i *ImportStatement) TokenPos() token.Pos {
+	return i.Token.Pos
 }
 
 type Parameter struct {
@@ -77,8 +77,8 @@ type Parameter struct {
 }
 
 func (p *Parameter) expressionNode() {}
-func (p *Parameter) TokenText() string {
-	return p.Token.Text
+func (p *Parameter) TokenPos() token.Pos {
+	return p.Token.Pos
 }
 func (p *Parameter) String() string {
 	if p.Type != nil {
@@ -94,8 +94,8 @@ type Identifier struct {
 
 func (i *Identifier) String() string { return i.Value }
 func (Identifier) expressionNode()   {}
-func (i *Identifier) TokenText() string {
-	return i.Token.Text
+func (i *Identifier) TokenPos() token.Pos {
+	return i.Token.Pos
 }
 
 type LetStatement struct {
@@ -113,8 +113,8 @@ func (l *LetStatement) String() string {
 }
 
 func (LetStatement) statementNode() {}
-func (l *LetStatement) TokenText() string {
-	return l.Token.Text
+func (l *LetStatement) TokenPos() token.Pos {
+	return l.Token.Pos
 }
 
 type WhileStatement struct {
@@ -128,8 +128,8 @@ func (w *WhileStatement) String() string {
 }
 
 func (WhileStatement) statementNode() {}
-func (w *WhileStatement) TokenText() string {
-	return w.Token.Text
+func (w *WhileStatement) TokenPos() token.Pos {
+	return w.Token.Pos
 }
 
 type ReturnStatement struct {
@@ -144,8 +144,8 @@ func (r *ReturnStatement) String() string {
 	return fmt.Sprintf("return %s", r.ReturnValue)
 }
 func (ReturnStatement) statementNode() {}
-func (r *ReturnStatement) TokenText() string {
-	return r.Token.Text
+func (r *ReturnStatement) TokenPos() token.Pos {
+	return r.Token.Pos
 }
 
 type ExpressionStatement struct {
@@ -160,8 +160,8 @@ func (e *ExpressionStatement) String() string {
 	return e.Expression.String()
 }
 func (ExpressionStatement) statementNode() {}
-func (e *ExpressionStatement) TokenText() string {
-	return e.Token.String()
+func (e *ExpressionStatement) TokenPos() token.Pos {
+	return e.Token.Pos
 }
 
 type DebuggerStatement struct {
@@ -169,11 +169,11 @@ type DebuggerStatement struct {
 }
 
 func (d *DebuggerStatement) String() string {
-	return d.TokenText()
+	return d.Token.Text
 }
 func (DebuggerStatement) statementNode() {}
-func (d *DebuggerStatement) TokenText() string {
-	return d.Token.Text
+func (d *DebuggerStatement) TokenPos() token.Pos {
+	return d.Token.Pos
 }
 
 type IntegerLiteral struct {
@@ -186,8 +186,8 @@ func (i *IntegerLiteral) String() string {
 }
 
 func (IntegerLiteral) expressionNode() {}
-func (i *IntegerLiteral) TokenText() string {
-	return i.Token.Text
+func (i *IntegerLiteral) TokenPos() token.Pos {
+	return i.Token.Pos
 }
 
 type AssignmentExpression struct {
@@ -201,8 +201,8 @@ func (a *AssignmentExpression) String() string {
 }
 
 func (AssignmentExpression) expressionNode() {}
-func (a *AssignmentExpression) TokenText() string {
-	return a.Token.Text
+func (a *AssignmentExpression) TokenPos() token.Pos {
+	return a.Token.Pos
 }
 
 type StringLiteral struct {
@@ -211,8 +211,8 @@ type StringLiteral struct {
 }
 
 func (StringLiteral) expressionNode() {}
-func (s *StringLiteral) TokenText() string {
-	return s.Token.Text
+func (s *StringLiteral) TokenPos() token.Pos {
+	return s.Token.Pos
 }
 func (s *StringLiteral) String() string {
 	return fmt.Sprintf("%q", s.Value)
@@ -228,8 +228,8 @@ func (p *PrefixExpression) String() string {
 	return fmt.Sprintf("(%s%s)", p.Operator, p.Right)
 }
 func (PrefixExpression) expressionNode() {}
-func (p *PrefixExpression) TokenText() string {
-	return p.Token.Text
+func (p *PrefixExpression) TokenPos() token.Pos {
+	return p.Token.Pos
 }
 
 type InfixExpression struct {
@@ -243,8 +243,8 @@ func (i *InfixExpression) String() string {
 	return fmt.Sprintf("(%s %s %s)", i.Left, i.Operator, i.Right)
 }
 func (InfixExpression) expressionNode() {}
-func (i *InfixExpression) TokenText() string {
-	return i.Token.Text
+func (i *InfixExpression) TokenPos() token.Pos {
+	return i.Token.Pos
 }
 
 type NullExpression struct {
@@ -255,8 +255,8 @@ func (NullExpression) String() string {
 	return "null"
 }
 func (NullExpression) expressionNode() {}
-func (n *NullExpression) TokenText() string {
-	return n.Token.Text
+func (n *NullExpression) TokenPos() token.Pos {
+	return n.Token.Pos
 }
 
 type BooleanExpression struct {
@@ -269,8 +269,8 @@ func (b *BooleanExpression) String() string {
 }
 
 func (BooleanExpression) expressionNode() {}
-func (b *BooleanExpression) TokenText() string {
-	return b.Token.Text
+func (b *BooleanExpression) TokenPos() token.Pos {
+	return b.Token.Pos
 }
 
 type IfExpression struct {
@@ -287,8 +287,8 @@ func (i *IfExpression) String() string {
 	return fmt.Sprintf("if (%s) {%s} else {%s}", i.Condition, i.Concequence, i.Alternative)
 }
 func (IfExpression) expressionNode() {}
-func (i *IfExpression) TokenText() string {
-	return i.Token.Text
+func (i *IfExpression) TokenPos() token.Pos {
+	return i.Token.Pos
 }
 
 type ArrayLiteral struct {
@@ -297,8 +297,8 @@ type ArrayLiteral struct {
 }
 
 func (ArrayLiteral) expressionNode() {}
-func (a *ArrayLiteral) TokenText() string {
-	return a.Token.Text
+func (a *ArrayLiteral) TokenPos() token.Pos {
+	return a.Token.Pos
 }
 func (a *ArrayLiteral) String() string {
 	var values []string
@@ -315,8 +315,8 @@ type IndexExpression struct {
 }
 
 func (i *IndexExpression) expressionNode() {}
-func (i *IndexExpression) TokenText() string {
-	return i.Token.Text
+func (i *IndexExpression) TokenPos() token.Pos {
+	return i.Token.Pos
 }
 func (i *IndexExpression) String() string {
 	return fmt.Sprintf("%s[%s]", i.Value, i.Index)
@@ -333,8 +333,8 @@ func (p *PropertyExpression) String() string {
 }
 
 func (p *PropertyExpression) expressionNode() {}
-func (p *PropertyExpression) TokenText() string {
-	return p.Token.Text
+func (p *PropertyExpression) TokenPos() token.Pos {
+	return p.Token.Pos
 }
 
 type BlockStatement struct {
@@ -350,8 +350,8 @@ func (b *BlockStatement) String() string {
 	return sb.String()
 }
 func (BlockStatement) statementNode() {}
-func (b *BlockStatement) TokenText() string {
-	return b.Token.Text
+func (b *BlockStatement) TokenPos() token.Pos {
+	return b.Token.Pos
 }
 
 type FunctionLiteral struct {
@@ -373,8 +373,8 @@ func (f *FunctionLiteral) String() string {
 	return fmt.Sprintf("fn(%s) { %s}", strings.Join(f.ParameterNames(), ", "), f.Body)
 }
 func (FunctionLiteral) expressionNode() {}
-func (f *FunctionLiteral) TokenText() string {
-	return f.Token.Text
+func (f *FunctionLiteral) TokenPos() token.Pos {
+	return f.Token.Pos
 }
 
 type FunctionStatement struct {
@@ -402,8 +402,8 @@ func (f *FunctionStatement) String() string {
 	)
 }
 func (FunctionStatement) statementNode() {}
-func (f *FunctionStatement) TokenText() string {
-	return f.Token.Text
+func (f *FunctionStatement) TokenPos() token.Pos {
+	return f.Token.Pos
 }
 
 type CallExpression struct {
@@ -420,8 +420,8 @@ func (c *CallExpression) String() string {
 	return fmt.Sprintf("%s(%s)", c.Function, strings.Join(args, ", "))
 }
 func (CallExpression) expressionNode() {}
-func (c *CallExpression) TokenText() string {
-	return c.Token.Text
+func (c *CallExpression) TokenPos() token.Pos {
+	return c.Token.Pos
 }
 
 type HashLiteral struct {
@@ -439,8 +439,8 @@ func (hp *HashPair) String() string {
 }
 
 func (h *HashLiteral) expressionNode() {}
-func (h *HashLiteral) TokenText() string {
-	return h.Token.Text
+func (h *HashLiteral) TokenPos() token.Pos {
+	return h.Token.Pos
 }
 func (h *HashLiteral) String() string {
 	var pairs []string
