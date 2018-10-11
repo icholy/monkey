@@ -61,7 +61,7 @@ type Builtin struct {
 }
 
 func (b *Builtin) KeyValue() KeyValue { return b.Fn }
-func (b *Builtin) Inspect() string    { return "builtin function" }
+func (b *Builtin) Inspect() string    { return "<builtin function>" }
 func (b *Builtin) Type() ObjectType   { return BUILTIN }
 
 type Integer struct {
