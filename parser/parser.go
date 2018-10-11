@@ -155,6 +155,12 @@ func (p *Parser) whileStmt() *ast.WhileStatement {
 	return while
 }
 
+func (p *Parser) debuggerStmt() *ast.DebuggerStatement {
+	debugger := &ast.DebuggerStatement{Token: p.cur}
+	p.semicolon()
+	return debugger
+}
+
 func (p *Parser) semicolon() {
 	for p.peek.Is(token.SEMICOLON) {
 		p.next()
@@ -411,6 +417,8 @@ func (p *Parser) stmt() ast.Statement {
 		return p.packageStmt()
 	case token.WHILE:
 		return p.whileStmt()
+	case token.DEBUGGER:
+		return p.debuggerStmt()
 	default:
 		return p.expressionStmt()
 	}

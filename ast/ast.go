@@ -164,6 +164,18 @@ func (e *ExpressionStatement) TokenText() string {
 	return e.Token.String()
 }
 
+type DebuggerStatement struct {
+	Token token.Token
+}
+
+func (d *DebuggerStatement) String() string {
+	return d.TokenText()
+}
+func (DebuggerStatement) statementNode() {}
+func (d *DebuggerStatement) TokenText() string {
+	return d.Token.Text
+}
+
 type IntegerLiteral struct {
 	Token token.Token
 	Value int64

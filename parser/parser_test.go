@@ -769,6 +769,19 @@ func TestMonkey(t *testing.T) {
 		})
 	})
 
+	t.Run("debugger", func(t *testing.T) {
+		RequireEqualAST(t, "debugger; debugger", &ast.Program{
+			Statements: []ast.Statement{
+				&ast.DebuggerStatement{
+					Token: token.New(token.DEBUGGER, "debugger"),
+				},
+				&ast.DebuggerStatement{
+					Token: token.New(token.DEBUGGER, "debugger"),
+				},
+			},
+		})
+	})
+
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {
