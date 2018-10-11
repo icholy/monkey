@@ -357,10 +357,10 @@ func evalArray(a *ast.ArrayLiteral, env *object.Env) (object.Object, error) {
 }
 
 func evalIdent(i *ast.Identifier, env *object.Env) (object.Object, error) {
-	if val, ok := builtins[i.Value]; ok {
+	if val, ok := env.Get(i.Value); ok {
 		return val, nil
 	}
-	if val, ok := env.Get(i.Value); ok {
+	if val, ok := builtins[i.Value]; ok {
 		return val, nil
 	}
 	return nil, fmt.Errorf("identifier not found: %s", i.Value)
