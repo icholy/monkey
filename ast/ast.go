@@ -215,7 +215,7 @@ func (s *StringLiteral) TokenText() string {
 	return s.Token.Text
 }
 func (s *StringLiteral) String() string {
-	return fmt.Sprintf("%v", s.Value)
+	return fmt.Sprintf("%q", s.Value)
 }
 
 type PrefixExpression struct {
