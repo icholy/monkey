@@ -22,6 +22,10 @@ const (
 	HASH     = "HASH"
 )
 
+func space(indent int) string {
+	return strings.Repeat("  ", indent)
+}
+
 var types = map[string]ObjectType{
 	"integer":  INTEGER,
 	"boolean":  BOOLEAN,
@@ -160,11 +164,14 @@ func (a *Array) SetAt(i int, v Object) error {
 func (a *Array) KeyValue() KeyValue { return a }
 func (Array) Type() ObjectType      { return ARRAY }
 func (a *Array) Inspect(indent int) string {
+	if len(a.Elements) == 0 {
+		return "[]"
+	}
 	var vals []string
 	for _, e := range a.Elements {
-		vals = append(vals, e.Inspect(indent))
+		vals = append(vals, fmt.Sprintf("%s%s", space(indent+1), e.Inspect(indent+1)))
 	}
-	return fmt.Sprintf("[%s]", strings.Join(vals, ", "))
+	return fmt.Sprintf("[\n%s\n%s]", strings.Join(vals, ",\n"), space(indent))
 }
 
 type KeyValue interface{}
@@ -229,7 +236,9 @@ func (h *Hash) Inspect(indent int) string {
 	}
 	var pairs []string
 	for _, p := range h.pairs {
-		pairs = append(pairs, fmt.Sprintf("%s: %s", p.Key.Inspect(indent), p.Value.Inspect(indent)))
+		key := p.Key.Inspect(indent + 1)
+		value := p.Value.Inspect(indent + 1)
+		pairs = append(pairs, fmt.Sprintf("%s%s: %s", space(indent+1), key, value))
 	}
-	return fmt.Sprintf("{ %s }", strings.Join(pairs, ", "))
+	return fmt.Sprintf("{\n%s\n%s}", strings.Join(pairs, ",\n"), space(indent))
 }
