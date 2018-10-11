@@ -195,6 +195,9 @@ func evalDebugger(env *object.Env) (object.Object, error) {
 	for {
 		line, err := rl.Readline()
 		if err != nil {
+			if err == io.EOF {
+				return NULL, nil
+			}
 			return nil, err
 		}
 		program, err := parser.Parse(line)
