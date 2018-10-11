@@ -182,7 +182,6 @@ func applyFunction(fn object.Object, args []object.Object) (object.Object, error
 }
 
 func evalDebugger(env *object.Env) (object.Object, error) {
-	env = object.NewEnv(env)
 	rl, err := readline.New(Prompt)
 	if err != nil {
 		if err == io.EOF {
