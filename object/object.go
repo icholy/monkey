@@ -131,7 +131,7 @@ func (f *Function) Inspect() string {
 	for _, p := range f.Parameters {
 		params = append(params, p.Name.Value)
 	}
-	return fmt.Sprintf("fn(%s) { %s }", strings.Join(params, ", "), f.Body)
+	return fmt.Sprintf("fn(%s)", strings.Join(params, ", "))
 }
 
 type Array struct {
