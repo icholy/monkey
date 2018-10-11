@@ -208,7 +208,7 @@ func evalDebugger(env *object.Env) (object.Object, error) {
 			if err != nil {
 				fmt.Printf("ERROR: %s\n", err)
 			} else {
-				fmt.Println(obj.Inspect())
+				fmt.Println(obj.Inspect(0))
 			}
 		}
 	}

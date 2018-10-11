@@ -87,7 +87,7 @@ var builtins = map[string]object.Object{
 		Fn: func(args ...object.Object) (object.Object, error) {
 			var values []interface{}
 			for _, a := range args {
-				values = append(values, a.Inspect())
+				values = append(values, a.Inspect(0))
 			}
 			fmt.Println(values...)
 			return &object.Null{}, nil
@@ -152,7 +152,7 @@ var builtins = map[string]object.Object{
 				return s, nil
 			}
 			return &object.String{
-				Value: args[0].Inspect(),
+				Value: args[0].Inspect(0),
 			}, nil
 		},
 	},

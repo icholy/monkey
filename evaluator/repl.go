@@ -34,7 +34,7 @@ func REPL(in io.Reader, out io.Writer) {
 			if err != nil {
 				fmt.Fprintf(out, "ERROR: %s\n", err)
 			} else {
-				fmt.Fprintln(out, obj.Inspect())
+				fmt.Fprintln(out, obj.Inspect(0))
 			}
 		}
 	}
