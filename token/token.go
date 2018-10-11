@@ -6,7 +6,17 @@ import (
 
 type TokenType string
 
+type Pos struct {
+	Line   int
+	Offset int
+}
+
+func (p Pos) String() string {
+	return fmt.Sprintf("%s:%s", p.Line, p.Offset)
+}
+
 type Token struct {
+	Pos
 	Type TokenType
 	Text string
 }
@@ -24,7 +34,7 @@ func (t Token) Is(typ TokenType) bool {
 }
 
 func (t Token) String() string {
-	return fmt.Sprintf("%s(\"%s\")", t.Type, t.Text)
+	return fmt.Sprintf("%s(\"%s\"):%d", t.Type, t.Text, t.Pos)
 }
 
 const (

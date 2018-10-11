@@ -8,15 +8,19 @@ import (
 
 func New(input string) *Lexer {
 	return &Lexer{
-		input: input,
-		ch:    input[0],
+		input:  input,
+		ch:     input[0],
+		offset: 1,
+		line:   1,
 	}
 }
 
 type Lexer struct {
-	input string
-	pos   int
-	ch    byte
+	input  string
+	pos    int
+	ch     byte
+	line   int
+	offset int
 }
 
 func (l *Lexer) peek() byte {
@@ -27,17 +31,29 @@ func (l *Lexer) peek() byte {
 	return l.input[next]
 }
 
+func (l *Lexer) Pos() token.Pos {
+	return token.Pos{
+		Line:   l.line,
+		Offset: l.offset,
+	}
+}
+
 func (l *Lexer) read() {
 	l.pos++
 	if l.pos >= len(l.input) {
 		l.ch = 0
 	} else {
+		l.offset++
+		if isNewline(l.ch) {
+			l.offset = 1
+			l.line++
+		}
 		l.ch = l.input[l.pos]
 	}
 }
 
 func (l *Lexer) charToken(typ token.TokenType) token.Token {
-	return token.Token{Type: typ, Text: string(l.ch)}
+	return token.Token{Type: typ, Text: string(l.ch), Pos: l.Pos()}
 }
 
 var bytetokens = map[byte]token.TokenType{
@@ -59,15 +75,17 @@ var bytetokens = map[byte]token.TokenType{
 }
 
 func (l *Lexer) NextToken() token.Token {
-	var tok token.Token
 	l.whitespace()
+	var tok token.Token
+	tok.Pos = l.Pos()
 
 	if typ, ok := bytetokens[l.ch]; ok {
 		if typ == token.EOF {
-			tok = token.Token{Type: token.EOF}
+			tok.Type = token.EOF
 		} else {
 			tok = token.NewByte(typ, l.ch)
 		}
+		tok.Pos = l.Pos()
 		l.read()
 		return tok
 	}
@@ -203,6 +221,10 @@ func isLetter(ch byte) bool {
 
 func isWhitespace(ch byte) bool {
 	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
+}
+
+func isNewline(ch byte) bool {
+	return ch == '\n' || ch == '\r'
 }
 
 func isDigit(ch byte) bool {

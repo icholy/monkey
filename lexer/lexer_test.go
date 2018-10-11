@@ -10,6 +10,7 @@ func ExpectTokens(t *testing.T, input string, expected []token.Token) {
 	l := New(input)
 	for i, e := range expected {
 		tok := l.NextToken()
+		tok.Pos = token.Pos{}
 		if tok != e {
 			t.Fatalf("test[%d] - wrong token. want=%s, got=%s", i, e, tok)
 		}
@@ -21,15 +22,15 @@ func TestNextToken(t *testing.T) {
 	t.Run("single char", func(t *testing.T) {
 		input := `=+(){},;`
 		ExpectTokens(t, input, []token.Token{
-			{token.ASSIGN, "="},
-			{token.PLUS, "+"},
-			{token.LPAREN, "("},
-			{token.RPAREN, ")"},
-			{token.LBRACE, "{"},
-			{token.RBRACE, "}"},
-			{token.COMMA, ","},
-			{token.SEMICOLON, ";"},
-			{token.EOF, ""},
+			token.New(token.ASSIGN, "="),
+			token.New(token.PLUS, "+"),
+			token.New(token.LPAREN, "("),
+			token.New(token.RPAREN, ")"),
+			token.New(token.LBRACE, "{"),
+			token.New(token.RBRACE, "}"),
+			token.New(token.COMMA, ","),
+			token.New(token.SEMICOLON, ";"),
+			token.New(token.EOF, ""),
 		})
 	})
 
@@ -43,56 +44,56 @@ func TestNextToken(t *testing.T) {
 			let result = add(five, ten);
 		`
 		ExpectTokens(t, input, []token.Token{
-			{token.LET, "let"},
-			{token.IDENT, "five"},
-			{token.ASSIGN, "="},
-			{token.INT, "5"},
-			{token.SEMICOLON, ";"},
-			{token.LET, "let"},
-			{token.IDENT, "ten"},
-			{token.ASSIGN, "="},
-			{token.INT, "10"},
-			{token.SEMICOLON, ";"},
-			{token.LET, "let"},
-			{token.IDENT, "add"},
-			{token.ASSIGN, "="},
-			{token.FN, "fn"},
-			{token.LPAREN, "("},
-			{token.IDENT, "x"},
-			{token.COMMA, ","},
-			{token.IDENT, "y"},
-			{token.RPAREN, ")"},
-			{token.LBRACE, "{"},
-			{token.IDENT, "x"},
-			{token.PLUS, "+"},
-			{token.IDENT, "y"},
-			{token.RBRACE, "}"},
-			{token.SEMICOLON, ";"},
-			{token.LET, "let"},
-			{token.IDENT, "result"},
-			{token.ASSIGN, "="},
-			{token.IDENT, "add"},
-			{token.LPAREN, "("},
-			{token.IDENT, "five"},
-			{token.COMMA, ","},
-			{token.IDENT, "ten"},
-			{token.RPAREN, ")"},
-			{token.SEMICOLON, ";"},
-			{token.EOF, ""},
+			token.New(token.LET, "let"),
+			token.New(token.IDENT, "five"),
+			token.New(token.ASSIGN, "="),
+			token.New(token.INT, "5"),
+			token.New(token.SEMICOLON, ";"),
+			token.New(token.LET, "let"),
+			token.New(token.IDENT, "ten"),
+			token.New(token.ASSIGN, "="),
+			token.New(token.INT, "10"),
+			token.New(token.SEMICOLON, ";"),
+			token.New(token.LET, "let"),
+			token.New(token.IDENT, "add"),
+			token.New(token.ASSIGN, "="),
+			token.New(token.FN, "fn"),
+			token.New(token.LPAREN, "("),
+			token.New(token.IDENT, "x"),
+			token.New(token.COMMA, ","),
+			token.New(token.IDENT, "y"),
+			token.New(token.RPAREN, ")"),
+			token.New(token.LBRACE, "{"),
+			token.New(token.IDENT, "x"),
+			token.New(token.PLUS, "+"),
+			token.New(token.IDENT, "y"),
+			token.New(token.RBRACE, "}"),
+			token.New(token.SEMICOLON, ";"),
+			token.New(token.LET, "let"),
+			token.New(token.IDENT, "result"),
+			token.New(token.ASSIGN, "="),
+			token.New(token.IDENT, "add"),
+			token.New(token.LPAREN, "("),
+			token.New(token.IDENT, "five"),
+			token.New(token.COMMA, ","),
+			token.New(token.IDENT, "ten"),
+			token.New(token.RPAREN, ")"),
+			token.New(token.SEMICOLON, ";"),
+			token.New(token.EOF, ""),
 		})
 	})
 
 	t.Run("one character operators", func(t *testing.T) {
 		input := `<!-/*5>`
 		ExpectTokens(t, input, []token.Token{
-			{token.LT, "<"},
-			{token.BANG, "!"},
-			{token.MINUS, "-"},
-			{token.SLASH, "/"},
-			{token.ASTERISK, "*"},
-			{token.INT, "5"},
-			{token.GT, ">"},
-			{token.EOF, ""},
+			token.New(token.LT, "<"),
+			token.New(token.BANG, "!"),
+			token.New(token.MINUS, "-"),
+			token.New(token.SLASH, "/"),
+			token.New(token.ASTERISK, "*"),
+			token.New(token.INT, "5"),
+			token.New(token.GT, ">"),
+			token.New(token.EOF, ""),
 		})
 	})
 
@@ -105,80 +106,80 @@ func TestNextToken(t *testing.T) {
 			}
 		`
 		ExpectTokens(t, input, []token.Token{
-			{token.IF, "if"},
-			{token.LPAREN, "("},
-			{token.TRUE, "true"},
-			{token.RPAREN, ")"},
-			{token.LBRACE, "{"},
-			{token.RETURN, "return"},
-			{token.FALSE, "false"},
-			{token.SEMICOLON, ";"},
-			{token.RBRACE, "}"},
-			{token.ELSE, "else"},
-			{token.LBRACE, "{"},
-			{token.RETURN, "return"},
-			{token.INT, "5"},
-			{token.SEMICOLON, ";"},
-			{token.RBRACE, "}"},
-			{token.EOF, ""},
+			token.New(token.IF, "if"),
+			token.New(token.LPAREN, "("),
+			token.New(token.TRUE, "true"),
+			token.New(token.RPAREN, ")"),
+			token.New(token.LBRACE, "{"),
+			token.New(token.RETURN, "return"),
+			token.New(token.FALSE, "false"),
+			token.New(token.SEMICOLON, ";"),
+			token.New(token.RBRACE, "}"),
+			token.New(token.ELSE, "else"),
+			token.New(token.LBRACE, "{"),
+			token.New(token.RETURN, "return"),
+			token.New(token.INT, "5"),
+			token.New(token.SEMICOLON, ";"),
+			token.New(token.RBRACE, "}"),
+			token.New(token.EOF, ""),
 		})
 	})
 
 	t.Run("two char operators", func(t *testing.T) {
 		input := `if (x == 10) { y != 3; }`
 		ExpectTokens(t, input, []token.Token{
-			{token.IF, "if"},
-			{token.LPAREN, "("},
-			{token.IDENT, "x"},
-			{token.EQ, "=="},
-			{token.INT, "10"},
-			{token.RPAREN, ")"},
-			{token.LBRACE, "{"},
-			{token.IDENT, "y"},
-			{token.NE, "!="},
-			{token.INT, "3"},
-			{token.SEMICOLON, ";"},
-			{token.RBRACE, "}"},
-			{token.EOF, ""},
+			token.New(token.IF, "if"),
+			token.New(token.LPAREN, "("),
+			token.New(token.IDENT, "x"),
+			token.New(token.EQ, "=="),
+			token.New(token.INT, "10"),
+			token.New(token.RPAREN, ")"),
+			token.New(token.LBRACE, "{"),
+			token.New(token.IDENT, "y"),
+			token.New(token.NE, "!="),
+			token.New(token.INT, "3"),
+			token.New(token.SEMICOLON, ";"),
+			token.New(token.RBRACE, "}"),
+			token.New(token.EOF, ""),
 		})
 	})
 
 	t.Run("strings", func(t *testing.T) {
 		ExpectTokens(t, `""`, []token.Token{
-			{token.STRING, ""},
-			{token.EOF, ""},
+			token.New(token.STRING, ""),
+			token.New(token.EOF, ""),
 		})
 		ExpectTokens(t, `"testing testing"`, []token.Token{
-			{token.STRING, "testing testing"},
-			{token.EOF, ""},
+			token.New(token.STRING, "testing testing"),
+			token.New(token.EOF, ""),
 		})
 		ExpectTokens(t, `"this is a \" test"`, []token.Token{
-			{token.STRING, `this is a " test`},
-			{token.EOF, ""},
+			token.New(token.STRING, `this is a " test`),
+			token.New(token.EOF, ""),
 		})
 		ExpectTokens(t, `"\t\n\r"`, []token.Token{
-			{token.STRING, "\t\n\r"},
-			{token.EOF, ""},
+			token.New(token.STRING, "\t\n\r"),
+			token.New(token.EOF, ""),
 		})
 	})
 
 	t.Run("array", func(t *testing.T) {
 		ExpectTokens(t, `[1]`, []token.Token{
-			{token.LBRACKET, "["},
-			{token.INT, "1"},
-			{token.RBRACKET, "]"},
-			{token.EOF, ""},
+			token.New(token.LBRACKET, "["),
+			token.New(token.INT, "1"),
+			token.New(token.RBRACKET, "]"),
+			token.New(token.EOF, ""),
 		})
 	})
 
 	t.Run("hash", func(t *testing.T) {
 		ExpectTokens(t, `{ "test": 123 }`, []token.Token{
-			token.Token{token.LBRACE, "{"},
-			token.Token{token.STRING, "test"},
-			token.Token{token.COLON, ":"},
-			token.Token{token.INT, "123"},
-			token.Token{token.RBRACE, "}"},
-			token.Token{token.EOF, ""},
+			token.New(token.LBRACE, "{"),
+			token.New(token.STRING, "test"),
+			token.New(token.COLON, ":"),
+			token.New(token.INT, "123"),
+			token.New(token.RBRACE, "}"),
+			token.New(token.EOF, ""),
 		})
 	})
 
