@@ -26,46 +26,46 @@ func TestMonkey(t *testing.T) {
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.LetStatement{
-					Token: token.Token{token.LET, "let"},
+					Token: token.New(token.LET, "let"),
 					Name: &ast.Identifier{
-						Token: token.Token{token.IDENT, "x"},
+						Token: token.New(token.IDENT, "x"),
 						Value: "x",
 					},
 					Value: &ast.IntegerLiteral{
-						Token: token.Token{token.INT, "5"},
+						Token: token.New(token.INT, "5"),
 						Value: 5,
 					},
 				},
 				&ast.LetStatement{
-					Token: token.Token{token.LET, "let"},
+					Token: token.New(token.LET, "let"),
 					Name: &ast.Identifier{
-						Token: token.Token{token.IDENT, "y"},
+						Token: token.New(token.IDENT, "y"),
 						Value: "y",
 					},
 					Value: &ast.IntegerLiteral{
-						Token: token.Token{token.INT, "10"},
+						Token: token.New(token.INT, "10"),
 						Value: 10,
 					},
 				},
 				&ast.LetStatement{
-					Token: token.Token{token.LET, "let"},
+					Token: token.New(token.LET, "let"),
 					Name: &ast.Identifier{
-						Token: token.Token{token.IDENT, "foobar"},
+						Token: token.New(token.IDENT, "foobar"),
 						Value: "foobar",
 					},
 					Value: &ast.IntegerLiteral{
-						Token: token.Token{token.INT, "838383"},
+						Token: token.New(token.INT, "838383"),
 						Value: 838383,
 					},
 				},
 				&ast.LetStatement{
-					Token: token.Token{token.LET, "let"},
+					Token: token.New(token.LET, "let"),
 					Name: &ast.Identifier{
-						Token: token.Token{token.IDENT, "str"},
+						Token: token.New(token.IDENT, "str"),
 						Value: "str",
 					},
 					Value: &ast.StringLiteral{
-						Token: token.Token{token.STRING, "testing"},
+						Token: token.New(token.STRING, "testing"),
 						Value: "testing",
 					},
 				},
@@ -83,26 +83,26 @@ func TestMonkey(t *testing.T) {
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ReturnStatement{
-					Token: token.Token{token.RETURN, "return"},
+					Token: token.New(token.RETURN, "return"),
 				},
 				&ast.ReturnStatement{
-					Token: token.Token{token.RETURN, "return"},
+					Token: token.New(token.RETURN, "return"),
 					ReturnValue: &ast.IntegerLiteral{
-						Token: token.Token{token.INT, "5"},
+						Token: token.New(token.INT, "5"),
 						Value: 5,
 					},
 				},
 				&ast.ReturnStatement{
-					Token: token.Token{token.RETURN, "return"},
+					Token: token.New(token.RETURN, "return"),
 					ReturnValue: &ast.Identifier{
-						Token: token.Token{token.IDENT, "foo"},
+						Token: token.New(token.IDENT, "foo"),
 						Value: "foo",
 					},
 				},
 				&ast.ReturnStatement{
-					Token: token.Token{token.RETURN, "return"},
+					Token: token.New(token.RETURN, "return"),
 					ReturnValue: &ast.BooleanExpression{
-						Token: token.Token{token.TRUE, "true"},
+						Token: token.New(token.TRUE, "true"),
 						Value: true,
 					},
 				},
@@ -115,16 +115,16 @@ func TestMonkey(t *testing.T) {
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{
-					Token: token.Token{token.IDENT, "foobar"},
+					Token: token.New(token.IDENT, "foobar"),
 					Expression: &ast.Identifier{
-						Token: token.Token{token.IDENT, "foobar"},
+						Token: token.New(token.IDENT, "foobar"),
 						Value: "foobar",
 					},
 				},
 				&ast.ExpressionStatement{
-					Token: token.Token{token.INT, "5"},
+					Token: token.New(token.INT, "5"),
 					Expression: &ast.IntegerLiteral{
-						Token: token.Token{token.INT, "5"},
+						Token: token.New(token.INT, "5"),
 						Value: 5,
 					},
 				},
@@ -137,23 +137,23 @@ func TestMonkey(t *testing.T) {
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{
-					Token: token.Token{token.BANG, "!"},
+					Token: token.New(token.BANG, "!"),
 					Expression: &ast.PrefixExpression{
-						Token:    token.Token{token.BANG, "!"},
+						Token:    token.New(token.BANG, "!"),
 						Operator: "!",
 						Right: &ast.IntegerLiteral{
-							Token: token.Token{token.INT, "5"},
+							Token: token.New(token.INT, "5"),
 							Value: 5,
 						},
 					},
 				},
 				&ast.ExpressionStatement{
-					Token: token.Token{token.MINUS, "-"},
+					Token: token.New(token.MINUS, "-"),
 					Expression: &ast.PrefixExpression{
-						Token:    token.Token{token.MINUS, "-"},
+						Token:    token.New(token.MINUS, "-"),
 						Operator: "-",
 						Right: &ast.Identifier{
-							Token: token.Token{token.IDENT, "foo"},
+							Token: token.New(token.IDENT, "foo"),
 							Value: "foo",
 						},
 					},
@@ -179,7 +179,7 @@ func TestMonkey(t *testing.T) {
 		}
 
 		for _, tt := range tests {
-			five := token.Token{token.INT, "5"}
+			five := token.New(token.INT, "5")
 			input := fmt.Sprintf("5 %s 5", tt.operator)
 			t.Run(input, func(t *testing.T) {
 				RequireEqualAST(t, input, &ast.Program{
@@ -187,7 +187,7 @@ func TestMonkey(t *testing.T) {
 						&ast.ExpressionStatement{
 							Token: five,
 							Expression: &ast.InfixExpression{
-								Token: token.Token{tt.opTokenType, tt.operator},
+								Token: token.New(tt.opTokenType, tt.operator),
 								Left: &ast.IntegerLiteral{
 									Token: five,
 									Value: 5,
@@ -232,16 +232,16 @@ func TestMonkey(t *testing.T) {
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{
-					Token: token.Token{token.TRUE, "true"},
+					Token: token.New(token.TRUE, "true"),
 					Expression: &ast.BooleanExpression{
-						Token: token.Token{token.TRUE, "true"},
+						Token: token.New(token.TRUE, "true"),
 						Value: true,
 					},
 				},
 				&ast.ExpressionStatement{
-					Token: token.Token{token.FALSE, "false"},
+					Token: token.New(token.FALSE, "false"),
 					Expression: &ast.BooleanExpression{
-						Token: token.Token{token.FALSE, "false"},
+						Token: token.New(token.FALSE, "false"),
 						Value: false,
 					},
 				},
@@ -254,32 +254,32 @@ func TestMonkey(t *testing.T) {
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{
-					Token: token.Token{token.IF, "if"},
+					Token: token.New(token.IF, "if"),
 					Expression: &ast.IfExpression{
-						Token: token.Token{token.IF, "if"},
+						Token: token.New(token.IF, "if"),
 						Condition: &ast.BooleanExpression{
-							Token: token.Token{token.TRUE, "true"},
+							Token: token.New(token.TRUE, "true"),
 							Value: true,
 						},
 						Concequence: &ast.BlockStatement{
-							Token: token.Token{token.LBRACE, "{"},
+							Token: token.New(token.LBRACE, "{"),
 							Statements: []ast.Statement{
 								&ast.ExpressionStatement{
-									Token: token.Token{token.IDENT, "x"},
+									Token: token.New(token.IDENT, "x"),
 									Expression: &ast.Identifier{
-										Token: token.Token{token.IDENT, "x"},
+										Token: token.New(token.IDENT, "x"),
 										Value: "x",
 									},
 								},
 							},
 						},
 						Alternative: &ast.BlockStatement{
-							Token: token.Token{token.LBRACE, "{"},
+							Token: token.New(token.LBRACE, "{"),
 							Statements: []ast.Statement{
 								&ast.ExpressionStatement{
-									Token: token.Token{token.IDENT, "foo"},
+									Token: token.New(token.IDENT, "foo"),
 									Expression: &ast.Identifier{
-										Token: token.Token{token.IDENT, "foo"},
+										Token: token.New(token.IDENT, "foo"),
 										Value: "foo",
 									},
 								},
@@ -298,19 +298,19 @@ func TestMonkey(t *testing.T) {
 				&ast.ExpressionStatement{
 					Token: token.New(token.FN, "fn"),
 					Expression: &ast.FunctionLiteral{
-						Token: token.Token{token.FN, "fn"},
+						Token: token.New(token.FN, "fn"),
 						Parameters: []*ast.Parameter{
 							{
-								Token: token.Token{token.IDENT, "x"},
+								Token: token.New(token.IDENT, "x"),
 								Name: &ast.Identifier{
-									Token: token.Token{token.IDENT, "x"},
+									Token: token.New(token.IDENT, "x"),
 									Value: "x",
 								},
 							},
 							{
-								Token: token.Token{token.IDENT, "y"},
+								Token: token.New(token.IDENT, "y"),
 								Name: &ast.Identifier{
-									Token: token.Token{token.IDENT, "y"},
+									Token: token.New(token.IDENT, "y"),
 									Value: "y",
 								},
 							},
@@ -320,12 +320,12 @@ func TestMonkey(t *testing.T) {
 							Value: "integer",
 						},
 						Body: &ast.BlockStatement{
-							Token: token.Token{token.LBRACE, "{"},
+							Token: token.New(token.LBRACE, "{"),
 							Statements: []ast.Statement{
 								&ast.ExpressionStatement{
-									Token: token.Token{token.IDENT, "x"},
+									Token: token.New(token.IDENT, "x"),
 									Expression: &ast.Identifier{
-										Token: token.Token{token.IDENT, "x"},
+										Token: token.New(token.IDENT, "x"),
 										Value: "x",
 									},
 								},
@@ -342,20 +342,20 @@ func TestMonkey(t *testing.T) {
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{
-					Token: token.Token{token.IDENT, "foo"},
+					Token: token.New(token.IDENT, "foo"),
 					Expression: &ast.CallExpression{
-						Token: token.Token{token.LPAREN, "("},
+						Token: token.New(token.LPAREN, "("),
 						Function: &ast.Identifier{
-							Token: token.Token{token.IDENT, "foo"},
+							Token: token.New(token.IDENT, "foo"),
 							Value: "foo",
 						},
 						Arguments: []ast.Expression{
 							&ast.Identifier{
-								Token: token.Token{token.IDENT, "x"},
+								Token: token.New(token.IDENT, "x"),
 								Value: "x",
 							},
 							&ast.IntegerLiteral{
-								Token: token.Token{token.INT, "1"},
+								Token: token.New(token.INT, "1"),
 								Value: 1,
 							},
 						},
@@ -370,16 +370,16 @@ func TestMonkey(t *testing.T) {
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{
-					Token: token.Token{token.STRING, "hello"},
+					Token: token.New(token.STRING, "hello"),
 					Expression: &ast.InfixExpression{
-						Token:    token.Token{token.PLUS, "+"},
+						Token:    token.New(token.PLUS, "+"),
 						Operator: "+",
 						Left: &ast.StringLiteral{
-							Token: token.Token{token.STRING, "hello"},
+							Token: token.New(token.STRING, "hello"),
 							Value: "hello",
 						},
 						Right: &ast.StringLiteral{
-							Token: token.Token{token.STRING, "world"},
+							Token: token.New(token.STRING, "world"),
 							Value: "world",
 						},
 					},
@@ -393,20 +393,20 @@ func TestMonkey(t *testing.T) {
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{
-					Token: token.Token{token.LBRACKET, "["},
+					Token: token.New(token.LBRACKET, "["),
 					Expression: &ast.ArrayLiteral{
-						Token: token.Token{token.LBRACKET, "["},
+						Token: token.New(token.LBRACKET, "["),
 						Elements: []ast.Expression{
 							&ast.StringLiteral{
-								Token: token.Token{token.STRING, "test"},
+								Token: token.New(token.STRING, "test"),
 								Value: "test",
 							},
 							&ast.IntegerLiteral{
-								Token: token.Token{token.INT, "1"},
+								Token: token.New(token.INT, "1"),
 								Value: 1,
 							},
 							&ast.Identifier{
-								Token: token.Token{token.IDENT, "hello"},
+								Token: token.New(token.IDENT, "hello"),
 								Value: "hello",
 							},
 						},
@@ -421,15 +421,15 @@ func TestMonkey(t *testing.T) {
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{
-					Token: token.Token{token.IDENT, "foo"},
+					Token: token.New(token.IDENT, "foo"),
 					Expression: &ast.IndexExpression{
-						Token: token.Token{token.LBRACKET, "["},
+						Token: token.New(token.LBRACKET, "["),
 						Value: &ast.Identifier{
-							Token: token.Token{token.IDENT, "foo"},
+							Token: token.New(token.IDENT, "foo"),
 							Value: "foo",
 						},
 						Index: &ast.IntegerLiteral{
-							Token: token.Token{token.INT, "123"},
+							Token: token.New(token.INT, "123"),
 							Value: 123,
 						},
 					},
@@ -443,9 +443,9 @@ func TestMonkey(t *testing.T) {
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{
-					Token: token.Token{token.LBRACE, "{"},
+					Token: token.New(token.LBRACE, "{"),
 					Expression: &ast.HashLiteral{
-						Token: token.Token{token.LBRACE, "{"},
+						Token: token.New(token.LBRACE, "{"),
 						Pairs: nil,
 					},
 				},
@@ -458,27 +458,27 @@ func TestMonkey(t *testing.T) {
 		RequireEqualAST(t, input, &ast.Program{
 			Statements: []ast.Statement{
 				&ast.ExpressionStatement{
-					Token: token.Token{token.LBRACE, "{"},
+					Token: token.New(token.LBRACE, "{"),
 					Expression: &ast.HashLiteral{
-						Token: token.Token{token.LBRACE, "{"},
+						Token: token.New(token.LBRACE, "{"),
 						Pairs: []*ast.HashPair{
 							{
 								Key: &ast.BooleanExpression{
-									Token: token.Token{token.TRUE, "true"},
+									Token: token.New(token.TRUE, "true"),
 									Value: true,
 								},
 								Value: &ast.IntegerLiteral{
-									Token: token.Token{token.INT, "1"},
+									Token: token.New(token.INT, "1"),
 									Value: 1,
 								},
 							},
 							{
 								Key: &ast.IntegerLiteral{
-									Token: token.Token{token.INT, "1"},
+									Token: token.New(token.INT, "1"),
 									Value: 1,
 								},
 								Value: &ast.StringLiteral{
-									Token: token.Token{token.STRING, "yes"},
+									Token: token.New(token.STRING, "yes"),
 									Value: "yes",
 								},
 							},
@@ -704,12 +704,12 @@ func TestMonkey(t *testing.T) {
 				&ast.ExpressionStatement{
 					Token: token.New(token.FN, "fn"),
 					Expression: &ast.FunctionLiteral{
-						Token: token.Token{token.FN, "fn"},
+						Token: token.New(token.FN, "fn"),
 						Parameters: []*ast.Parameter{
 							{
-								Token: token.Token{token.IDENT, "x"},
+								Token: token.New(token.IDENT, "x"),
 								Name: &ast.Identifier{
-									Token: token.Token{token.IDENT, "x"},
+									Token: token.New(token.IDENT, "x"),
 									Value: "x",
 								},
 								Type: &ast.Identifier{
@@ -718,9 +718,9 @@ func TestMonkey(t *testing.T) {
 								},
 							},
 							{
-								Token: token.Token{token.IDENT, "y"},
+								Token: token.New(token.IDENT, "y"),
 								Name: &ast.Identifier{
-									Token: token.Token{token.IDENT, "y"},
+									Token: token.New(token.IDENT, "y"),
 									Value: "y",
 								},
 								Type: &ast.Identifier{
@@ -730,12 +730,12 @@ func TestMonkey(t *testing.T) {
 							},
 						},
 						Body: &ast.BlockStatement{
-							Token: token.Token{token.LBRACE, "{"},
+							Token: token.New(token.LBRACE, "{"),
 							Statements: []ast.Statement{
 								&ast.ExpressionStatement{
-									Token: token.Token{token.IDENT, "x"},
+									Token: token.New(token.IDENT, "x"),
 									Expression: &ast.Identifier{
-										Token: token.Token{token.IDENT, "x"},
+										Token: token.New(token.IDENT, "x"),
 										Value: "x",
 									},
 								},
@@ -823,7 +823,10 @@ func RequireEqualString(t *testing.T, input, expected string) {
 func RequireEqualAST(t *testing.T, input string, expected *ast.Program) {
 	actual, err := Parse(input)
 	require.NoError(t, err)
-	if !cmp.Equal(expected, actual) {
+	trans := cmp.Transformer("pos", func(in token.Pos) token.Pos {
+		return token.Pos{}
+	})
+	if !cmp.Equal(expected, actual, trans) {
 		litter.Dump(expected)
 		litter.Dump(actual)
 		t.Fatal(cmp.Diff(expected, actual))
