@@ -122,10 +122,6 @@ func (p *Parser) precedence(t token.Token) int {
 	return LOWEST
 }
 
-func (p *Parser) peekError(t token.TokenType) {
-	p.errorf("expected %s, got %s instead", t, p.peek)
-}
-
 func (p *Parser) next() {
 	p.cur = p.peek
 	p.peek = p.l.NextToken()
@@ -540,10 +536,11 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 		p.next()
 		return true
 	}
-	p.peekError(t)
+	p.errorf("expected %s, got %s instead", t, p.peek)
 	return false
 }
 
 func (p *Parser) errorf(format string, args ...interface{}) {
-	p.errors = append(p.errors, fmt.Sprintf(format, args...))
+	err := fmt.Sprintf(format, args...)
+	p.errors = append(p.errors, fmt.Sprintf("%s: %s", p.cur.Pos, err))
 }
