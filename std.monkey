@@ -103,7 +103,7 @@ function NewLexer(input) {
   }
 
   this.next = fn() {
-    let tok = null
+    let tok = {}
     this.whitespace()
 
     if simpletokens[ch] != null {
@@ -138,7 +138,7 @@ function NewLexer(input) {
   return this;
 }
 
-let source = read("lexer.cosby")
+let source = read("std.monkey")
 let lex = NewLexer(source)
 
 while !lex.done() {
