@@ -263,6 +263,11 @@ func evalSwitch(s *ast.SwitchStatement, env *object.Env) (object.Object, error) 
 			return NULL, nil
 		}
 	}
+	for _, stmt := range s.Default {
+		if _, err := Eval(stmt, env); err != nil {
+			return nil, err
+		}
+	}
 	return NULL, nil
 }
 

@@ -180,6 +180,20 @@ func TestEvaluator(t *testing.T) {
 		`
 		RequireEqualEval(t, input, TRUE)
 	})
+
+	t.Run("switch with default", func(t *testing.T) {
+		input := `
+			let x = null;
+			switch "maybe" {
+			case "yes":
+			case "no":
+			default:
+				x = true
+			}
+			x;
+		`
+		RequireEqualEval(t, input, TRUE)
+	})
 }
 
 func ParseEval(t *testing.T, input string) (object.Object, error) {
