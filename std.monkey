@@ -113,20 +113,98 @@ function NewLexer(input) {
       return tok
     }
 
-    if ch == "<" {
+    switch ch {
+    case "<":
+      if this.peek() == "=" {
+        this.read()
+        tok.type = TokenType.LT_EQ
+        tok.text = "<="
+      } else {
+        tok = this.charTok(TokenType.LT)
+      }
+    case ">":
       if this.peek() == "=" {
         this.read()
         tok.type = TokenType.GT_EQ
-        tok.text = "<="
+        tok.text = ">="
       } else {
         tok = this.charTok(TokenType.GT)
       }
-    } else {
+    case "=":
+      if this.peek() == "=" {
+        this.read()
+        tok.type = TokenType.EQ
+        tok.text = "=="
+      } else {
+        tok = this.charTok(TokenType.ASSIGN)
+      }
+    case "!":
+      if this.peek() == "=" {
+        this.read()
+        tok.type = TokenType.NE
+        tok.text = "!="
+      } else {
+        tok = this.charTok(TokenType.BANG)
+      }
+    case "|":
+      if this.peek() == "|" {
+        this.read()
+        tok.type = TokenType.OR
+        tok.text = "||"
+      } else {
+        tok = this.charTok(TokenType.ILLEGAL)
+      }
+    case "&":
+      if this.peek() == "&" {
+        this.read()
+        tok.type = TokenType.AND
+        tok.text = "&&"
+      } else {
+        tok = this.charTok(TokenType.ILLEGAL)
+      }
+    case "\"":
+      tok.text = this.str()
+      tok.type = TokenType.STRING
+      return tok
+    default:
       tok = this.charTok(TokenType.ILLEGAL)
     }
 
     this.read()
     return tok
+  }
+  this.str = fn() {
+    this.read()
+    let escaped = false
+    let str = ""
+    for !this.done() {
+      if escaped {
+        switch ch {
+        case "t":
+          str = str + "\t"
+        case "r":
+          str = str + "\r"
+        case "n":
+          str = str + "\n"
+        default:
+          str = str + ch
+        }
+        escaped = false
+      } else {
+        if ch == "\"" {
+          this.read()
+          return str
+        }
+        if l.ch == "\\" {
+          escaped = true
+        } else {
+          str = str + ch
+        }
+      }
+      this.read()
+    }
+    this.read()
+    return str
   }
 
   this.charTok = fn(type) { return NewToken(type, ch) }
