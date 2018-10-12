@@ -163,6 +163,41 @@ func (p *Parser) whileStmt() *ast.WhileStatement {
 	return while
 }
 
+func (p *Parser) caseStmt() *ast.CaseStatement {
+	stmt := &ast.CaseStatement{Token: p.cur}
+	p.next()
+	stmt.Value = p.expression(LOWEST)
+	if !p.expectPeek(token.COLON) {
+		return nil
+	}
+	for !p.peek.Is(token.CASE) && !p.peek.Is(token.RBRACE) && !p.peek.Is(token.EOF) {
+		p.next()
+		if s := p.stmt(); s != nil {
+			stmt.Statements = append(stmt.Statements, s)
+		}
+	}
+	return stmt
+}
+
+func (p *Parser) switchStmt() *ast.SwitchStatement {
+	stmt := &ast.SwitchStatement{Token: p.cur}
+	p.next()
+	stmt.Value = p.expression(LOWEST)
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+	for p.peek.Is(token.CASE) {
+		p.next()
+		if s := p.caseStmt(); s != nil {
+			stmt.Cases = append(stmt.Cases, s)
+		}
+	}
+	if !p.expectPeek(token.RBRACE) {
+		return nil
+	}
+	return stmt
+}
+
 func (p *Parser) debuggerStmt() *ast.DebuggerStatement {
 	debugger := &ast.DebuggerStatement{Token: p.cur}
 	p.semicolon()
@@ -427,6 +462,8 @@ func (p *Parser) stmt() ast.Statement {
 		return p.whileStmt()
 	case token.DEBUGGER:
 		return p.debuggerStmt()
+	case token.SWITCH:
+		return p.switchStmt()
 	default:
 		return p.expressionStmt()
 	}

@@ -813,6 +813,62 @@ func TestMonkey(t *testing.T) {
 		})
 	})
 
+	t.Run("switch", func(t *testing.T) {
+		input := `
+			switch x {
+			case "yes":
+				return true;
+			case "no":
+				return false;
+			}
+		`
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.SwitchStatement{
+					Token: token.New(token.SWITCH, "switch"),
+					Value: &ast.Identifier{
+						Token: token.New(token.IDENT, "x"),
+						Value: "x",
+					},
+					Cases: []*ast.CaseStatement{
+						{
+							Token: token.New(token.CASE, "case"),
+							Value: &ast.StringLiteral{
+								Token: token.New(token.STRING, "yes"),
+								Value: "yes",
+							},
+							Statements: []ast.Statement{
+								&ast.ReturnStatement{
+									Token: token.New(token.RETURN, "return"),
+									ReturnValue: &ast.BooleanExpression{
+										Token: token.New(token.TRUE, "true"),
+										Value: true,
+									},
+								},
+							},
+						},
+						{
+							Token: token.New(token.CASE, "case"),
+							Value: &ast.StringLiteral{
+								Token: token.New(token.STRING, "no"),
+								Value: "no",
+							},
+							Statements: []ast.Statement{
+								&ast.ReturnStatement{
+									Token: token.New(token.RETURN, "return"),
+									ReturnValue: &ast.BooleanExpression{
+										Token: token.New(token.FALSE, "false"),
+										Value: false,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		})
+	})
+
 }
 
 func RequireEqualString(t *testing.T, input, expected string) {
