@@ -177,7 +177,7 @@ function NewLexer(input) {
     this.read()
     let escaped = false
     let str = ""
-    for !this.done() {
+    while !this.done() {
       if escaped {
         switch ch {
         case "t":
@@ -195,7 +195,7 @@ function NewLexer(input) {
           this.read()
           return str
         }
-        if l.ch == "\\" {
+        if ch == "\\" {
           escaped = true
         } else {
           str = str + ch
