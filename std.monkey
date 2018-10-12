@@ -42,6 +42,10 @@ let TokenType = {
 	"PACKAGE":   "PACKAGE",
 	"DEBUGGER":  "DEBUGGER",
 	"NULL":      "NULL",
+  "IN":        "IN",
+  "SWITCH":    "SWITCH",
+  "CASE":      "CASE",
+  "DEFAULT":   "DEFAULT"
 }
 
 function NewToken(type, text) {
@@ -54,11 +58,35 @@ function NewToken(type, text) {
   return this;
 }
 
+function NewSet(array) {
+  let set = {};
+  let i = 0;
+  while i < len(array) {
+    set[array[i]] = true
+    i = i + 1
+  }
+  return set
+}
+
 function NewLexer(input) {
 
   let pos = 0;
   let ch = input[0];
   let this = {};
+
+  let numbers = NewSet(["1", "2", "3", "4", "5", "6", "7", "8", "9"])
+
+  let letters = NewSet([
+    "a", "b", "c", "d", "e", "f", 
+    "g", "h", "i", "j", "k", "l",
+    "m", "n", "o", "p", "q", "r",
+    "s", "t", "u", "v", "w", "x",
+    "y", "z", "A", "B", "C", "D",
+    "E", "F", "J", "K", "L", "M",
+    "N", "O", "P", "Q", "R", "S",
+    "T", "U", "V", "W", "X", "Y",
+    "Z"
+  ])
 
   let simpletokens = {
     ";":  TokenType.SEMICOLON,
@@ -75,7 +103,27 @@ function NewLexer(input) {
     "/":  TokenType.SLASH,
     ",":  TokenType.COMMA,
     ".":  TokenType.DOT,
-    null: TokenType.EOF,
+    null: TokenType.EOF
+  }
+
+  let keywords = {
+    "fn":       TokenType.FN,
+    "let":      TokenType.LET,
+    "true":     TokenType.TRUE,
+    "false":    TokenType.FALSE,
+    "if":       TokenType.IF,
+    "else":     TokenType.ELSE,
+    "return":   TokenType.RETURN,
+    "function": TokenType.FUNCTION,
+    "import":   TokenType.IMPORT,
+    "while":    TokenType.WHILE,
+    "package":  TokenType.PACKAGE,
+    "debugger": TokenType.DEBUGGER,
+    "null":     TokenType.NULL,
+    "in":       TokenType.IN,
+    "switch":   TokenType.SWITCH,
+    "case":     TokenType.CASE,
+    "default":  TokenType.DEFAULT
   }
 
   this.read = fn() {
@@ -167,6 +215,21 @@ function NewLexer(input) {
       tok.type = TokenType.STRING
       return tok
     default:
+      if ch in letters {
+        let ident = this.ident()
+        tok.text = ident 
+        if ident in keywords {
+          tok.type = keywords[ident]
+        } else {
+          tok.type = TokenType.IDENT
+        }
+        return tok
+      }
+      if ch in numbers {
+        tok.text = this.integer()
+        tok.type = TokenType.INT
+        return tok
+      }
       tok = this.charTok(TokenType.ILLEGAL)
     }
 
@@ -205,6 +268,24 @@ function NewLexer(input) {
     }
     this.read()
     return str
+  }
+
+  this.ident = fn() {
+    let ident = "";
+    while ch in letters || ch in numbers || ch == "_" {
+      ident = ident + ch
+      this.read()
+    }
+    return ident;
+  }
+
+  this.integer = fn() {
+    let integer = ""
+    while ch in numbers {
+      integer = integer + ch
+      this.read()
+    }
+    return integer
   }
 
   this.charTok = fn(type) { return NewToken(type, ch) }
