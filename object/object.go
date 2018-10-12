@@ -22,8 +22,10 @@ const (
 	HASH     = "HASH"
 )
 
-func space(indent int) string {
-	return strings.Repeat("  ", indent)
+var MaxDepth = 10
+
+func space(depth int) string {
+	return strings.Repeat("  ", depth)
 }
 
 var types = map[string]ObjectType{
@@ -42,7 +44,7 @@ func LookupType(name string) (ObjectType, bool) {
 
 type Object interface {
 	Type() ObjectType
-	Inspect(indent int) string
+	Inspect(depth int) string
 	KeyValue() KeyValue
 }
 
@@ -64,25 +66,25 @@ type Builtin struct {
 	Fn BuiltinFunc
 }
 
-func (b *Builtin) KeyValue() KeyValue        { return b.Fn }
-func (b *Builtin) Inspect(indent int) string { return "<builtin function>" }
-func (b *Builtin) Type() ObjectType          { return BUILTIN }
+func (b *Builtin) KeyValue() KeyValue       { return b.Fn }
+func (b *Builtin) Inspect(depth int) string { return "<builtin function>" }
+func (b *Builtin) Type() ObjectType         { return BUILTIN }
 
 type Integer struct {
 	Value int64
 }
 
-func (i *Integer) KeyValue() KeyValue        { return i.Value }
-func (i *Integer) Inspect(indent int) string { return fmt.Sprintf("%d", i.Value) }
-func (i *Integer) Type() ObjectType          { return INTEGER }
+func (i *Integer) KeyValue() KeyValue       { return i.Value }
+func (i *Integer) Inspect(depth int) string { return fmt.Sprintf("%d", i.Value) }
+func (i *Integer) Type() ObjectType         { return INTEGER }
 
 type Boolean struct {
 	Value bool
 }
 
-func (b *Boolean) KeyValue() KeyValue        { return b.Value }
-func (b *Boolean) Inspect(indent int) string { return strconv.FormatBool(b.Value) }
-func (b *Boolean) Type() ObjectType          { return BOOLEAN }
+func (b *Boolean) KeyValue() KeyValue       { return b.Value }
+func (b *Boolean) Inspect(depth int) string { return strconv.FormatBool(b.Value) }
+func (b *Boolean) Type() ObjectType         { return BOOLEAN }
 
 type String struct {
 	Value string
@@ -95,23 +97,23 @@ func (s *String) At(i int) (Object, error) {
 	return &String{Value: string(s.Value[i])}, nil
 }
 
-func (s *String) KeyValue() KeyValue        { return s.Value }
-func (s *String) Inspect(indent int) string { return fmt.Sprintf("%q", s.Value) }
-func (s *String) Type() ObjectType          { return STRING }
+func (s *String) KeyValue() KeyValue       { return s.Value }
+func (s *String) Inspect(depth int) string { return fmt.Sprintf("%q", s.Value) }
+func (s *String) Type() ObjectType         { return STRING }
 
 type Null struct{}
 
-func (n *Null) KeyValue() KeyValue        { return nil }
-func (n *Null) Inspect(indent int) string { return "null" }
-func (n *Null) Type() ObjectType          { return NULL }
+func (n *Null) KeyValue() KeyValue       { return nil }
+func (n *Null) Inspect(depth int) string { return "null" }
+func (n *Null) Type() ObjectType         { return NULL }
 
 type ReturnValue struct {
 	Value Object
 }
 
-func (r *ReturnValue) KeyValue() KeyValue        { return r.Value.KeyValue() }
-func (r *ReturnValue) Inspect(indent int) string { return r.Value.Inspect(indent) }
-func (r *ReturnValue) Type() ObjectType          { return RETURN }
+func (r *ReturnValue) KeyValue() KeyValue       { return r.Value.KeyValue() }
+func (r *ReturnValue) Inspect(depth int) string { return r.Value.Inspect(depth) }
+func (r *ReturnValue) Type() ObjectType         { return RETURN }
 
 func UnwrapReturn(obj Object) Object {
 	if ret, ok := obj.(*ReturnValue); ok {
@@ -130,7 +132,7 @@ func (f *Function) KeyValue() KeyValue { return f }
 
 func (f *Function) Type() ObjectType { return FUNCTION }
 
-func (f *Function) Inspect(indent int) string {
+func (f *Function) Inspect(depth int) string {
 	var params []string
 	for _, p := range f.Parameters {
 		params = append(params, p.Name.Value)
@@ -163,15 +165,18 @@ func (a *Array) SetAt(i int, v Object) error {
 
 func (a *Array) KeyValue() KeyValue { return a }
 func (Array) Type() ObjectType      { return ARRAY }
-func (a *Array) Inspect(indent int) string {
+func (a *Array) Inspect(depth int) string {
+	if depth > MaxDepth {
+		return "<max depth exceeded>"
+	}
 	if len(a.Elements) == 0 {
 		return "[]"
 	}
 	var vals []string
 	for _, e := range a.Elements {
-		vals = append(vals, fmt.Sprintf("%s%s", space(indent+1), e.Inspect(indent+1)))
+		vals = append(vals, fmt.Sprintf("%s%s", space(depth+1), e.Inspect(depth+1)))
 	}
-	return fmt.Sprintf("[\n%s\n%s]", strings.Join(vals, ",\n"), space(indent))
+	return fmt.Sprintf("[\n%s\n%s]", strings.Join(vals, ",\n"), space(depth))
 }
 
 type KeyValue interface{}
@@ -230,15 +235,18 @@ func (h *Hash) Pairs() []*HashPair {
 
 func (h *Hash) KeyValue() KeyValue { return h }
 func (Hash) Type() ObjectType      { return HASH }
-func (h *Hash) Inspect(indent int) string {
+func (h *Hash) Inspect(depth int) string {
+	if depth > MaxDepth {
+		return "<max depth exceeded>"
+	}
 	if h.Len() == 0 {
 		return "{}"
 	}
 	var pairs []string
 	for _, p := range h.pairs {
-		key := p.Key.Inspect(indent + 1)
-		value := p.Value.Inspect(indent + 1)
-		pairs = append(pairs, fmt.Sprintf("%s%s: %s", space(indent+1), key, value))
+		key := p.Key.Inspect(depth + 1)
+		value := p.Value.Inspect(depth + 1)
+		pairs = append(pairs, fmt.Sprintf("%s%s: %s", space(depth+1), key, value))
 	}
-	return fmt.Sprintf("{\n%s\n%s}", strings.Join(pairs, ",\n"), space(indent))
+	return fmt.Sprintf("{\n%s\n%s}", strings.Join(pairs, ",\n"), space(depth))
 }
