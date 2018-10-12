@@ -120,6 +120,8 @@ func eval(node ast.Node, env *object.Env) (object.Object, error) {
 			return nil, err
 		}
 		return evalInfixExpression(node.Operator, left, right)
+	case *ast.SwitchStatement:
+		return evalSwitch(node, env)
 	case *ast.LetStatement:
 		val, err := Eval(node.Value, env)
 		if err != nil {
@@ -233,6 +235,32 @@ func evalDebugger(env *object.Env) (object.Object, error) {
 			} else {
 				fmt.Println(obj.Inspect(0))
 			}
+		}
+	}
+	return NULL, nil
+}
+
+func evalSwitch(s *ast.SwitchStatement, env *object.Env) (object.Object, error) {
+	want, err := Eval(s.Value, env)
+	if err != nil {
+		return nil, err
+	}
+	for _, c := range s.Cases {
+		val, err := Eval(c.Value, env)
+		if err != nil {
+			return nil, err
+		}
+		ok, err := objectsEqual(val, want)
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			for _, stmt := range c.Statements {
+				if _, err := Eval(stmt, env); err != nil {
+					return nil, err
+				}
+			}
+			return NULL, nil
 		}
 	}
 	return NULL, nil

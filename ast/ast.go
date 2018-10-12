@@ -148,6 +148,26 @@ func (r *ReturnStatement) TokenPos() token.Pos {
 	return r.Token.Pos
 }
 
+type SwitchStatement struct {
+	Token token.Token
+	Value Expression
+	Cases []*CaseStatement
+}
+
+type CaseStatement struct {
+	Token      token.Token
+	Value      Expression
+	Statements []Statement
+}
+
+func (c *CaseStatement) statementNode()      {}
+func (c *CaseStatement) TokenPos() token.Pos { return c.Token.Pos }
+func (c *CaseStatement) String() string      { return "<case>" }
+
+func (s *SwitchStatement) statementNode()      {}
+func (s *SwitchStatement) TokenPos() token.Pos { return s.Token.Pos }
+func (s *SwitchStatement) String() string      { return "<switch>" }
+
 type ExpressionStatement struct {
 	Token      token.Token
 	Expression Expression

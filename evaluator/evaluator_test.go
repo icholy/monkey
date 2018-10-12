@@ -166,6 +166,20 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, "true in { true: 123 }", TRUE)
 		RequireEqualEval(t, "true in {}", FALSE)
 	})
+
+	t.Run("simple switch", func(t *testing.T) {
+		input := `
+			let x = null;
+			switch "yes" {
+			case "yes":
+				x = true
+			case "no":
+				x = false;
+			}
+			x;
+		`
+		RequireEqualEval(t, input, TRUE)
+	})
 }
 
 func ParseEval(t *testing.T, input string) (object.Object, error) {
