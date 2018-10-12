@@ -255,20 +255,32 @@ func evalSwitch(s *ast.SwitchStatement, env *object.Env) (object.Object, error) 
 			return nil, err
 		}
 		if ok {
+			var last object.Object = NULL
 			for _, stmt := range c.Statements {
-				if _, err := Eval(stmt, env); err != nil {
+				val, err := Eval(stmt, env)
+				if err != nil {
 					return nil, err
 				}
+				if val.Type() == object.RETURN {
+					return val, nil
+				}
+				last = val
 			}
-			return NULL, nil
+			return last, nil
 		}
 	}
+	var last object.Object = NULL
 	for _, stmt := range s.Default {
-		if _, err := Eval(stmt, env); err != nil {
+		val, err := Eval(stmt, env)
+		if err != nil {
 			return nil, err
 		}
+		if val.Type() == object.RETURN {
+			return val, nil
+		}
+		last = val
 	}
-	return NULL, nil
+	return last, nil
 }
 
 func evalWhile(w *ast.WhileStatement, env *object.Env) (object.Object, error) {

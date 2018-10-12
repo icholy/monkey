@@ -194,6 +194,34 @@ func TestEvaluator(t *testing.T) {
 		`
 		RequireEqualEval(t, input, TRUE)
 	})
+
+	t.Run("return from switch case", func(t *testing.T) {
+
+		input := `
+			function foo() {
+				switch true {
+				case true:
+					return "hello";
+				}
+			}
+			foo()
+		`
+		RequireEqualEval(t, input, &object.String{Value: "hello"})
+	})
+
+	t.Run("return from switch default", func(t *testing.T) {
+
+		input := `
+			function foo() {
+				switch true {
+				default:
+					return "hello";
+				}
+			}
+			foo()
+		`
+		RequireEqualEval(t, input, &object.String{Value: "hello"})
+	})
 }
 
 func ParseEval(t *testing.T, input string) (object.Object, error) {
