@@ -144,6 +144,7 @@ func TestEvaluator(t *testing.T) {
 
 	t.Run("while loop", func(t *testing.T) {
 		RequireEqualEval(t, "let x = true; while(x) { x = false }; x", FALSE)
+		RequireEqualEval(t, `function foo() { let x = true; while (x) { return "hello"; x = false;  }}; foo()`, &object.String{Value: "hello"})
 	})
 
 	t.Run("property access", func(t *testing.T) {
