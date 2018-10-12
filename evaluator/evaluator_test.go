@@ -159,6 +159,13 @@ func TestEvaluator(t *testing.T) {
 		RequireEqualEval(t, "let x: integer = 123; x", &object.TypedObject{ObjectType: object.INTEGER, Object: &object.Integer{123}})
 		RequireEvalError(t, "let x: boolean = false; x = 123", "1:27: wrong type: expected BOOLEAN, got INTEGER")
 	})
+
+	t.Run("in expression", func(t *testing.T) {
+		RequireEqualEval(t, "1 in [1]", TRUE)
+		RequireEqualEval(t, "0 in [1]", FALSE)
+		RequireEqualEval(t, "true in { true: 123 }", TRUE)
+		RequireEqualEval(t, "true in {}", FALSE)
+	})
 }
 
 func ParseEval(t *testing.T, input string) (object.Object, error) {

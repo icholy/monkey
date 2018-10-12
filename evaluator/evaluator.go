@@ -428,18 +428,24 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Env) (object.Obje
 
 func evalInfixExpression(operator string, left, right object.Object) (object.Object, error) {
 	switch operator {
+	case "==":
+		ok, err := objectsEqual(left, right)
+		if err != nil {
+			return nil, err
+		}
+		return boolToObject(ok), nil
+	case "!=":
+		ok, err := objectsEqual(left, right)
+		if err != nil {
+			return nil, err
+		}
+		return boolToObject(!ok), nil
+	case "in":
+		return evalInfixInExpression(left, right)
 	case "||":
 		return boolToObject(isTruthy(left) || isTruthy(right)), nil
 	case "&&":
 		return boolToObject(isTruthy(left) && isTruthy(right)), nil
-	}
-	if left == NULL || right == NULL {
-		switch operator {
-		case "==":
-			return boolToObject(left == right), nil
-		case "!=":
-			return boolToObject(left != right), nil
-		}
 	}
 	if left.Type() != right.Type() {
 		return nil, fmt.Errorf("type mismatch: %s %s %s", left.Type(), operator, right.Type())
@@ -449,15 +455,46 @@ func evalInfixExpression(operator string, left, right object.Object) (object.Obj
 		return evalIntegerInfixExpression(operator, left.(*object.Integer), right.(*object.Integer))
 	case object.STRING:
 		return evalStringInfixExpression(operator, left.(*object.String), right.(*object.String))
-	}
-
-	switch operator {
-	case "==":
-		return boolToObject(left == right), nil
-	case "!=":
-		return boolToObject(left != right), nil
 	default:
 		return nil, fmt.Errorf("unknown operator: %s %s %s", left.Type(), operator, right.Type())
+	}
+}
+
+func evalInfixInExpression(left, right object.Object) (object.Object, error) {
+	switch val := right.(type) {
+	case *object.Array:
+		for _, v := range val.Elements {
+			if ok, _ := objectsEqual(v, left); ok {
+				return TRUE, nil
+			}
+		}
+		return FALSE, nil
+	case *object.Hash:
+		_, ok := val.Get(left)
+		return boolToObject(ok), nil
+	default:
+		return nil, fmt.Errorf("unknown operator: in %s %s", left.Type(), right.Type())
+	}
+}
+
+func objectsEqual(left, right object.Object) (bool, error) {
+	if left == NULL || right == NULL {
+		return left == right, nil
+	}
+	if left.Type() != right.Type() {
+		return false, fmt.Errorf("type mismatch: %s == %s", left.Type(), right.Type())
+	}
+	switch left.Type() {
+	case object.STRING:
+		lstr := left.(*object.String)
+		rstr := right.(*object.String)
+		return lstr.Value == rstr.Value, nil
+	case object.INTEGER:
+		lint := left.(*object.Integer)
+		rint := right.(*object.Integer)
+		return lint.Value == rint.Value, nil
+	default:
+		return left == right, nil
 	}
 }
 
