@@ -149,9 +149,10 @@ func (r *ReturnStatement) TokenPos() token.Pos {
 }
 
 type SwitchStatement struct {
-	Token token.Token
-	Value Expression
-	Cases []*CaseStatement
+	Token   token.Token
+	Value   Expression
+	Cases   []*CaseStatement
+	Default []Statement
 }
 
 type CaseStatement struct {

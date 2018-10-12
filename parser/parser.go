@@ -170,7 +170,7 @@ func (p *Parser) caseStmt() *ast.CaseStatement {
 	if !p.expectPeek(token.COLON) {
 		return nil
 	}
-	for !p.peek.Is(token.CASE) && !p.peek.Is(token.RBRACE) && !p.peek.Is(token.EOF) {
+	for !p.peek.Is(token.CASE) && !p.peek.Is(token.DEFAULT) && !p.peek.Is(token.RBRACE) && !p.peek.Is(token.EOF) {
 		p.next()
 		if s := p.stmt(); s != nil {
 			stmt.Statements = append(stmt.Statements, s)
@@ -190,6 +190,18 @@ func (p *Parser) switchStmt() *ast.SwitchStatement {
 		p.next()
 		if s := p.caseStmt(); s != nil {
 			stmt.Cases = append(stmt.Cases, s)
+		}
+	}
+	if p.peek.Is(token.DEFAULT) {
+		p.next()
+		if !p.expectPeek(token.COLON) {
+			return nil
+		}
+		for !p.peek.Is(token.RBRACE) && !p.peek.Is(token.EOF) {
+			p.next()
+			if s := p.stmt(); s != nil {
+				stmt.Default = append(stmt.Default, s)
+			}
 		}
 	}
 	if !p.expectPeek(token.RBRACE) {

@@ -820,6 +820,8 @@ func TestMonkey(t *testing.T) {
 				return true;
 			case "no":
 				return false;
+			default:
+				return null;
 			}
 		`
 		RequireEqualAST(t, input, &ast.Program{
@@ -861,6 +863,14 @@ func TestMonkey(t *testing.T) {
 										Value: false,
 									},
 								},
+							},
+						},
+					},
+					Default: []ast.Statement{
+						&ast.ReturnStatement{
+							Token: token.New(token.RETURN, "return"),
+							ReturnValue: &ast.NullExpression{
+								Token: token.New(token.NULL, "null"),
 							},
 						},
 					},
