@@ -58,6 +58,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.precedences = map[token.TokenType]int{
 		token.EQ:       EQUALS,
 		token.NE:       EQUALS,
+		token.IN:       EQUALS,
 		token.LT:       LESSGREATER,
 		token.LT_EQ:    LESSGREATER,
 		token.GT:       LESSGREATER,
@@ -101,6 +102,7 @@ func New(l *lexer.Lexer) *Parser {
 		token.GT_EQ:    p.infixExpr,
 		token.OR:       p.infixExpr,
 		token.AND:      p.infixExpr,
+		token.IN:       p.infixExpr,
 		token.LPAREN:   p.callExpr,
 		token.LBRACKET: p.indexExpr,
 		token.ASSIGN:   p.assignExpr,

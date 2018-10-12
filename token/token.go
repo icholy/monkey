@@ -87,6 +87,7 @@ const (
 	PACKAGE  = "PACKAGE"
 	DEBUGGER = "DEBUGGER"
 	NULL     = "NULL"
+	IN       = "IN"
 )
 
 var keywords = map[string]TokenType{
@@ -103,6 +104,7 @@ var keywords = map[string]TokenType{
 	"package":  PACKAGE,
 	"debugger": DEBUGGER,
 	"null":     NULL,
+	"in":       IN,
 }
 
 func LookupIdent(ident string) TokenType {

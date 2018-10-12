@@ -239,4 +239,14 @@ func TestNextToken(t *testing.T) {
 		})
 	})
 
+	t.Run("x in []", func(t *testing.T) {
+		ExpectTokens(t, "x in []", []token.Token{
+			token.New(token.IDENT, "x"),
+			token.New(token.IN, "in"),
+			token.New(token.LBRACKET, "["),
+			token.New(token.RBRACKET, "]"),
+			token.New(token.EOF, ""),
+		})
+	})
+
 }
