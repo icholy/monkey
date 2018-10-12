@@ -106,7 +106,7 @@ function NewLexer(input) {
     let tok = {}
     this.whitespace()
 
-    if simpletokens[ch] != null {
+    if ch in simpletokens {
       let type = simpletokens[ch]
       tok = NewToken(type, ch)
       this.read()
