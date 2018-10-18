@@ -21,7 +21,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			expected: &Bytecode{
 				Instructions: code.Concat(
 					code.Make(code.OpConstant, 0),
-					code.Make(code.OpConstant, 2),
+					code.Make(code.OpConstant, 1),
 				),
 				Constants: []object.Object{
 					object.New(1),
