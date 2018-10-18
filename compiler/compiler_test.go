@@ -23,10 +23,26 @@ func TestIntegerArithmetic(t *testing.T) {
 					code.Make(code.OpConstant, 0),
 					code.Make(code.OpConstant, 1),
 					code.Make(code.OpAdd),
+					code.Make(code.OpPop),
 				),
 				Constants: []object.Object{
 					object.New(1),
 					object.New(2),
+				},
+			},
+		},
+		{
+			input: "12; 43",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpPop),
+					code.Make(code.OpConstant, 1),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(12),
+					object.New(43),
 				},
 			},
 		},

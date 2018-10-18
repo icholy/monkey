@@ -27,7 +27,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			assert.NilError(t, err)
 			vm := New(bytecode)
 			assert.NilError(t, vm.Run())
-			assert.DeepEqual(t, vm.StackTop(), tt.expected)
+			assert.DeepEqual(t, vm.LastPopped(), tt.expected)
 		})
 	}
 }
