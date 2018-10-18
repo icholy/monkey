@@ -6,6 +6,9 @@ import (
 	"io/ioutil"
 	"log"
 
+	"github.com/icholy/monkey/compiler"
+	"github.com/icholy/monkey/vm"
+
 	"github.com/chzyer/readline"
 
 	"github.com/icholy/monkey/object"
@@ -36,6 +39,40 @@ func REPL(in io.Reader, out io.Writer) {
 			} else {
 				fmt.Fprintln(out, obj.Inspect(0))
 			}
+		}
+	}
+}
+
+func REPL2(in io.Reader, out io.Writer) {
+	rl, err := readline.New(Prompt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rl.Close()
+	for {
+		line, err := rl.Readline()
+		if err != nil {
+			log.Fatal(err)
+		}
+		program, err := parser.Parse(line)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		bytecode, err := compiler.Compile(program)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		machine := vm.New(bytecode)
+		if err := machine.Run(); err != nil {
+			fmt.Println(err)
+			continue
+		}
+		if obj := machine.StackTop(); obj != nil {
+			fmt.Fprintln(out, obj.Inspect(0))
+		} else {
+			fmt.Println("NULL")
 		}
 	}
 }

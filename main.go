@@ -21,5 +21,5 @@ func main() {
 		return
 	}
 
-	evaluator.REPL(os.Stdin, os.Stdout)
+	evaluator.REPL2(os.Stdin, os.Stdout)
 }
