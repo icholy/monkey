@@ -69,7 +69,7 @@ func REPL2(in io.Reader, out io.Writer) {
 			fmt.Println(err)
 			continue
 		}
-		if obj := machine.StackTop(); obj != nil {
+		if obj := machine.LastPopped(); obj != nil {
 			fmt.Fprintln(out, obj.Inspect(0))
 		} else {
 			fmt.Println("NULL")
