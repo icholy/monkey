@@ -91,6 +91,17 @@ func TestIntegerArithmetic(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: "true; false",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpTrue),
+					code.Make(code.OpPop),
+					code.Make(code.OpFalse),
+					code.Make(code.OpPop),
+				),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
