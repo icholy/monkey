@@ -3,9 +3,8 @@ package code
 import (
 	"encoding/binary"
 	"fmt"
+	"strings"
 )
-
-type Instructions []byte
 
 type Opcode byte
 
@@ -28,6 +27,44 @@ func (d Definition) Width() int {
 
 var definitions = map[Opcode]*Definition{
 	OpConstant: {"OpConstant", []int{2}},
+}
+
+type Instructions []byte
+
+func (ins Instructions) String() string {
+	var lines []string
+	for i := 0; i < len(ins); i++ {
+		var b strings.Builder
+		def, err := Lookup(ins[i])
+		if err != nil {
+			return err.Error()
+		}
+		fmt.Fprintf(&b, "%04d %s", i, def.Name)
+		operands, n := ReadOperands(def, ins[i+1:])
+		for _, o := range operands {
+			fmt.Fprintf(&b, " %d", o)
+		}
+		i += n
+		lines = append(lines, b.String())
+	}
+	return strings.Join(lines, "\n")
+}
+
+func ReadOperands(def *Definition, ins Instructions) ([]int, int) {
+	operands := make([]int, len(def.OperandWidths))
+	offset := 0
+	for i, width := range def.OperandWidths {
+		switch width {
+		case 2:
+			operands[i] = int(ReadUint16(ins[offset:]))
+		}
+		offset += width
+	}
+	return operands, offset
+}
+
+func ReadUint16(ins Instructions) uint16 {
+	return binary.BigEndian.Uint16(ins)
 }
 
 func Lookup(op byte) (*Definition, error) {

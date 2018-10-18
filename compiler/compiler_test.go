@@ -11,11 +11,6 @@ import (
 	"github.com/icholy/monkey/parser"
 )
 
-type compilerTestCase struct {
-	input    string
-	expected *Bytecode
-}
-
 func TestIntegerArithmetic(t *testing.T) {
 	tests := []struct {
 		input    string
