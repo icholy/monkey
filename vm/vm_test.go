@@ -17,7 +17,7 @@ func TestIntegerArithmetic(t *testing.T) {
 	}{
 		{"1", object.New(1)},
 		{"2", object.New(2)},
-		{"1 + 2", object.New(2)},
+		{"1 + 2", object.New(3)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {

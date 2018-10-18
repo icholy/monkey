@@ -45,9 +45,25 @@ func (vm *VM) Run() error {
 				return err
 			}
 			ip += 2
+		case code.OpAdd:
+			right := vm.pop()
+			left := vm.pop()
+
+			leftVal := left.(*object.Integer).Value
+			rightVal := right.(*object.Integer).Value
+			vm.push(&object.Integer{Value: leftVal + rightVal})
 		}
 	}
 	return nil
+}
+
+func (vm *VM) pop() object.Object {
+	if vm.sp == 0 {
+		return nil
+	}
+	v := vm.StackTop()
+	vm.sp--
+	return v
 }
 
 func (vm *VM) push(v object.Object) error {
