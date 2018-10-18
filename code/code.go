@@ -3,6 +3,7 @@ package code
 import (
 	"encoding/binary"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -10,6 +11,7 @@ type Opcode byte
 
 const (
 	OpConstant Opcode = iota
+	OpAdd
 )
 
 type Definition struct {
@@ -25,8 +27,20 @@ func (d Definition) Width() int {
 	return width
 }
 
+func (d Definition) String() string {
+	if len(d.OperandWidths) == 0 {
+		return d.Name
+	}
+	var widths []string
+	for _, w := range d.OperandWidths {
+		widths = append(widths, strconv.Itoa(w))
+	}
+	return fmt.Sprintf("%s(%s)", d.Name, strings.Join(widths, ", "))
+}
+
 var definitions = map[Opcode]*Definition{
 	OpConstant: {"OpConstant", []int{2}},
+	OpAdd:      {"OpAdd", []int{}},
 }
 
 type Instructions []byte
@@ -55,6 +69,9 @@ func ReadOperands(def *Definition, ins Instructions) ([]int, int) {
 	operands := make([]int, len(def.OperandWidths))
 	offset := 0
 	for i, width := range def.OperandWidths {
+		if len(ins) < width {
+			return nil, 0
+		}
 		switch width {
 		case 2:
 			operands[i] = int(ReadUint16(ins[offset:]))

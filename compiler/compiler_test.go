@@ -22,6 +22,7 @@ func TestIntegerArithmetic(t *testing.T) {
 				Instructions: code.Concat(
 					code.Make(code.OpConstant, 0),
 					code.Make(code.OpConstant, 1),
+					code.Make(code.OpAdd),
 				),
 				Constants: []object.Object{
 					object.New(1),
@@ -34,9 +35,10 @@ func TestIntegerArithmetic(t *testing.T) {
 		t.Run(tt.input, func(t *testing.T) {
 			program, err := parser.Parse(tt.input)
 			assert.NilError(t, err)
-			compiler := New()
-			assert.NilError(t, compiler.Compile(program))
-			assert.DeepEqual(t, tt.expected, compiler.Bytecode())
+			actual, err := Compile(program)
+			assert.NilError(t, err)
+			assert.DeepEqual(t, tt.expected.Constants, actual.Constants)
+			assert.Equal(t, tt.expected.Instructions.String(), actual.Instructions.String())
 		})
 	}
 }
