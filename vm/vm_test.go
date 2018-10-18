@@ -10,7 +10,7 @@ import (
 	"github.com/icholy/monkey/parser"
 )
 
-func TestIntegerArithmetic(t *testing.T) {
+func TestRun(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected object.Object
@@ -23,6 +23,8 @@ func TestIntegerArithmetic(t *testing.T) {
 		{"1 / 1", object.New(1)},
 		{"1 + 4 * 2", object.New(9)},
 		{"10 + 10 / 5", object.New(12)},
+		{"true", object.New(true)},
+		{"false", object.New(false)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {

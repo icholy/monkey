@@ -52,6 +52,8 @@ func New(value interface{}) Object {
 	switch v := value.(type) {
 	case int:
 		return &Integer{Value: int64(v)}
+	case bool:
+		return &Boolean{Value: v}
 	default:
 		return nil
 	}
