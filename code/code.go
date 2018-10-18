@@ -37,7 +37,8 @@ func (ins Instructions) String() string {
 		var b strings.Builder
 		def, err := Lookup(ins[i])
 		if err != nil {
-			return err.Error()
+			lines = append(lines, fmt.Sprintf("ERROR: %s", err))
+			continue
 		}
 		fmt.Fprintf(&b, "%04d %s", i, def.Name)
 		operands, n := ReadOperands(def, ins[i+1:])
