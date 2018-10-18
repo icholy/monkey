@@ -15,6 +15,14 @@ func New() *Compiler {
 	return &Compiler{}
 }
 
+func Compile(node ast.Node) (*Bytecode, error) {
+	c := New()
+	if err := c.Compile(node); err != nil {
+		return nil, err
+	}
+	return c.Bytecode(), nil
+}
+
 func (c *Compiler) Compile(node ast.Node) error {
 	switch node := node.(type) {
 	case *ast.Program:
