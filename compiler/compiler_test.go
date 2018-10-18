@@ -46,6 +46,51 @@ func TestIntegerArithmetic(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: "1 - 2",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpConstant, 1),
+					code.Make(code.OpSub),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(1),
+					object.New(2),
+				},
+			},
+		},
+		{
+			input: "1 * 2",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpConstant, 1),
+					code.Make(code.OpMul),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(1),
+					object.New(2),
+				},
+			},
+		},
+		{
+			input: "1 / 2",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpConstant, 1),
+					code.Make(code.OpDiv),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(1),
+					object.New(2),
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
