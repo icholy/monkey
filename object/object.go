@@ -48,6 +48,15 @@ type Object interface {
 	KeyValue() KeyValue
 }
 
+func New(value interface{}) Object {
+	switch v := value.(type) {
+	case int:
+		return &Integer{Value: int64(v)}
+	default:
+		return nil
+	}
+}
+
 type TypedObject struct {
 	Object
 	ObjectType ObjectType
