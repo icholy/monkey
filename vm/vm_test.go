@@ -48,6 +48,7 @@ func TestRun(t *testing.T) {
 		{"if null { 10 } else { 20 }", object.New(20)},
 		{"let one = 1; one", object.New(1)},
 		{"let one = 1; let two = 2; one + two", object.New(3)},
+		{`"hello" + " " + "world"`, object.New("hello world")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
