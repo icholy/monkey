@@ -49,13 +49,25 @@ type Object interface {
 }
 
 func New(value interface{}) Object {
-	switch v := value.(type) {
+	switch value := value.(type) {
 	case int:
-		return &Integer{Value: int64(v)}
+		return &Integer{Value: int64(value)}
 	case bool:
-		return &Boolean{Value: v}
+		return &Boolean{Value: value}
+	case map[interface{}]interface{}:
+		h := NewHash()
+		for k, v := range value {
+			h.Set(New(k), New(v))
+		}
+		return h
+	case []interface{}:
+		var a Array
+		for _, v := range value {
+			a.Append(New(v))
+		}
+		return &a
 	default:
-		return nil
+		panic(fmt.Sprintf("cannot create object from %#v\n", value))
 	}
 }
 
@@ -164,6 +176,10 @@ func (a *Array) At(i int) (Object, error) {
 		return nil, fmt.Errorf("%d not in range", i)
 	}
 	return a.Elements[i], nil
+}
+
+func (a *Array) Append(v Object) {
+	a.Elements = append(a.Elements, v)
 }
 
 func (a *Array) SetAt(i int, v Object) error {
