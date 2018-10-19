@@ -102,21 +102,21 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if c.prev.Is(code.OpPop) {
 			c.undo()
 		}
-		alternativePos := len(c.instructions)
-
-		if node.Alternative != nil {
-			jumpPos := c.emit(code.OpJump, 9999)
-			alternativePos = len(c.instructions)
-			if err := c.Compile(node.Alternative); err != nil {
-				return err
-			}
-			if c.prev.Is(code.OpPop) {
-				c.undo()
-			}
-			c.rewrite(jumpPos, code.OpJump, len(c.instructions))
+		if node.Alternative == nil {
+			c.rewrite(jumpNotTruthyPos, code.OpJumpNotTruthy, len(c.instructions))
+			return nil
 		}
 
-		c.rewrite(jumpNotTruthyPos, code.OpJumpNotTruthy, alternativePos)
+		jumpPos := c.emit(code.OpJump, 9999)
+		c.rewrite(jumpNotTruthyPos, code.OpJumpNotTruthy, len(c.instructions))
+		if err := c.Compile(node.Alternative); err != nil {
+			return err
+		}
+		if c.prev.Is(code.OpPop) {
+			c.undo()
+		}
+		c.rewrite(jumpPos, code.OpJump, len(c.instructions))
+
 		return nil
 	case *ast.PrefixExpression:
 		if err := c.Compile(node.Right); err != nil {
