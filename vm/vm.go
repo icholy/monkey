@@ -13,6 +13,7 @@ const StackSize = 2048
 var (
 	True  = object.New(true)
 	False = object.New(false)
+	Null  = object.New(nil)
 )
 
 type VM struct {
@@ -72,6 +73,10 @@ func (vm *VM) Run() error {
 			}
 		case code.OpFalse:
 			if err := vm.push(False); err != nil {
+				return err
+			}
+		case code.OpNull:
+			if err := vm.push(Null); err != nil {
 				return err
 			}
 		case code.OpPop:
