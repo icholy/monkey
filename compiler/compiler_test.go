@@ -170,12 +170,14 @@ func TestIntegerArithmetic(t *testing.T) {
 			input: "if true { 10 }; 3333",
 			expected: &Bytecode{
 				Instructions: code.Concat(
-					code.Make(code.OpTrue),             // 0000
-					code.Make(code.OpJumpNotTruthy, 7), // 0001
-					code.Make(code.OpConstant, 0),      // 0004
-					code.Make(code.OpPop),              // 0007
-					code.Make(code.OpConstant, 1),      // 0008
-					code.Make(code.OpPop),              // 0011
+					code.Make(code.OpTrue),              // 0000
+					code.Make(code.OpJumpNotTruthy, 10), // 0001
+					code.Make(code.OpConstant, 0),       // 0004
+					code.Make(code.OpJump, 11),          // 0007
+					code.Make(code.OpNull),              // 0010
+					code.Make(code.OpPop),               // 0011
+					code.Make(code.OpConstant, 1),       // 0012
+					code.Make(code.OpPop),               // 0015
 				),
 				Constants: []object.Object{
 					object.New(10),

@@ -42,6 +42,8 @@ func TestRun(t *testing.T) {
 		{"if (1) { 10 }", object.New(10)},
 		{"if 1 > 2 { 10 } else { 20 }", object.New(20)},
 		{"if 1 < 2 { 10 } else { 20 }", object.New(10)},
+		{"if false { 10 }", object.New(nil)},
+		{"if 1 > 2 { 10 }", object.New(nil)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {

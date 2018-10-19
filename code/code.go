@@ -25,6 +25,7 @@ const (
 	OpBang
 	OpJump
 	OpJumpNotTruthy
+	OpNull
 )
 
 type Definition struct {
@@ -60,6 +61,7 @@ var definitions = map[Opcode]*Definition{
 	OpPop:           {"OpPop", []int{}},
 	OpTrue:          {"OpTrue", []int{}},
 	OpFalse:         {"OpFalse", []int{}},
+	OpNull:          {"OpNull", []int{}},
 	OpEqual:         {"OpEqual", []int{}},
 	OpNotEqual:      {"OpNotEqual", []int{}},
 	OpGreaterThan:   {"OpGreaterThan", []int{}},

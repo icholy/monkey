@@ -49,6 +49,9 @@ type Object interface {
 }
 
 func New(value interface{}) Object {
+	if value == nil {
+		return &Null{}
+	}
 	switch value := value.(type) {
 	case int:
 		return &Integer{Value: int64(value)}

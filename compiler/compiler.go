@@ -102,19 +102,21 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if c.prev.Is(code.OpPop) {
 			c.undo()
 		}
-		if node.Alternative == nil {
-			c.rewrite(jumpNotTruthyPos, code.OpJumpNotTruthy, len(c.instructions))
-			return nil
-		}
 
 		jumpPos := c.emit(code.OpJump, 9999)
 		c.rewrite(jumpNotTruthyPos, code.OpJumpNotTruthy, len(c.instructions))
-		if err := c.Compile(node.Alternative); err != nil {
-			return err
+
+		if node.Alternative != nil {
+			if err := c.Compile(node.Alternative); err != nil {
+				return err
+			}
+			if c.prev.Is(code.OpPop) {
+				c.undo()
+			}
+		} else {
+			c.emit(code.OpNull)
 		}
-		if c.prev.Is(code.OpPop) {
-			c.undo()
-		}
+
 		c.rewrite(jumpPos, code.OpJump, len(c.instructions))
 
 		return nil
