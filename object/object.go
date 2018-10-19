@@ -57,6 +57,8 @@ func New(value interface{}) Object {
 		return &Integer{Value: int64(value)}
 	case bool:
 		return &Boolean{Value: value}
+	case string:
+		return &String{Value: value}
 	case map[interface{}]interface{}:
 		h := NewHash()
 		for k, v := range value {
