@@ -84,11 +84,31 @@ func (vm *VM) Run() error {
 			if err := vm.bangOp(); err != nil {
 				return err
 			}
+		case code.OpJump:
+			pos := code.ReadUint16(vm.instructions[ip+1:])
+			ip = int(pos) - 1
+		case code.OpJumpNotTruthy:
+			pos := code.ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+
+			condition := vm.pop()
+			if !isTruthy(condition) {
+				ip = int(pos) - 1
+			}
 		default:
 			return fmt.Errorf("unexpected opcode: %d", op)
 		}
 	}
 	return nil
+}
+
+func isTruthy(v object.Object) bool {
+	switch v := v.(type) {
+	case *object.Boolean:
+		return v.Value
+	default:
+		return true
+	}
 }
 
 func boolObject(v bool) object.Object {
