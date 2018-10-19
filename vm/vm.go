@@ -202,9 +202,8 @@ func (vm *VM) pop() object.Object {
 	if vm.sp == 0 {
 		return nil
 	}
-	v := vm.StackTop()
 	vm.sp--
-	return v
+	return vm.stack[vm.sp]
 }
 
 func (vm *VM) push(v object.Object) error {
