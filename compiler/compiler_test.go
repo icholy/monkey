@@ -253,6 +253,29 @@ func TestIntegerArithmetic(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: "{ 1: 1, 2: 2, 3: 3}",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpConstant, 1),
+					code.Make(code.OpConstant, 2),
+					code.Make(code.OpConstant, 3),
+					code.Make(code.OpConstant, 4),
+					code.Make(code.OpConstant, 5),
+					code.Make(code.OpHash, 3),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(1),
+					object.New(1),
+					object.New(2),
+					object.New(2),
+					object.New(3),
+					object.New(3),
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
