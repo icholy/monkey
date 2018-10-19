@@ -114,6 +114,10 @@ func (vm *VM) Run() error {
 			if err := vm.push(h); err != nil {
 				return err
 			}
+		case code.OpIndex:
+			if err := vm.indexOp(); err != nil {
+				return err
+			}
 		case code.OpPop:
 			vm.pop()
 		case code.OpMinus:
@@ -168,6 +172,32 @@ func boolObject(v bool) object.Object {
 		return True
 	}
 	return False
+}
+
+func (vm *VM) indexOp() error {
+	index := vm.pop()
+	value := vm.pop()
+
+	switch value := value.(type) {
+	case *object.Array:
+		i, ok := index.(*object.Integer)
+		if !ok {
+			return fmt.Errorf("cannot index into array with: %s", index.Type())
+		}
+		el, err := value.At(int(i.Value))
+		if err != nil {
+			return err
+		}
+		return vm.push(el)
+	case *object.Hash:
+		el, ok := value.Get(index)
+		if !ok {
+			return vm.push(Null)
+		}
+		return vm.push(el)
+	default:
+		return fmt.Errorf("cannot index into: %s", value.Type())
+	}
 }
 
 func (vm *VM) minusOp() error {

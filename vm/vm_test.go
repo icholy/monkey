@@ -54,6 +54,7 @@ func TestRun(t *testing.T) {
 		{"[1, 2, 3]", object.New([]interface{}{1, 2, 3})},
 		{`[1 + 2, "test", true == false]`, object.New([]interface{}{3, "test", false})},
 		{"{1: 1, 2: 2, 3:3 }", object.New(map[interface{}]interface{}{1: 1, 2: 2, 3: 3})},
+		{"[1, 2, 3][1]", object.New(2)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
