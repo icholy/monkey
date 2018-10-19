@@ -101,6 +101,19 @@ func (vm *VM) Run() error {
 			if err := vm.push(v); err != nil {
 				return err
 			}
+		case code.OpHash:
+			n := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+
+			h := object.NewHash()
+			for i := 0; i < n; i++ {
+				value := vm.pop()
+				key := vm.pop()
+				h.Set(key, value)
+			}
+			if err := vm.push(h); err != nil {
+				return err
+			}
 		case code.OpPop:
 			vm.pop()
 		case code.OpMinus:

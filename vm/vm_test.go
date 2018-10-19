@@ -3,6 +3,8 @@ package vm
 import (
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+
 	"gotest.tools/assert"
 
 	"github.com/icholy/monkey/compiler"
@@ -51,6 +53,7 @@ func TestRun(t *testing.T) {
 		{`"hello" + " " + "world"`, object.New("hello world")},
 		{"[1, 2, 3]", object.New([]interface{}{1, 2, 3})},
 		{`[1 + 2, "test", true == false]`, object.New([]interface{}{3, "test", false})},
+		{"{1: 1, 2: 2, 3:3 }", object.New(map[interface{}]interface{}{1: 1, 2: 2, 3: 3})},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
@@ -60,7 +63,7 @@ func TestRun(t *testing.T) {
 			assert.NilError(t, err)
 			vm := New(bytecode)
 			assert.NilError(t, vm.Run())
-			assert.DeepEqual(t, vm.LastPopped(), tt.expected)
+			assert.DeepEqual(t, vm.LastPopped(), tt.expected, cmp.AllowUnexported(object.Hash{}))
 		})
 	}
 }
