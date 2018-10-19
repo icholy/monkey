@@ -77,21 +77,11 @@ func (vm *VM) Run() error {
 		case code.OpPop:
 			vm.pop()
 		case code.OpMinus:
-			right := vm.pop()
-			rigthVal, ok := right.(*object.Integer)
-			if !ok {
-				return fmt.Errorf("cannot use minus on type: %s", right.Type())
-			}
-			if err := vm.push(&object.Integer{Value: -rigthVal.Value}); err != nil {
+			if err := vm.minusOp(); err != nil {
 				return err
 			}
 		case code.OpBang:
-			right := vm.pop()
-			rightVal, ok := right.(*object.Boolean)
-			if !ok {
-				return fmt.Errorf("cannot use bang on type: %s", right.Type())
-			}
-			if err := vm.push(boolObject(!rightVal.Value)); err != nil {
+			if err := vm.bangOp(); err != nil {
 				return err
 			}
 		default:
@@ -106,6 +96,26 @@ func boolObject(v bool) object.Object {
 		return True
 	}
 	return False
+}
+
+func (vm *VM) minusOp() error {
+	right := vm.pop()
+	value, ok := right.(*object.Integer)
+	if !ok {
+		return fmt.Errorf("cannot use minus on type: %s", right.Type())
+	}
+	return vm.push(&object.Integer{Value: -value.Value})
+}
+
+func (vm *VM) bangOp() error {
+	switch vm.pop() {
+	case True:
+		return vm.push(False)
+	case False:
+		return vm.push(True)
+	default:
+		return vm.push(False)
+	}
 }
 
 func (vm *VM) compareOp(op code.Opcode, left, right object.Object) error {
