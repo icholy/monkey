@@ -49,6 +49,11 @@ func REPL2(in io.Reader, out io.Writer) {
 		log.Fatal(err)
 	}
 	defer rl.Close()
+
+	constants := []object.Object{}
+	globals := make([]object.Object, vm.GlobalsSize)
+	symbols := compiler.NewSymbolTable()
+
 	for {
 		line, err := rl.Readline()
 		if err != nil {
@@ -59,12 +64,12 @@ func REPL2(in io.Reader, out io.Writer) {
 			fmt.Println(err)
 			continue
 		}
-		bytecode, err := compiler.Compile(program)
-		if err != nil {
+		comp := compiler.NewWithState(symbols, constants)
+		if err := comp.Compile(program); err != nil {
 			fmt.Println(err)
 			continue
 		}
-		machine := vm.New(bytecode)
+		machine := vm.NewWithGlobals(comp.Bytecode(), globals)
 		if err := machine.Run(); err != nil {
 			fmt.Println(err)
 			continue

@@ -32,6 +32,13 @@ func New() *Compiler {
 	}
 }
 
+func NewWithState(symbols *SymbolTable, constants []object.Object) *Compiler {
+	c := New()
+	c.symbols = symbols
+	c.constants = c.constants
+	return c
+}
+
 func Compile(node ast.Node) (*Bytecode, error) {
 	c := New()
 	if err := c.Compile(node); err != nil {
