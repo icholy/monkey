@@ -95,14 +95,28 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if err := c.Compile(node.Condition); err != nil {
 			return err
 		}
-		jmpPos := c.emit(code.OpJumpNotTruthy, 9999)
+		jumpNotTruthyPos := c.emit(code.OpJumpNotTruthy, 9999)
 		if err := c.Compile(node.Concequence); err != nil {
 			return err
 		}
 		if c.prev.Is(code.OpPop) {
 			c.undo()
 		}
-		c.replace(jmpPos, code.OpJumpNotTruthy, len(c.instructions))
+		if node.Alternative == nil {
+			c.rewrite(jumpNotTruthyPos, code.OpJumpNotTruthy, len(c.instructions))
+			return nil
+		}
+
+		// we have the alternative case here
+		jumpPos := c.emit(code.OpJump, 9999)
+		c.rewrite(jumpNotTruthyPos, code.OpJumpNotTruthy, len(c.instructions))
+		if err := c.Compile(node.Alternative); err != nil {
+			return err
+		}
+		if c.prev.Is(code.OpPop) {
+			c.undo()
+		}
+		c.rewrite(jumpPos, code.OpJump, len(c.instructions))
 		return nil
 	case *ast.PrefixExpression:
 		if err := c.Compile(node.Right); err != nil {
@@ -145,7 +159,7 @@ func (c *Compiler) emit(op code.Opcode, operands ...int) int {
 	return pos
 }
 
-func (c *Compiler) replace(pos int, op code.Opcode, operands ...int) {
+func (c *Compiler) rewrite(pos int, op code.Opcode, operands ...int) {
 	ins := code.Make(op, operands...)
 	for i := range ins {
 		c.instructions[pos+i] = ins[i]

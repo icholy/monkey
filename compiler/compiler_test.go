@@ -183,6 +183,26 @@ func TestIntegerArithmetic(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: "if true { 10 } else { 20 }; 3333;",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpTrue),              // 0000
+					code.Make(code.OpJumpNotTruthy, 10), // 0001
+					code.Make(code.OpConstant, 0),       // 0004
+					code.Make(code.OpJump, 13),          // 0007
+					code.Make(code.OpConstant, 1),       // 0010
+					code.Make(code.OpPop),               // 0013
+					code.Make(code.OpConstant, 2),       // 0014
+					code.Make(code.OpPop),               // 0017
+				),
+				Constants: []object.Object{
+					object.New(10),
+					object.New(20),
+					object.New(3333),
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
