@@ -90,6 +90,17 @@ func (vm *VM) Run() error {
 			if err := vm.push(Null); err != nil {
 				return err
 			}
+		case code.OpArray:
+			n := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+			elements := make([]object.Object, n)
+			for i := 0; i < n; i++ {
+				elements[n-1-i] = vm.pop()
+			}
+			v := &object.Array{Elements: elements}
+			if err := vm.push(v); err != nil {
+				return err
+			}
 		case code.OpPop:
 			vm.pop()
 		case code.OpMinus:
