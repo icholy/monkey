@@ -205,6 +205,22 @@ func TestIntegerArithmetic(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: "let x = 33; let y = x; y;",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpSetGlobal, 0),
+					code.Make(code.OpGetGlobal, 0),
+					code.Make(code.OpSetGlobal, 1),
+					code.Make(code.OpGetGlobal, 1),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(33),
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {

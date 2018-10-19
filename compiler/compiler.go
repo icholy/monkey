@@ -8,14 +8,6 @@ import (
 	"github.com/icholy/monkey/object"
 )
 
-type Compiler struct {
-	instructions code.Instructions
-	constants    []object.Object
-
-	prev     Instruction
-	prevprev Instruction
-}
-
 type Instruction struct {
 	Opcode   code.Opcode
 	Position int
@@ -25,8 +17,19 @@ func (i Instruction) Is(op code.Opcode) bool {
 	return i.Opcode == op
 }
 
+type Compiler struct {
+	instructions code.Instructions
+	constants    []object.Object
+	symbols      *SymbolTable
+
+	prev     Instruction
+	prevprev Instruction
+}
+
 func New() *Compiler {
-	return &Compiler{}
+	return &Compiler{
+		symbols: NewSymbolTable(),
+	}
 }
 
 func Compile(node ast.Node) (*Bytecode, error) {
@@ -141,6 +144,18 @@ func (c *Compiler) Compile(node ast.Node) error {
 		} else {
 			c.emit(code.OpFalse)
 		}
+	case *ast.LetStatement:
+		if err := c.Compile(node.Value); err != nil {
+			return err
+		}
+		symbol := c.symbols.Define(node.Name.Value)
+		c.emit(code.OpSetGlobal, symbol.Index)
+	case *ast.Identifier:
+		symbol, ok := c.symbols.Resolve(node.Value)
+		if !ok {
+			return fmt.Errorf("invalid identifier: %s", node.Value)
+		}
+		c.emit(code.OpGetGlobal, symbol.Index)
 	case *ast.NullExpression:
 		c.emit(code.OpNull)
 	}
