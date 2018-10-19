@@ -141,6 +141,8 @@ func (c *Compiler) Compile(node ast.Node) error {
 		} else {
 			c.emit(code.OpFalse)
 		}
+	case *ast.NullExpression:
+		c.emit(code.OpNull)
 	}
 	return nil
 }

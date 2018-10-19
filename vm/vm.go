@@ -111,6 +111,8 @@ func isTruthy(v object.Object) bool {
 	switch v := v.(type) {
 	case *object.Boolean:
 		return v.Value
+	case *object.Null:
+		return false
 	default:
 		return true
 	}
@@ -137,6 +139,8 @@ func (vm *VM) bangOp() error {
 	case True:
 		return vm.push(False)
 	case False:
+		return vm.push(True)
+	case Null:
 		return vm.push(True)
 	default:
 		return vm.push(False)
