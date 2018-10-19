@@ -11,6 +11,18 @@ import (
 type Compiler struct {
 	instructions code.Instructions
 	constants    []object.Object
+
+	prev     Instruction
+	prevprev Instruction
+}
+
+type Instruction struct {
+	Opcode   code.Opcode
+	Position int
+}
+
+func (i Instruction) Is(op code.Opcode) bool {
+	return i.Opcode == op
 }
 
 func New() *Compiler {
@@ -38,6 +50,12 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return err
 		}
 		c.emit(code.OpPop)
+	case *ast.BlockStatement:
+		for _, s := range node.Statements {
+			if err := c.Compile(s); err != nil {
+				return err
+			}
+		}
 	case *ast.InfixExpression:
 		if node.Operator == "<" {
 			if err := c.Compile(node.Right); err != nil {
@@ -73,6 +91,19 @@ func (c *Compiler) Compile(node ast.Node) error {
 		default:
 			return fmt.Errorf("unknown operator: %s", node.Operator)
 		}
+	case *ast.IfExpression:
+		if err := c.Compile(node.Condition); err != nil {
+			return err
+		}
+		jmpPos := c.emit(code.OpJumpNotTruthy, 9999)
+		if err := c.Compile(node.Concequence); err != nil {
+			return err
+		}
+		if c.prev.Is(code.OpPop) {
+			c.undo()
+		}
+		c.replace(jmpPos, code.OpJumpNotTruthy, len(c.instructions))
+		return nil
 	case *ast.PrefixExpression:
 		if err := c.Compile(node.Right); err != nil {
 			return err
@@ -98,9 +129,27 @@ func (c *Compiler) Compile(node ast.Node) error {
 	return nil
 }
 
+func (c *Compiler) undo() {
+	c.instructions = c.instructions[:c.prev.Position]
+	c.prev = c.prevprev
+}
+
 func (c *Compiler) emit(op code.Opcode, operands ...int) int {
 	ins := code.Make(op, operands...)
-	return c.addInstructions(ins)
+	pos := c.addInstructions(ins)
+	c.prevprev = c.prev
+	c.prev = Instruction{
+		Opcode:   op,
+		Position: pos,
+	}
+	return pos
+}
+
+func (c *Compiler) replace(pos int, op code.Opcode, operands ...int) {
+	ins := code.Make(op, operands...)
+	for i := range ins {
+		c.instructions[pos+i] = ins[i]
+	}
 }
 
 func (c *Compiler) addInstructions(ins code.Instructions) int {
