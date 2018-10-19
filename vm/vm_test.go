@@ -50,6 +50,7 @@ func TestRun(t *testing.T) {
 		{"let one = 1; let two = 2; one + two", object.New(3)},
 		{`"hello" + " " + "world"`, object.New("hello world")},
 		{"[1, 2, 3]", object.New([]interface{}{1, 2, 3})},
+		{`[1 + 2, "test", true == false]`, object.New([]interface{}{3, "test", false})},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
