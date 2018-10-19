@@ -143,6 +143,29 @@ func TestIntegerArithmetic(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: "-1",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpMinus),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(1),
+				},
+			},
+		},
+		{
+			input: "!true",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpTrue),
+					code.Make(code.OpBang),
+					code.Make(code.OpPop),
+				),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {

@@ -76,6 +76,24 @@ func (vm *VM) Run() error {
 			}
 		case code.OpPop:
 			vm.pop()
+		case code.OpMinus:
+			right := vm.pop()
+			rigthVal, ok := right.(*object.Integer)
+			if !ok {
+				return fmt.Errorf("cannot use minus on type: %s", right.Type())
+			}
+			if err := vm.push(&object.Integer{Value: -rigthVal.Value}); err != nil {
+				return err
+			}
+		case code.OpBang:
+			right := vm.pop()
+			rightVal, ok := right.(*object.Boolean)
+			if !ok {
+				return fmt.Errorf("cannot use bang on type: %s", right.Type())
+			}
+			if err := vm.push(boolObject(!rightVal.Value)); err != nil {
+				return err
+			}
 		default:
 			return fmt.Errorf("unexpected opcode: %d", op)
 		}
@@ -113,7 +131,7 @@ func (vm *VM) compareIntegerOp(op code.Opcode, left, right *object.Integer) erro
 	case code.OpGreaterThan:
 		return vm.push(boolObject(left.Value > right.Value))
 	default:
-		return fmt.Errorf("unknown operator: %d (%s, %s)", op, left.Type(), right.Type())
+		return fmt.Errorf("unknown operator: %d", op)
 	}
 }
 

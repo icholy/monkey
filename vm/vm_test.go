@@ -33,6 +33,9 @@ func TestRun(t *testing.T) {
 		{"true == true", object.New(true)},
 		{"(1 > 2) == true", object.New(false)},
 		{"(1 > 2) == false", object.New(true)},
+		{"!true", object.New(false)},
+		{"!false", object.New(true)},
+		{"-1", object.New(-1)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
