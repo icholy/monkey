@@ -25,6 +25,14 @@ func TestRun(t *testing.T) {
 		{"10 + 10 / 5", object.New(12)},
 		{"true", object.New(true)},
 		{"false", object.New(false)},
+		{"1 > 2", object.New(false)},
+		{"1 > 2", object.New(false)},
+		{"1 < 1", object.New(false)},
+		{"1 != 2", object.New(true)},
+		{"false != true", object.New(true)},
+		{"true == true", object.New(true)},
+		{"(1 > 2) == true", object.New(false)},
+		{"(1 > 2) == false", object.New(true)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {

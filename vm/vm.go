@@ -60,6 +60,12 @@ func (vm *VM) Run() error {
 			if err := vm.binaryOp(op, left, right); err != nil {
 				return err
 			}
+		case code.OpEqual, code.OpNotEqual, code.OpGreaterThan:
+			right := vm.pop()
+			left := vm.pop()
+			if err := vm.compareOp(op, left, right); err != nil {
+				return err
+			}
 		case code.OpTrue:
 			if err := vm.push(True); err != nil {
 				return err
@@ -75,6 +81,40 @@ func (vm *VM) Run() error {
 		}
 	}
 	return nil
+}
+
+func boolObject(v bool) object.Object {
+	if v {
+		return True
+	}
+	return False
+}
+
+func (vm *VM) compareOp(op code.Opcode, left, right object.Object) error {
+	if left.Type() == object.INTEGER && left.Type() == object.INTEGER {
+		return vm.compareIntegerOp(op, left.(*object.Integer), right.(*object.Integer))
+	}
+	switch op {
+	case code.OpEqual:
+		return vm.push(boolObject(left == right))
+	case code.OpNotEqual:
+		return vm.push(boolObject(left != right))
+	default:
+		return fmt.Errorf("unknown operator: %d (%s, %s)", op, left.Type(), right.Type())
+	}
+}
+
+func (vm *VM) compareIntegerOp(op code.Opcode, left, right *object.Integer) error {
+	switch op {
+	case code.OpEqual:
+		return vm.push(boolObject(left.Value == right.Value))
+	case code.OpNotEqual:
+		return vm.push(boolObject(left.Value != right.Value))
+	case code.OpGreaterThan:
+		return vm.push(boolObject(left.Value > right.Value))
+	default:
+		return fmt.Errorf("unknown operator: %d (%s, %s)", op, left.Type(), right.Type())
+	}
 }
 
 func (vm *VM) binaryOp(op code.Opcode, left, right object.Object) error {
