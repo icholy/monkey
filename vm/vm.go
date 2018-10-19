@@ -8,7 +8,10 @@ import (
 	"github.com/icholy/monkey/object"
 )
 
-const StackSize = 2048
+const (
+	StackSize   = 2048
+	GlobalsSize = 65536
+)
 
 var (
 	True  = object.New(true)
@@ -21,8 +24,9 @@ type VM struct {
 	instructions code.Instructions
 
 	// always points to the next value, top of the stack is sp-1
-	sp    int
-	stack []object.Object
+	sp      int
+	stack   []object.Object
+	globals []object.Object
 }
 
 func New(bytecode *compiler.Bytecode) *VM {
@@ -31,6 +35,7 @@ func New(bytecode *compiler.Bytecode) *VM {
 		instructions: bytecode.Instructions,
 		sp:           0,
 		stack:        make([]object.Object, StackSize),
+		globals:      make([]object.Object, GlobalsSize),
 	}
 }
 
@@ -99,6 +104,16 @@ func (vm *VM) Run() error {
 			condition := vm.pop()
 			if !isTruthy(condition) {
 				ip = int(pos) - 1
+			}
+		case code.OpSetGlobal:
+			index := code.ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+			vm.globals[index] = vm.pop()
+		case code.OpGetGlobal:
+			index := code.ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+			if err := vm.push(vm.globals[index]); err != nil {
+				return err
 			}
 		default:
 			return fmt.Errorf("unexpected opcode: %d", op)
