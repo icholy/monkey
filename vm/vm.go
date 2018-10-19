@@ -199,7 +199,21 @@ func (vm *VM) binaryOp(op code.Opcode, left, right object.Object) error {
 	if left.Type() == object.INTEGER && right.Type() == object.INTEGER {
 		return vm.binaryIntegerOp(op, left.(*object.Integer), right.(*object.Integer))
 	}
+	if left.Type() == object.STRING && right.Type() == object.STRING {
+		return vm.binaryStringOp(op, left.(*object.String), right.(*object.String))
+	}
 	return fmt.Errorf("unsuported types for binary operator: %s, %s", left.Type(), right.Type())
+}
+
+func (vm *VM) binaryStringOp(op code.Opcode, left, right *object.String) error {
+	var result string
+	switch op {
+	case code.OpAdd:
+		result = left.Value + right.Value
+	default:
+		return fmt.Errorf("unknown string operator: %d", op)
+	}
+	return vm.push(&object.String{Value: result})
 }
 
 func (vm *VM) binaryIntegerOp(op code.Opcode, left, right *object.Integer) error {
