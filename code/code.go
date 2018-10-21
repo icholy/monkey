@@ -28,6 +28,8 @@ const (
 	OpNull
 	OpSetGlobal
 	OpGetGlobal
+	OpSetLocal
+	OpGetLocal
 	OpArray
 	OpHash
 	OpIndex
@@ -78,6 +80,8 @@ var definitions = map[Opcode]*Definition{
 	OpJumpNotTruthy: {"OpJumpNotTruthy", []int{2}},
 	OpSetGlobal:     {"OpSetGlobal", []int{2}},
 	OpGetGlobal:     {"OpGetGlobal", []int{2}},
+	OpSetLocal:      {"OpSetLocal", []int{1}},
+	OpGetLocal:      {"OpGetLocal", []int{1}},
 	OpArray:         {"OpArray", []int{2}},
 	OpHash:          {"OpHash", []int{2}},
 	OpIndex:         {"OpIndex", []int{}},
@@ -151,6 +155,8 @@ func Make(op Opcode, operands ...int) Instructions {
 	for i, o := range operands {
 		width := def.OperandWidths[i]
 		switch width {
+		case 1:
+			instruction[offset] = uint8(o)
 		case 2:
 			binary.BigEndian.PutUint16(instruction[offset:], uint16(o))
 		}
