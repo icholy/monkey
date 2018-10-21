@@ -239,7 +239,8 @@ func (c *Compiler) Compile(node ast.Node) error {
 
 		// handle empty function
 		if !scope.prev.Is(code.OpReturnValue) {
-			scope.emit(code.OpReturn)
+			scope.emit(code.OpNull)
+			scope.emit(code.OpReturnValue)
 		}
 
 		compiledFn := &object.CompiledFunction{
@@ -247,8 +248,12 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 		c.emit(code.OpConstant, c.addConstant(compiledFn))
 	case *ast.ReturnStatement:
-		if err := c.Compile(node.ReturnValue); err != nil {
-			return err
+		if node.ReturnValue != nil {
+			if err := c.Compile(node.ReturnValue); err != nil {
+				return err
+			}
+		} else {
+			c.emit(code.OpNull)
 		}
 		c.emit(code.OpReturnValue)
 	case *ast.NullExpression:

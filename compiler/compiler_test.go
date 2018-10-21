@@ -352,7 +352,25 @@ func TestIntegerArithmetic(t *testing.T) {
 				Constants: []object.Object{
 					&object.CompiledFunction{
 						Instructions: code.Concat(
-							code.Make(code.OpReturn),
+							code.Make(code.OpNull),
+							code.Make(code.OpReturnValue),
+						),
+					},
+				},
+			},
+		},
+		{
+			input: "fn() { return; }",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpNull),
+							code.Make(code.OpReturnValue),
 						),
 					},
 				},
