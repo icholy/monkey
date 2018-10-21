@@ -5,21 +5,24 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/icholy/monkey/code"
+
 	"github.com/icholy/monkey/ast"
 )
 
 type ObjectType string
 
 const (
-	INTEGER  = "INTEGER"
-	NULL     = "NULL"
-	BOOLEAN  = "BOOLEAN"
-	RETURN   = "RETURN"
-	FUNCTION = "FUNCTION"
-	STRING   = "STRING"
-	BUILTIN  = "BUILTIN"
-	ARRAY    = "ARRAY"
-	HASH     = "HASH"
+	INTEGER           = "INTEGER"
+	NULL              = "NULL"
+	BOOLEAN           = "BOOLEAN"
+	RETURN            = "RETURN"
+	FUNCTION          = "FUNCTION"
+	STRING            = "STRING"
+	BUILTIN           = "BUILTIN"
+	ARRAY             = "ARRAY"
+	HASH              = "HASH"
+	COMPILED_FUNCTION = "COMPILED_FUNCTION"
 )
 
 var MaxDepth = 10
@@ -282,3 +285,11 @@ func (h *Hash) Inspect(depth int) string {
 	}
 	return fmt.Sprintf("{\n%s\n%s}", strings.Join(pairs, ",\n"), space(depth))
 }
+
+type CompiledFunction struct {
+	Instructions code.Instructions
+}
+
+func (cf *CompiledFunction) Tyoe() ObjectType         { return COMPILED_FUNCTION }
+func (cf *CompiledFunction) Inspect(depth int) string { return fmt.Sprintf("CompiledFunction[%p]", cf) }
+func (cf *CompiledFunction) KeyValue() interface{}    { return cf }
