@@ -376,6 +376,46 @@ func TestIntegerArithmetic(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: "fn() { return 24; }()",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 1),
+					code.Make(code.OpCall),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(24),
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpConstant, 0),
+							code.Make(code.OpReturnValue),
+						),
+					},
+				},
+			},
+		},
+		{
+			input: "let f = fn() { 24 }; f();",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 1),
+					code.Make(code.OpSetGlobal, 0),
+					code.Make(code.OpGetGlobal, 0),
+					code.Make(code.OpCall),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(24),
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpConstant, 0),
+							code.Make(code.OpReturnValue),
+						),
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
