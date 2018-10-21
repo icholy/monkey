@@ -60,11 +60,11 @@ func TestRun(t *testing.T) {
 		{"let x = fn() { return 1; return 2; }; x()", object.New(1)},
 		{"let x = fn() { return }; x()", object.New(nil)},
 		{"let x = fn() {}; x()", object.New(nil)},
-		{"let one = fn() { let one = 1; one }", object.New(1)},
+		{"let one = fn() { let one = 1; one }; one()", object.New(1)},
 		{"let x = fn() { let one = 1; let two = 2; one + two }; x()", object.New(3)},
 		{"let x = fn() { let one = 1; let two = 2; one + two }; let y = fn() { let three = 3; let four = 4; three + four }; x() + y()", object.New(10)},
-		{"let seed = 50; let minusOne = fn() { let x = 1; seed - num }()", object.New(49)},
-		{"let x = fn() { let x = 1; }; let y = fn() { let x = 1; }; x() + y()", object.New(2)},
+		{"let seed = 50; let minusOne = fn() { let x = 1; seed - x }()", object.New(49)},
+		{"let x = fn() { let x = 1; x }; let y = fn() { let x = 1; x }; x() + y()", object.New(2)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {

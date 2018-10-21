@@ -183,8 +183,7 @@ func (vm *VM) Run() error {
 			vm.pushFrame(frame)
 			vm.sp = frame.bp + fn.NumLocals
 		case code.OpReturn:
-			retVal := vm.pop() // return value
-			vm.pop()           // compiled function
+			retVal := vm.pop()
 			vm.sp = vm.popFrame().bp - 1
 			frame = vm.frame()
 			if err := vm.push(retVal); err != nil {
