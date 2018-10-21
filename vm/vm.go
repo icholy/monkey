@@ -175,7 +175,7 @@ func (vm *VM) Run() error {
 			}
 			frame = NewFrame(fn.Instructions)
 			vm.pushFrame(frame)
-		case code.OpReturnValue:
+		case code.OpReturn:
 			retVal := vm.pop() // return value
 			vm.pop()           // compiled function
 			if err := vm.push(retVal); err != nil {

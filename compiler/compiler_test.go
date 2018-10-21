@@ -315,7 +315,7 @@ func TestIntegerArithmetic(t *testing.T) {
 							code.Make(code.OpConstant, 0),
 							code.Make(code.OpConstant, 1),
 							code.Make(code.OpAdd),
-							code.Make(code.OpReturnValue),
+							code.Make(code.OpReturn),
 						),
 					},
 				},
@@ -336,7 +336,7 @@ func TestIntegerArithmetic(t *testing.T) {
 							code.Make(code.OpConstant, 0),
 							code.Make(code.OpConstant, 1),
 							code.Make(code.OpAdd),
-							code.Make(code.OpReturnValue),
+							code.Make(code.OpReturn),
 						),
 					},
 				},
@@ -353,7 +353,7 @@ func TestIntegerArithmetic(t *testing.T) {
 					&object.CompiledFunction{
 						Instructions: code.Concat(
 							code.Make(code.OpNull),
-							code.Make(code.OpReturnValue),
+							code.Make(code.OpReturn),
 						),
 					},
 				},
@@ -370,7 +370,7 @@ func TestIntegerArithmetic(t *testing.T) {
 					&object.CompiledFunction{
 						Instructions: code.Concat(
 							code.Make(code.OpNull),
-							code.Make(code.OpReturnValue),
+							code.Make(code.OpReturn),
 						),
 					},
 				},
@@ -389,7 +389,7 @@ func TestIntegerArithmetic(t *testing.T) {
 					&object.CompiledFunction{
 						Instructions: code.Concat(
 							code.Make(code.OpConstant, 0),
-							code.Make(code.OpReturnValue),
+							code.Make(code.OpReturn),
 						),
 					},
 				},
@@ -410,7 +410,7 @@ func TestIntegerArithmetic(t *testing.T) {
 					&object.CompiledFunction{
 						Instructions: code.Concat(
 							code.Make(code.OpConstant, 0),
-							code.Make(code.OpReturnValue),
+							code.Make(code.OpReturn),
 						),
 					},
 				},
@@ -434,7 +434,72 @@ func TestIntegerArithmetic(t *testing.T) {
 					&object.CompiledFunction{
 						Instructions: code.Concat(
 							code.Make(code.OpConstant, 0),
-							code.Make(code.OpReturnValue),
+							code.Make(code.OpReturn),
+						),
+					},
+				},
+			},
+		},
+		{
+			input: "let num = 55; fn() { num }",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpSetGlobal, 0),
+					code.Make(code.OpConstant, 1),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(55),
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpGetGlobal, 0),
+							code.Make(code.OpReturn),
+						),
+					},
+				},
+			},
+		},
+		{
+			input: "fn() { let num = 55; num }",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 1),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(55),
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpConstant, 0),
+							code.Make(code.OpSetLocal, 0),
+							code.Make(code.OpGetLocal, 0),
+							code.Make(code.OpReturn),
+						),
+					},
+				},
+			},
+		},
+		{
+			input: "fn() { let a = 55; let b = 77; return a + b }",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 2),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(55),
+					object.New(77),
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpConstant, 0),
+							code.Make(code.OpSetLocal, 0),
+							code.Make(code.OpConstant, 1),
+							code.Make(code.OpSetLocal, 1),
+							code.Make(code.OpGetLocal, 0),
+							code.Make(code.OpGetLocal, 1),
+							code.Make(code.OpAdd),
+							code.Make(code.OpReturn),
 						),
 					},
 				},

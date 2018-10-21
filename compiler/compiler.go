@@ -234,13 +234,13 @@ func (c *Compiler) Compile(node ast.Node) error {
 		scope := c.scope()
 		if scope.prev.Is(code.OpPop) {
 			scope.undo()
-			scope.emit(code.OpReturnValue)
+			scope.emit(code.OpReturn)
 		}
 
 		// handle empty function
-		if !scope.prev.Is(code.OpReturnValue) {
+		if !scope.prev.Is(code.OpReturn) {
 			scope.emit(code.OpNull)
-			scope.emit(code.OpReturnValue)
+			scope.emit(code.OpReturn)
 		}
 
 		compiledFn := &object.CompiledFunction{
@@ -255,7 +255,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 		} else {
 			c.emit(code.OpNull)
 		}
-		c.emit(code.OpReturnValue)
+		c.emit(code.OpReturn)
 	case *ast.CallExpression:
 		if err := c.Compile(node.Function); err != nil {
 			return err
