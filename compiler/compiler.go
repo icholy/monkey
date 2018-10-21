@@ -26,7 +26,7 @@ type Compiler struct {
 
 func New() *Compiler {
 	return &Compiler{
-		symbols: NewSymbolTable(),
+		symbols: NewSymbolTable(nil),
 		scopes: []*Scope{
 			&Scope{},
 		},
