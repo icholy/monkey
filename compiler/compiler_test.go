@@ -521,6 +521,7 @@ func TestIntegerArithmetic(t *testing.T) {
 }
 func TestScopes(t *testing.T) {
 	compiler := New()
+	global := compiler.symbols
 
 	compiler.emit(code.OpMul)
 	assert.Assert(t, is.Len(compiler.scopes, 1))
@@ -528,6 +529,7 @@ func TestScopes(t *testing.T) {
 
 	compiler.enterScope()
 	assert.Assert(t, is.Len(compiler.scopes, 2))
+	assert.Equal(t, global, compiler.symbols.Outer)
 
 	compiler.emit(code.OpSub)
 	assert.Assert(t, is.Len(compiler.scope().instructions, 1))
@@ -535,6 +537,8 @@ func TestScopes(t *testing.T) {
 
 	compiler.leaveScope()
 	assert.Assert(t, is.Len(compiler.scopes, 1))
+	assert.Equal(t, global, compiler.symbols)
+	assert.Assert(t, is.Nil(compiler.symbols.Outer))
 
 	compiler.emit(code.OpAdd)
 	assert.Assert(t, is.Len(compiler.scope().instructions, 2))

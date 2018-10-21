@@ -208,7 +208,11 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return err
 		}
 		symbol := c.symbols.Define(node.Name.Value)
-		c.emit(code.OpSetGlobal, symbol.Index)
+		if symbol.Scope == GlobalScope {
+			c.emit(code.OpSetGlobal, symbol.Index)
+		} else {
+			c.emit(code.OpSetLocal, symbol.Index)
+		}
 	case *ast.Identifier:
 		symbol, ok := c.symbols.Resolve(node.Value)
 		if !ok {
@@ -296,12 +300,14 @@ func (c *Compiler) scope() *Scope {
 }
 
 func (c *Compiler) enterScope() {
+	c.symbols = NewSymbolTable(c.symbols)
 	c.scopes = append(c.scopes, &Scope{})
 }
 
 func (c *Compiler) leaveScope() code.Instructions {
 	ins := c.instructions()
 	c.scopes = c.scopes[:len(c.scopes)-1]
+	c.symbols = c.symbols.Outer
 	return ins
 }
 

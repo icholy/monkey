@@ -14,21 +14,21 @@ type Symbol struct {
 }
 
 type SymbolTable struct {
-	outer *SymbolTable
+	Outer *SymbolTable
 	store map[string]Symbol
 	count int
 }
 
 func NewSymbolTable(outer *SymbolTable) *SymbolTable {
 	return &SymbolTable{
-		outer: outer,
+		Outer: outer,
 		store: map[string]Symbol{},
 	}
 }
 
 func (st *SymbolTable) Define(name string) Symbol {
 	s := Symbol{Name: name, Index: st.count, Scope: LocalScope}
-	if st.outer == nil {
+	if st.Outer == nil {
 		s.Scope = GlobalScope
 	}
 	st.count++
@@ -38,8 +38,8 @@ func (st *SymbolTable) Define(name string) Symbol {
 
 func (st *SymbolTable) Resolve(name string) (Symbol, bool) {
 	s, ok := st.store[name]
-	if !ok && st.outer != nil {
-		return st.outer.Resolve(name)
+	if !ok && st.Outer != nil {
+		return st.Outer.Resolve(name)
 	}
 	return s, ok
 }
