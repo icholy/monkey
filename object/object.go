@@ -290,6 +290,6 @@ type CompiledFunction struct {
 	Instructions code.Instructions
 }
 
-func (cf *CompiledFunction) Tyoe() ObjectType         { return COMPILED_FUNCTION }
+func (cf *CompiledFunction) Type() ObjectType         { return COMPILED_FUNCTION }
 func (cf *CompiledFunction) Inspect(depth int) string { return fmt.Sprintf("CompiledFunction[%p]", cf) }
-func (cf *CompiledFunction) KeyValue() interface{}    { return cf }
+func (cf *CompiledFunction) KeyValue() KeyValue       { return cf }

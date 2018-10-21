@@ -296,6 +296,27 @@ func TestIntegerArithmetic(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: "fn() { return 5 + 10 }",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 2),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(5),
+					object.New(10),
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpConstant, 0),
+							code.Make(code.OpConstant, 1),
+							code.Make(code.OpAdd),
+							code.Make(code.OpPop),
+						),
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
