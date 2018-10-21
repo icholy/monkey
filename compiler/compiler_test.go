@@ -470,6 +470,7 @@ func TestIntegerArithmetic(t *testing.T) {
 				Constants: []object.Object{
 					object.New(55),
 					&object.CompiledFunction{
+						NumLocals: 1,
 						Instructions: code.Concat(
 							code.Make(code.OpConstant, 0),
 							code.Make(code.OpSetLocal, 0),
@@ -491,6 +492,7 @@ func TestIntegerArithmetic(t *testing.T) {
 					object.New(55),
 					object.New(77),
 					&object.CompiledFunction{
+						NumLocals: 2,
 						Instructions: code.Concat(
 							code.Make(code.OpConstant, 0),
 							code.Make(code.OpSetLocal, 0),

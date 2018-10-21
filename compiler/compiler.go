@@ -251,7 +251,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 			scope.emit(code.OpReturn)
 		}
 
+		nLocals := c.symbols.Count
 		compiledFn := &object.CompiledFunction{
+			NumLocals:    nLocals,
 			Instructions: c.leaveScope(),
 		}
 		c.emit(code.OpConstant, c.addConstant(compiledFn))
