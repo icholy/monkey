@@ -56,6 +56,7 @@ func TestRun(t *testing.T) {
 		{"{1: 1, 2: 2, 3:3 }", object.New(map[interface{}]interface{}{1: 1, 2: 2, 3: 3})},
 		{"[1, 2, 3][1]", object.New(2)},
 		{"fn() { 15 }()", object.New(15)},
+		{"let one = fn() { 1 }; one() + one()", object.New(2)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
