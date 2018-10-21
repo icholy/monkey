@@ -35,7 +35,7 @@ type VM struct {
 func New(bytecode *compiler.Bytecode) *VM {
 
 	frames := make([]*Frame, MaxFrames)
-	frames[0] = NewFrame(bytecode.Instructions)
+	frames[0] = NewFrame(bytecode.Instructions, 0)
 
 	return &VM{
 		constants: bytecode.Constants,
@@ -168,21 +168,28 @@ func (vm *VM) Run() error {
 			if err := vm.push(vm.globals[index]); err != nil {
 				return err
 			}
+		case code.OpSetLocal:
+			index := frame.ReadUint8()
+			vm.stack[frame.bp+index] = vm.pop()
+		case code.OpGetLocal:
+			index := frame.ReadUint8()
+			vm.push(vm.stack[frame.bp+index])
 		case code.OpCall:
 			fn, ok := vm.peek().(*object.CompiledFunction)
 			if !ok {
 				return fmt.Errorf("calling non-function")
 			}
-			frame = NewFrame(fn.Instructions)
+			frame = NewFrame(fn.Instructions, vm.sp)
 			vm.pushFrame(frame)
+			vm.sp = frame.bp + fn.NumLocals
 		case code.OpReturn:
 			retVal := vm.pop() // return value
 			vm.pop()           // compiled function
+			vm.sp = vm.popFrame().bp - 1
+			frame = vm.frame()
 			if err := vm.push(retVal); err != nil {
 				return err
 			}
-			vm.popFrame()
-			frame = vm.frame()
 		default:
 			return fmt.Errorf("unexpected opcode: %d", op)
 		}

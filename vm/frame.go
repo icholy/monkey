@@ -7,10 +7,11 @@ import (
 type Frame struct {
 	instructions code.Instructions
 	ip           int
+	bp           int
 }
 
-func NewFrame(ins code.Instructions) *Frame {
-	return &Frame{instructions: ins, ip: -1}
+func NewFrame(ins code.Instructions, bp int) *Frame {
+	return &Frame{instructions: ins, ip: -1, bp: bp}
 }
 
 func (f *Frame) next() bool {
