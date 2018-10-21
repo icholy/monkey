@@ -18,18 +18,31 @@ func (i Instruction) Is(op code.Opcode) bool {
 }
 
 type Compiler struct {
-	instructions code.Instructions
-	constants    []object.Object
-	symbols      *SymbolTable
+	constants []object.Object
+	symbols   *SymbolTable
 
-	prev     Instruction
-	prevprev Instruction
+	scopes   []*Scope
+	scopeIdx int
 }
 
 func New() *Compiler {
 	return &Compiler{
 		symbols: NewSymbolTable(),
+		scopes: []*Scope{
+			&Scope{},
+		},
 	}
+}
+
+type Scope struct {
+	instructions code.Instructions
+	prev         Instruction
+	prevprev     Instruction
+}
+
+func (s *Scope) undo() {
+	s.instructions = s.instructions[:s.prev.Position]
+	s.prev = s.prevprev
 }
 
 func NewWithState(symbols *SymbolTable, constants []object.Object) *Compiler {
@@ -102,6 +115,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return fmt.Errorf("unknown operator: %s", node.Operator)
 		}
 	case *ast.IfExpression:
+		scope := c.scope()
 		if err := c.Compile(node.Condition); err != nil {
 			return err
 		}
@@ -109,25 +123,25 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if err := c.Compile(node.Concequence); err != nil {
 			return err
 		}
-		if c.prev.Is(code.OpPop) {
-			c.undo()
+		if scope.prev.Is(code.OpPop) {
+			scope.undo()
 		}
 
 		jumpPos := c.emit(code.OpJump, 9999)
-		c.rewrite(jumpNotTruthyPos, code.OpJumpNotTruthy, len(c.instructions))
+		c.rewrite(jumpNotTruthyPos, code.OpJumpNotTruthy, len(c.instructions()))
 
 		if node.Alternative != nil {
 			if err := c.Compile(node.Alternative); err != nil {
 				return err
 			}
-			if c.prev.Is(code.OpPop) {
-				c.undo()
+			if scope.prev.Is(code.OpPop) {
+				scope.undo()
 			}
 		} else {
 			c.emit(code.OpNull)
 		}
 
-		c.rewrite(jumpPos, code.OpJump, len(c.instructions))
+		c.rewrite(jumpPos, code.OpJump, len(c.instructions()))
 
 		return nil
 	case *ast.PrefixExpression:
@@ -197,16 +211,17 @@ func (c *Compiler) Compile(node ast.Node) error {
 	return nil
 }
 
-func (c *Compiler) undo() {
-	c.instructions = c.instructions[:c.prev.Position]
-	c.prev = c.prevprev
+func (c *Compiler) instructions() code.Instructions {
+	return c.scope().instructions
 }
 
 func (c *Compiler) emit(op code.Opcode, operands ...int) int {
 	ins := code.Make(op, operands...)
-	pos := c.addInstructions(ins)
-	c.prevprev = c.prev
-	c.prev = Instruction{
+	scope := c.scope()
+	pos := len(scope.instructions)
+	scope.instructions = append(scope.instructions, ins...)
+	scope.prevprev = scope.prev
+	scope.prev = Instruction{
 		Opcode:   op,
 		Position: pos,
 	}
@@ -214,15 +229,16 @@ func (c *Compiler) emit(op code.Opcode, operands ...int) int {
 }
 
 func (c *Compiler) rewrite(pos int, op code.Opcode, operands ...int) {
-	ins := code.Make(op, operands...)
-	for i := range ins {
-		c.instructions[pos+i] = ins[i]
+	ins := c.scope().instructions
+	for i, x := range code.Make(op, operands...) {
+		ins[pos+i] = x
 	}
 }
 
 func (c *Compiler) addInstructions(ins code.Instructions) int {
-	pos := len(c.instructions)
-	c.instructions = append(c.instructions, ins...)
+	scope := c.scope()
+	pos := len(scope.instructions)
+	scope.instructions = append(scope.instructions, ins...)
 	return pos
 }
 
@@ -231,9 +247,25 @@ func (c *Compiler) addConstant(v object.Object) int {
 	return len(c.constants) - 1
 }
 
+func (c *Compiler) scope() *Scope {
+	return c.scopes[c.scopeIdx]
+}
+
+func (c *Compiler) enterScope() {
+	c.scopes = append(c.scopes, &Scope{})
+	c.scopeIdx++
+}
+
+func (c *Compiler) leaveScope() code.Instructions {
+	ins := c.instructions()
+	c.scopes = c.scopes[:len(c.scopes)-1]
+	c.scopeIdx--
+	return ins
+}
+
 func (c *Compiler) Bytecode() *Bytecode {
 	return &Bytecode{
-		Instructions: c.instructions,
+		Instructions: c.instructions(),
 		Constants:    c.constants,
 	}
 }

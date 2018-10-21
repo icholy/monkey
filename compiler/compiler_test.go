@@ -3,6 +3,8 @@ package compiler
 import (
 	"testing"
 
+	"gotest.tools/assert/cmp"
+
 	"github.com/icholy/monkey/object"
 
 	"gotest.tools/assert"
@@ -328,4 +330,28 @@ func TestIntegerArithmetic(t *testing.T) {
 			assert.Equal(t, tt.expected.Instructions.String(), actual.Instructions.String())
 		})
 	}
+}
+
+func TestScopes(t *testing.T) {
+	compiler := New()
+
+	compiler.emit(code.OpMul)
+	assert.Equal(t, compiler.scopeIdx, 0)
+	assert.Assert(t, compiler.scope().prev.Is(code.OpMul))
+
+	compiler.enterScope()
+	assert.Equal(t, compiler.scopeIdx, 1)
+	assert.Assert(t, cmp.Len(compiler.scopes, 1))
+
+	compiler.emit(code.OpSub)
+	assert.Assert(t, cmp.Len(compiler.scope().instructions, 1))
+	assert.Assert(t, compiler.scope().prev.Is(code.OpSub))
+
+	compiler.leaveScope()
+	assert.Equal(t, compiler.scopeIdx, 0)
+
+	compiler.emit(code.OpAdd)
+	assert.Assert(t, cmp.Len(compiler.scope().instructions, 2))
+	assert.Assert(t, compiler.scope().prev.Is(code.OpAdd))
+	assert.Assert(t, compiler.scope().prevprev.Is(code.OpMul))
 }
