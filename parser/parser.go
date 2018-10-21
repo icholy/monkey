@@ -492,7 +492,7 @@ func (p *Parser) expressionStmt() *ast.ExpressionStatement {
 func (p *Parser) returnStmt() *ast.ReturnStatement {
 	stmt := &ast.ReturnStatement{}
 	stmt.Token = p.cur
-	if p.peek.Is(token.SEMICOLON) {
+	if p.peek.Is(token.SEMICOLON) || p.peek.Is(token.RBRACE) {
 		p.next()
 		return stmt
 	}

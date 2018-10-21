@@ -531,6 +531,31 @@ func TestMonkey(t *testing.T) {
 		})
 	})
 
+	t.Run("function bare return", func(t *testing.T) {
+		input := `
+			function foo() { return }
+		`
+		RequireEqualAST(t, input, &ast.Program{
+			Statements: []ast.Statement{
+				&ast.FunctionStatement{
+					Token: token.New(token.FUNCTION, "function"),
+					Name: &ast.Identifier{
+						Token: token.New(token.IDENT, "foo"),
+						Value: "foo",
+					},
+					Body: &ast.BlockStatement{
+						Token: token.New(token.LBRACE, "{"),
+						Statements: []ast.Statement{
+							&ast.ReturnStatement{
+								Token: token.New(token.RETURN, "return"),
+							},
+						},
+					},
+				},
+			},
+		})
+	})
+
 	t.Run("typed function statement", func(t *testing.T) {
 		input := `
 			function foo(x): string {}
