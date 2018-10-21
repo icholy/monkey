@@ -30,6 +30,7 @@ func TestInstructionsString(t *testing.T) {
 		Make(OpConstant, 2),
 		Make(OpConstant, 65535),
 		Make(OpAdd),
+		Make(OpSetLocal, 255),
 	)
 
 	expected := strings.Join([]string{
@@ -37,6 +38,7 @@ func TestInstructionsString(t *testing.T) {
 		"0003 OpConstant 2",
 		"0006 OpConstant 65535",
 		"0009 OpAdd",
+		"0010 OpSetLocal 255",
 	}, "\n")
 
 	assert.Equal(t, instructions.String(), expected)

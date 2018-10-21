@@ -119,6 +119,8 @@ func ReadOperands(def *Definition, ins Instructions) ([]int, int) {
 			return nil, 0
 		}
 		switch width {
+		case 1:
+			operands[i] = int(ins[offset])
 		case 2:
 			operands[i] = int(ReadUint16(ins[offset:]))
 		}
