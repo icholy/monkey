@@ -22,6 +22,10 @@ func (f *Frame) Opcode() code.Opcode {
 	return code.Opcode(f.instructions[f.ip])
 }
 
+func (f *Frame) JumpTo(ip int) {
+	f.ip = ip - 1
+}
+
 func (f *Frame) ReadOperand() int {
 	x := code.ReadUint16(f.instructions[f.ip+1:])
 	f.ip += 2

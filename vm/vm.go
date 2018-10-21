@@ -153,13 +153,12 @@ func (vm *VM) Run() error {
 			}
 		case code.OpJump:
 			pos := frame.ReadOperand()
-			frame.ip = pos - 1
+			frame.JumpTo(pos)
 		case code.OpJumpNotTruthy:
 			pos := frame.ReadOperand()
-
 			condition := vm.pop()
 			if !isTruthy(condition) {
-				frame.ip = pos - 1
+				frame.JumpTo(pos)
 			}
 		case code.OpSetGlobal:
 			index := frame.ReadOperand()
