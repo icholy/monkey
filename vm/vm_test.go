@@ -58,7 +58,7 @@ func TestRun(t *testing.T) {
 		{"fn() { 15 }()", object.New(15)},
 		{"let one = fn() { 1 }; one() + one()", object.New(2)},
 		{"let x = fn() { return 1; return 2; }; x()", object.New(1)},
-		{"let x = fn() { return; }; x()", object.New(nil)},
+		{"let x = fn() { return }; x()", object.New(nil)},
 		{"let x = fn() {}; x()", object.New(nil)},
 	}
 	for _, tt := range tests {
