@@ -336,11 +336,10 @@ func TestScopes(t *testing.T) {
 	compiler := New()
 
 	compiler.emit(code.OpMul)
-	assert.Equal(t, compiler.scopeIdx, 0)
+	assert.Assert(t, cmp.Len(compiler.scopes, 1))
 	assert.Assert(t, compiler.scope().prev.Is(code.OpMul))
 
 	compiler.enterScope()
-	assert.Equal(t, compiler.scopeIdx, 1)
 	assert.Assert(t, cmp.Len(compiler.scopes, 1))
 
 	compiler.emit(code.OpSub)
@@ -348,7 +347,7 @@ func TestScopes(t *testing.T) {
 	assert.Assert(t, compiler.scope().prev.Is(code.OpSub))
 
 	compiler.leaveScope()
-	assert.Equal(t, compiler.scopeIdx, 0)
+	assert.Assert(t, cmp.Len(compiler.scopes, 1))
 
 	compiler.emit(code.OpAdd)
 	assert.Assert(t, cmp.Len(compiler.scope().instructions, 2))

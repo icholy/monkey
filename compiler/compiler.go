@@ -21,8 +21,7 @@ type Compiler struct {
 	constants []object.Object
 	symbols   *SymbolTable
 
-	scopes   []*Scope
-	scopeIdx int
+	scopes []*Scope
 }
 
 func New() *Compiler {
@@ -248,18 +247,16 @@ func (c *Compiler) addConstant(v object.Object) int {
 }
 
 func (c *Compiler) scope() *Scope {
-	return c.scopes[c.scopeIdx]
+	return c.scopes[len(c.scopes)-1]
 }
 
 func (c *Compiler) enterScope() {
 	c.scopes = append(c.scopes, &Scope{})
-	c.scopeIdx++
 }
 
 func (c *Compiler) leaveScope() code.Instructions {
 	ins := c.instructions()
 	c.scopes = c.scopes[:len(c.scopes)-1]
-	c.scopeIdx--
 	return ins
 }
 
