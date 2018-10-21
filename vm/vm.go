@@ -168,6 +168,21 @@ func (vm *VM) Run() error {
 			if err := vm.push(vm.globals[index]); err != nil {
 				return err
 			}
+		case code.OpCall:
+			fn, ok := vm.peek().(*object.CompiledFunction)
+			if !ok {
+				return fmt.Errorf("calling non-function")
+			}
+			frame = NewFrame(fn.Instructions)
+			vm.pushFrame(frame)
+		case code.OpReturnValue:
+			retVal := vm.pop() // return value
+			vm.pop()           // compiled function
+			if err := vm.push(retVal); err != nil {
+				return err
+			}
+
+			frame = vm.popFrame()
 		default:
 			return fmt.Errorf("unexpected opcode: %d", op)
 		}
@@ -304,6 +319,13 @@ func (vm *VM) binaryIntegerOp(op code.Opcode, left, right *object.Integer) error
 		return fmt.Errorf("unknown integer operator: %d", op)
 	}
 	return vm.push(&object.Integer{Value: result})
+}
+
+func (vm *VM) peek() object.Object {
+	if vm.sp == 0 {
+		return nil
+	}
+	return vm.stack[vm.sp-1]
 }
 
 func (vm *VM) pop() object.Object {
