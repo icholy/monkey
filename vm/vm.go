@@ -88,7 +88,7 @@ func (vm *VM) Run() error {
 
 		switch op {
 		case code.OpConstant:
-			index := frame.ReadOperand()
+			index := frame.ReadUint16()
 			if err := vm.push(vm.constants[index]); err != nil {
 				return err
 			}
@@ -117,7 +117,7 @@ func (vm *VM) Run() error {
 				return err
 			}
 		case code.OpArray:
-			n := frame.ReadOperand()
+			n := frame.ReadUint16()
 			elements := make([]object.Object, n)
 			for i := 0; i < n; i++ {
 				elements[n-1-i] = vm.pop()
@@ -127,7 +127,7 @@ func (vm *VM) Run() error {
 				return err
 			}
 		case code.OpHash:
-			n := frame.ReadOperand()
+			n := frame.ReadUint16()
 			h := object.NewHash()
 			for i := 0; i < n; i++ {
 				value := vm.pop()
@@ -152,19 +152,19 @@ func (vm *VM) Run() error {
 				return err
 			}
 		case code.OpJump:
-			pos := frame.ReadOperand()
+			pos := frame.ReadUint16()
 			frame.JumpTo(pos)
 		case code.OpJumpNotTruthy:
-			pos := frame.ReadOperand()
+			pos := frame.ReadUint16()
 			condition := vm.pop()
 			if !isTruthy(condition) {
 				frame.JumpTo(pos)
 			}
 		case code.OpSetGlobal:
-			index := frame.ReadOperand()
+			index := frame.ReadUint16()
 			vm.globals[index] = vm.pop()
 		case code.OpGetGlobal:
-			index := frame.ReadOperand()
+			index := frame.ReadUint16()
 			if err := vm.push(vm.globals[index]); err != nil {
 				return err
 			}
@@ -190,7 +190,7 @@ func (vm *VM) Run() error {
 	return nil
 }
 
-func (vm *VM) PrintStack() {
+func (vm *VM) DumpStack() {
 	for i := 0; i < vm.sp; i++ {
 		v := vm.stack[i]
 		fmt.Println(v.Type(), v.Inspect(0))

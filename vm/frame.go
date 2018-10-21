@@ -26,7 +26,13 @@ func (f *Frame) JumpTo(ip int) {
 	f.ip = ip - 1
 }
 
-func (f *Frame) ReadOperand() int {
+func (f *Frame) ReadUint8() int {
+	x := code.ReadUint8(f.instructions[f.ip+1:])
+	f.ip++
+	return int(x)
+}
+
+func (f *Frame) ReadUint16() int {
 	x := code.ReadUint16(f.instructions[f.ip+1:])
 	f.ip += 2
 	return int(x)
