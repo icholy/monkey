@@ -3,7 +3,9 @@ package compiler
 import (
 	"testing"
 
-	"gotest.tools/assert/cmp"
+	"github.com/google/go-cmp/cmp"
+
+	is "gotest.tools/assert/cmp"
 
 	"github.com/icholy/monkey/object"
 
@@ -319,6 +321,27 @@ func TestIntegerArithmetic(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: "fn() { 5 + 10 }",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 2),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(5),
+					object.New(10),
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpConstant, 0),
+							code.Make(code.OpConstant, 1),
+							code.Make(code.OpAdd),
+							code.Make(code.OpReturnValue),
+						),
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
@@ -326,8 +349,10 @@ func TestIntegerArithmetic(t *testing.T) {
 			assert.NilError(t, err)
 			actual, err := Compile(program)
 			assert.NilError(t, err)
+			assert.DeepEqual(t, tt.expected.Constants, actual.Constants, cmp.Transformer("Instructions", code.Instructions.String))
+			assert.DeepEqual(t, tt.expected.Instructions, actual.Instructions, cmp.Transformer("Instructions", code.Instructions.String))
 			assert.DeepEqual(t, tt.expected.Constants, actual.Constants)
-			assert.Equal(t, tt.expected.Instructions.String(), actual.Instructions.String())
+			assert.DeepEqual(t, tt.expected.Instructions, actual.Instructions)
 		})
 	}
 }
@@ -335,21 +360,21 @@ func TestScopes(t *testing.T) {
 	compiler := New()
 
 	compiler.emit(code.OpMul)
-	assert.Assert(t, cmp.Len(compiler.scopes, 1))
+	assert.Assert(t, is.Len(compiler.scopes, 1))
 	assert.Assert(t, compiler.scope().prev.Is(code.OpMul))
 
 	compiler.enterScope()
-	assert.Assert(t, cmp.Len(compiler.scopes, 2))
+	assert.Assert(t, is.Len(compiler.scopes, 2))
 
 	compiler.emit(code.OpSub)
-	assert.Assert(t, cmp.Len(compiler.scope().instructions, 1))
+	assert.Assert(t, is.Len(compiler.scope().instructions, 1))
 	assert.Assert(t, compiler.scope().prev.Is(code.OpSub))
 
 	compiler.leaveScope()
-	assert.Assert(t, cmp.Len(compiler.scopes, 1))
+	assert.Assert(t, is.Len(compiler.scopes, 1))
 
 	compiler.emit(code.OpAdd)
-	assert.Assert(t, cmp.Len(compiler.scope().instructions, 2))
+	assert.Assert(t, is.Len(compiler.scope().instructions, 2))
 	assert.Assert(t, compiler.scope().prev.Is(code.OpAdd))
 	assert.Assert(t, compiler.scope().prevprev.Is(code.OpMul))
 }

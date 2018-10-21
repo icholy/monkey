@@ -228,6 +228,14 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if err := c.Compile(node.Body); err != nil {
 			return err
 		}
+
+		// handle implicit return
+		scope := c.scope()
+		if scope.prev.Is(code.OpPop) {
+			scope.undo()
+			scope.emit(code.OpReturnValue)
+		}
+
 		compiledFn := &object.CompiledFunction{
 			Instructions: c.leaveScope(),
 		}
