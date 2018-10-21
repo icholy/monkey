@@ -313,7 +313,7 @@ func TestIntegerArithmetic(t *testing.T) {
 							code.Make(code.OpConstant, 0),
 							code.Make(code.OpConstant, 1),
 							code.Make(code.OpAdd),
-							code.Make(code.OpPop),
+							code.Make(code.OpReturnValue),
 						),
 					},
 				},
@@ -331,7 +331,6 @@ func TestIntegerArithmetic(t *testing.T) {
 		})
 	}
 }
-
 func TestScopes(t *testing.T) {
 	compiler := New()
 
@@ -340,7 +339,7 @@ func TestScopes(t *testing.T) {
 	assert.Assert(t, compiler.scope().prev.Is(code.OpMul))
 
 	compiler.enterScope()
-	assert.Assert(t, cmp.Len(compiler.scopes, 1))
+	assert.Assert(t, cmp.Len(compiler.scopes, 2))
 
 	compiler.emit(code.OpSub)
 	assert.Assert(t, cmp.Len(compiler.scope().instructions, 1))

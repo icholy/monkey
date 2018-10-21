@@ -44,6 +44,25 @@ func (s *Scope) undo() {
 	s.prev = s.prevprev
 }
 
+func (s *Scope) emit(op code.Opcode, operands ...int) int {
+	ins := code.Make(op, operands...)
+	pos := len(s.instructions)
+	s.instructions = append(s.instructions, ins...)
+	s.prevprev = s.prev
+	s.prev = Instruction{
+		Opcode:   op,
+		Position: pos,
+	}
+	return pos
+}
+
+func (s *Scope) rewrite(pos int, op code.Opcode, operands ...int) {
+	ins := s.instructions
+	for i, x := range code.Make(op, operands...) {
+		ins[pos+i] = x
+	}
+}
+
 func NewWithState(symbols *SymbolTable, constants []object.Object) *Compiler {
 	c := New()
 	c.symbols = symbols
@@ -204,6 +223,20 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return err
 		}
 		c.emit(code.OpIndex)
+	case *ast.FunctionLiteral:
+		c.enterScope()
+		if err := c.Compile(node.Body); err != nil {
+			return err
+		}
+		compiledFn := &object.CompiledFunction{
+			Instructions: c.leaveScope(),
+		}
+		c.emit(code.OpConstant, c.addConstant(compiledFn))
+	case *ast.ReturnStatement:
+		if err := c.Compile(node.ReturnValue); err != nil {
+			return err
+		}
+		c.emit(code.OpReturnValue)
 	case *ast.NullExpression:
 		c.emit(code.OpNull)
 	}
@@ -215,23 +248,11 @@ func (c *Compiler) instructions() code.Instructions {
 }
 
 func (c *Compiler) emit(op code.Opcode, operands ...int) int {
-	ins := code.Make(op, operands...)
-	scope := c.scope()
-	pos := len(scope.instructions)
-	scope.instructions = append(scope.instructions, ins...)
-	scope.prevprev = scope.prev
-	scope.prev = Instruction{
-		Opcode:   op,
-		Position: pos,
-	}
-	return pos
+	return c.scope().emit(op, operands...)
 }
 
 func (c *Compiler) rewrite(pos int, op code.Opcode, operands ...int) {
-	ins := c.scope().instructions
-	for i, x := range code.Make(op, operands...) {
-		ins[pos+i] = x
-	}
+	c.scope().rewrite(pos, op, operands...)
 }
 
 func (c *Compiler) addInstructions(ins code.Instructions) int {
