@@ -181,13 +181,20 @@ func (vm *VM) Run() error {
 			if err := vm.push(retVal); err != nil {
 				return err
 			}
-
-			frame = vm.popFrame()
+			vm.popFrame()
+			frame = vm.frame()
 		default:
 			return fmt.Errorf("unexpected opcode: %d", op)
 		}
 	}
 	return nil
+}
+
+func (vm *VM) PrintStack() {
+	for i := 0; i < vm.sp; i++ {
+		v := vm.stack[i]
+		fmt.Println(v.Type(), v.Inspect(0))
+	}
 }
 
 func isTruthy(v object.Object) bool {
