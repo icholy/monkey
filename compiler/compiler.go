@@ -226,21 +226,20 @@ func (c *Compiler) Compile(node ast.Node) error {
 	case *ast.FunctionLiteral:
 		c.enterScope()
 
-		if len(node.Body.Statements) > 0 {
+		if err := c.Compile(node.Body); err != nil {
+			return err
+		}
 
-			if err := c.Compile(node.Body); err != nil {
-				return err
-			}
+		// handle implicit return
+		scope := c.scope()
+		if scope.prev.Is(code.OpPop) {
+			scope.undo()
+			scope.emit(code.OpReturnValue)
+		}
 
-			// handle implicit return
-			scope := c.scope()
-			if scope.prev.Is(code.OpPop) {
-				scope.undo()
-				scope.emit(code.OpReturnValue)
-			}
-
-		} else {
-			c.emit(code.OpReturn)
+		// handle empty function
+		if !scope.prev.Is(code.OpReturnValue) {
+			scope.emit(code.OpReturn)
 		}
 
 		compiledFn := &object.CompiledFunction{
