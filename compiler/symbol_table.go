@@ -27,9 +27,8 @@ func NewSymbolTable(outer *SymbolTable) *SymbolTable {
 	}
 }
 
-func (st *SymbolTable) DefineBuiltin(name string) Symbol {
-	s := Symbol{Name: name, Index: st.Count, Scope: BuiltinScope}
-	st.Count++
+func (st *SymbolTable) DefineBuiltin(name string, index int) Symbol {
+	s := Symbol{Name: name, Index: index, Scope: BuiltinScope}
 	st.store[name] = s
 	return s
 }

@@ -581,6 +581,7 @@ func TestIntegerArithmetic(t *testing.T) {
 					code.Make(code.OpGetBuiltin, object.FindBuiltin("len")),
 					code.Make(code.OpArray, 0),
 					code.Make(code.OpCall, 1),
+					code.Make(code.OpPop),
 					code.Make(code.OpGetBuiltin, object.FindBuiltin("append")),
 					code.Make(code.OpArray, 0),
 					code.Make(code.OpConstant, 0),

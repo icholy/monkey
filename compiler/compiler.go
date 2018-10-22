@@ -25,8 +25,12 @@ type Compiler struct {
 }
 
 func New() *Compiler {
+	symbols := NewSymbolTable(nil)
+	for i, b := range object.Builtins {
+		symbols.DefineBuiltin(b.Name, i)
+	}
 	return &Compiler{
-		symbols: NewSymbolTable(nil),
+		symbols: symbols,
 		scopes: []*Scope{
 			&Scope{},
 		},
@@ -218,10 +222,15 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if !ok {
 			return fmt.Errorf("invalid identifier: %s", node.Value)
 		}
-		if symbol.Scope == GlobalScope {
+		switch symbol.Scope {
+		case GlobalScope:
 			c.emit(code.OpGetGlobal, symbol.Index)
-		} else {
+		case LocalScope:
 			c.emit(code.OpGetLocal, symbol.Index)
+		case BuiltinScope:
+			c.emit(code.OpGetBuiltin, symbol.Index)
+		default:
+			return fmt.Errorf("invalid symbol scope: %s", symbol.Scope)
 		}
 	case *ast.IndexExpression:
 		if err := c.Compile(node.Value); err != nil {
