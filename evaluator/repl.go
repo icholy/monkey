@@ -54,6 +54,10 @@ func REPL2(in io.Reader, out io.Writer) {
 	globals := make([]object.Object, vm.GlobalsSize)
 	symbols := compiler.NewSymbolTable(nil)
 
+	for i, b := range object.Builtins {
+		symbols.DefineBuiltin(b.Name, i)
+	}
+
 	for {
 		line, err := rl.Readline()
 		if err != nil {
