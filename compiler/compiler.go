@@ -270,7 +270,12 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if err := c.Compile(node.Function); err != nil {
 			return err
 		}
-		c.emit(code.OpCall, 0)
+		for _, arg := range node.Arguments {
+			if err := c.Compile(arg); err != nil {
+				return err
+			}
+		}
+		c.emit(code.OpCall, len(node.Arguments))
 	case *ast.NullExpression:
 		c.emit(code.OpNull)
 	}
