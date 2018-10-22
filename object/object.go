@@ -289,6 +289,7 @@ func (h *Hash) Inspect(depth int) string {
 type CompiledFunction struct {
 	Instructions code.Instructions
 	NumLocals    int
+	NumArgs      int
 }
 
 func (cf *CompiledFunction) Type() ObjectType         { return COMPILED_FUNCTION }

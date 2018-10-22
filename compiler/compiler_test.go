@@ -381,7 +381,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			expected: &Bytecode{
 				Instructions: code.Concat(
 					code.Make(code.OpConstant, 1),
-					code.Make(code.OpCall),
+					code.Make(code.OpCall, 0),
 					code.Make(code.OpPop),
 				),
 				Constants: []object.Object{
@@ -402,7 +402,7 @@ func TestIntegerArithmetic(t *testing.T) {
 					code.Make(code.OpConstant, 1),
 					code.Make(code.OpSetGlobal, 0),
 					code.Make(code.OpGetGlobal, 0),
-					code.Make(code.OpCall),
+					code.Make(code.OpCall, 0),
 					code.Make(code.OpPop),
 				),
 				Constants: []object.Object{
@@ -423,9 +423,9 @@ func TestIntegerArithmetic(t *testing.T) {
 					code.Make(code.OpConstant, 1),
 					code.Make(code.OpSetGlobal, 0),
 					code.Make(code.OpGetGlobal, 0),
-					code.Make(code.OpCall),
+					code.Make(code.OpCall, 0),
 					code.Make(code.OpGetGlobal, 0),
-					code.Make(code.OpCall),
+					code.Make(code.OpCall, 0),
 					code.Make(code.OpAdd),
 					code.Make(code.OpPop),
 				),

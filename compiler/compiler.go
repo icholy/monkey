@@ -270,7 +270,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if err := c.Compile(node.Function); err != nil {
 			return err
 		}
-		c.emit(code.OpCall)
+		c.emit(code.OpCall, 0)
 	case *ast.NullExpression:
 		c.emit(code.OpNull)
 	}
