@@ -3,6 +3,7 @@ package evaluator
 import (
 	"fmt"
 	"io/ioutil"
+	"reflect"
 
 	"github.com/icholy/monkey/object"
 )
@@ -166,4 +167,59 @@ var builtins = map[string]object.Object{
 			}, nil
 		},
 	},
+}
+
+func WrapFunc(fn interface{}) object.BuiltinFunc {
+	var (
+		objectType = reflect.TypeOf((*object.Object)(nil)).Elem()
+		errorType  = reflect.TypeOf((*error)(nil)).Elem()
+		fnType     = reflect.TypeOf(fn)
+		fnValue    = reflect.ValueOf(fn)
+	)
+
+	// make sure it's a function a usable function
+	if fnType.Kind() != reflect.Func {
+		panic("builtin: must be a function")
+	}
+	if fnType.IsVariadic() {
+		panic("builtin: variadic functions are not supported")
+	}
+
+	// check the return types
+	if fnType.NumOut() != 2 {
+		panic("builtin: expected 2 return values")
+	}
+	if fnType.Out(0) != objectType {
+		panic("builtin: return value 1 should be object.Object")
+	}
+	if fnType.Out(1) != errorType {
+		panic("builtin: return value 2 should be error")
+	}
+
+	// check the parameters
+	var params []reflect.Type
+	for i := 0; i < fnType.NumIn(); i++ {
+		if !fnType.In(i).Implements(objectType) {
+			panic("builtin: param doesn't implement object.Object")
+		}
+		params = append(params, fnType.In(i))
+	}
+
+	return func(args ...object.Object) (object.Object, error) {
+		// check the parameters
+		if len(args) != len(params) {
+			return nil, fmt.Errorf("wrong number of arguments")
+		}
+
+		in := make([]reflect.Value, len(params))
+		for i, arg := range args {
+			value := reflect.ValueOf(arg)
+			if !value.Type().AssignableTo(params[i]) {
+				return nil, fmt.Errorf("invalid argument: %d %s", i, arg.Inspect(0))
+			}
+			in[i] = value
+		}
+		out := fnValue.Call(in)
+		return out[0].Interface().(object.Object), out[1].Interface().(error)
+	}
 }
