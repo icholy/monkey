@@ -19,7 +19,7 @@ func (b *Builtin) Type() ObjectType         { return BUILTIN }
 
 var Builtins = []*Builtin{
 	&Builtin{
-		Name: "let",
+		Name: "len",
 		Fn: func(args ...Object) (Object, error) {
 			if len(args) != 1 {
 				return nil, fmt.Errorf("len: wrong number of arguments")
@@ -135,6 +135,14 @@ var Builtins = []*Builtin{
 			return &String{Value: string(v.Type())}, nil
 		}),
 	},
+}
+
+func BuiltinMap() map[string]*Builtin {
+	m := map[string]*Builtin{}
+	for _, b := range Builtins {
+		m[b.Name] = b
+	}
+	return m
 }
 
 func LookupBuiltin(name string) *Builtin {

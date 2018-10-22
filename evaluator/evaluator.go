@@ -17,6 +17,8 @@ var (
 	TRUE  = &object.Boolean{true}
 	FALSE = &object.Boolean{false}
 	NULL  = &object.Null{}
+
+	builtins = object.BuiltinMap()
 )
 
 type Error struct {
@@ -435,7 +437,7 @@ func evalIdent(i *ast.Identifier, env *object.Env) (object.Object, error) {
 	if val, ok := env.Get(i.Value); ok {
 		return val, nil
 	}
-	if val, ok := object.LookupBuiltin(i.Value); ok {
+	if val, ok := builtins[i.Value]; ok {
 		return val, nil
 	}
 	return nil, fmt.Errorf("identifier not found: %s", i.Value)
