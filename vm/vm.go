@@ -173,10 +173,14 @@ func (vm *VM) Run() error {
 			vm.stack[frame.bp+index] = vm.pop()
 		case code.OpGetLocal:
 			index := frame.ReadUint8()
-			vm.push(vm.stack[frame.bp+index])
+			if err := vm.push(vm.stack[frame.bp+index]); err != nil {
+				return err
+			}
 		case code.OpGetBuiltin:
 			index := frame.ReadUint8()
-			vm.push(object.Builtins[index])
+			if err := vm.push(object.Builtins[index]); err != nil {
+				return err
+			}
 		case code.OpCall:
 			nArgs := frame.ReadUint8() // num args
 			fn := vm.stack[vm.sp-1-nArgs]
