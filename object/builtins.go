@@ -16,7 +16,7 @@ func (b *Builtin) KeyValue() KeyValue       { return b.Fn }
 func (b *Builtin) Inspect(depth int) string { return "<builtin function>" }
 func (b *Builtin) Type() ObjectType         { return BUILTIN }
 
-var builtins = map[string]Object{
+var Builtins = map[string]Object{
 	"len": &Builtin{
 		Fn: func(args ...Object) (Object, error) {
 			if len(args) != 1 {
@@ -110,7 +110,7 @@ var builtins = map[string]Object{
 }
 
 func LookupBuiltin(name string) (Object, bool) {
-	b, ok := builtins[name]
+	b, ok := Builtins[name]
 	return b, ok
 }
 
