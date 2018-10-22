@@ -52,7 +52,7 @@ func REPL2(in io.Reader, out io.Writer) {
 
 	constants := []object.Object{}
 	globals := make([]object.Object, vm.GlobalsSize)
-	symbols := compiler.NewSymbolTable()
+	symbols := compiler.NewSymbolTable(nil)
 
 	for {
 		line, err := rl.Readline()
