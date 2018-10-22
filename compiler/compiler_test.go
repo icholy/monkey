@@ -549,7 +549,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			},
 		},
 		{
-			input: "let oneArg = fn(a) {}; oneArg(24)",
+			input: "let oneArg = fn(a, b) { a + b }; oneArg(24)",
 			expected: &Bytecode{
 				Instructions: code.Concat(
 					code.Make(code.OpConstant, 0),
@@ -561,10 +561,12 @@ func TestIntegerArithmetic(t *testing.T) {
 				),
 				Constants: []object.Object{
 					&object.CompiledFunction{
-						NumLocals:     1,
-						NumParameters: 1,
+						NumLocals:     2,
+						NumParameters: 2,
 						Instructions: code.Concat(
-							code.Make(code.OpNull),
+							code.Make(code.OpGetLocal, 0),
+							code.Make(code.OpGetLocal, 1),
+							code.Make(code.OpAdd),
 							code.Make(code.OpReturn),
 						),
 					},
