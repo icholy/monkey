@@ -27,17 +27,10 @@ var builtins = map[string]object.Object{
 		},
 	},
 	"delete": &object.Builtin{
-		Fn: func(args ...object.Object) (object.Object, error) {
-			if len(args) != 2 {
-				return nil, fmt.Errorf("delete: expecting two arguments")
-			}
-			hash, ok := args[0].(*object.Hash)
-			if !ok {
-				return nil, fmt.Errorf("delete: expecting first parameter to be hash")
-			}
-			hash.Delete(args[1])
+		Fn: WrapFunc(func(hash *object.Hash, key object.Object) (object.Object, error) {
+			hash.Delete(key)
 			return NULL, nil
-		},
+		}),
 	},
 	"append": &object.Builtin{
 		Fn: func(args ...object.Object) (object.Object, error) {
@@ -53,36 +46,22 @@ var builtins = map[string]object.Object{
 		},
 	},
 	"first": &object.Builtin{
-		Fn: func(args ...object.Object) (object.Object, error) {
-			if len(args) != 1 {
-				return nil, fmt.Errorf("first: expecting one array argument")
-			}
-			arr, ok := args[0].(*object.Array)
-			if !ok {
-				return nil, fmt.Errorf("first: expecting one array argument")
-			}
+		Fn: WrapFunc(func(arr *object.Array) (object.Object, error) {
 			if len(arr.Elements) == 0 {
 				return nil, fmt.Errorf("first: cannot get first element of empty array")
 			}
 			return arr.Elements[0], nil
-		},
+		}),
 	},
 	"rest": &object.Builtin{
-		Fn: func(args ...object.Object) (object.Object, error) {
-			if len(args) != 1 {
-				return nil, fmt.Errorf("first: expecting one array argument")
-			}
-			arr, ok := args[0].(*object.Array)
-			if !ok {
-				return nil, fmt.Errorf("first: expecting one array argument")
-			}
+		Fn: WrapFunc(func(arr *object.Array) (object.Object, error) {
 			if len(arr.Elements) == 0 {
 				return &object.Array{}, nil
 			}
 			return &object.Array{
 				Elements: arr.Elements[1:],
 			}, nil
-		},
+		}),
 	},
 	"print": &object.Builtin{
 		Fn: func(args ...object.Object) (object.Object, error) {
@@ -95,14 +74,7 @@ var builtins = map[string]object.Object{
 		},
 	},
 	"read": &object.Builtin{
-		Fn: func(args ...object.Object) (object.Object, error) {
-			if len(args) != 1 {
-				return nil, fmt.Errorf("read: requires one argument")
-			}
-			name, ok := args[0].(*object.String)
-			if !ok {
-				return nil, fmt.Errorf("read: expected a string, got %s", args[0].Type())
-			}
+		Fn: WrapFunc(func(name *object.String) (object.Object, error) {
 			data, err := ioutil.ReadFile(name.Value)
 			if err != nil {
 				return nil, fmt.Errorf("read: %v", err)
@@ -110,62 +82,38 @@ var builtins = map[string]object.Object{
 			return &object.String{
 				Value: string(data),
 			}, nil
-		},
+		}),
 	},
 	"keys": &object.Builtin{
-		Fn: func(args ...object.Object) (object.Object, error) {
-			if len(args) != 1 {
-				return nil, fmt.Errorf("keys: requires one argument")
-			}
-			hash, ok := args[0].(*object.Hash)
-			if !ok {
-				return nil, fmt.Errorf("keys: expected a hash, got %s", args[0].Type())
-			}
+		Fn: WrapFunc(func(hash *object.Hash) (object.Object, error) {
 			arr := &object.Array{}
 			for _, p := range hash.Pairs() {
 				arr.Elements = append(arr.Elements, p.Key)
 			}
 			return arr, nil
-		},
+		}),
 	},
 	"values": &object.Builtin{
-		Fn: func(args ...object.Object) (object.Object, error) {
-			if len(args) != 1 {
-				return nil, fmt.Errorf("keys: requires one argument")
-			}
-			hash, ok := args[0].(*object.Hash)
-			if !ok {
-				return nil, fmt.Errorf("keys: expected a hash, got %s", args[0].Type())
-			}
+		Fn: WrapFunc(func(hash *object.Hash) (object.Object, error) {
 			arr := &object.Array{}
 			for _, p := range hash.Pairs() {
 				arr.Elements = append(arr.Elements, p.Value)
 			}
 			return arr, nil
-		},
+		}),
 	},
 	"str": &object.Builtin{
-		Fn: func(args ...object.Object) (object.Object, error) {
-			if len(args) != 1 {
-				return nil, fmt.Errorf("str: requires one argument")
+		Fn: WrapFunc(func(v object.Object) (object.Object, error) {
+			if v.Type() == object.STRING {
+				return v, nil
 			}
-			if s, ok := args[0].(*object.String); ok {
-				return s, nil
-			}
-			return &object.String{
-				Value: args[0].Inspect(0),
-			}, nil
-		},
+			return &object.String{Value: v.Inspect(0)}, nil
+		}),
 	},
 	"type": &object.Builtin{
-		Fn: func(args ...object.Object) (object.Object, error) {
-			if len(args) != 1 {
-				return nil, fmt.Errorf("type: requires one argument")
-			}
-			return &object.String{
-				Value: string(args[0].Type()),
-			}, nil
-		},
+		Fn: WrapFunc(func(v object.Object) (object.Object, error) {
+			return &object.String{Value: string(v.Type())}, nil
+		}),
 	},
 }
 
@@ -220,6 +168,15 @@ func WrapFunc(fn interface{}) object.BuiltinFunc {
 			in[i] = value
 		}
 		out := fnValue.Call(in)
-		return out[0].Interface().(object.Object), out[1].Interface().(error)
+
+		var result object.Object
+		if v := out[0]; !v.IsNil() {
+			result = v.Interface().(object.Object)
+		}
+		var err error
+		if v := out[1]; !v.IsNil() {
+			err = v.Interface().(error)
+		}
+		return result, err
 	}
 }

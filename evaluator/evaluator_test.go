@@ -223,6 +223,12 @@ func TestEvaluator(t *testing.T) {
 		`
 		RequireEqualEval(t, input, &object.String{Value: "hello"})
 	})
+
+	t.Run("builtin", func(t *testing.T) {
+		RequireEqualEval(t, "type(1)", object.New("INTEGER"))
+		RequireEqualEval(t, "str(1)", object.New("1"))
+		RequireEqualEval(t, "values({1:1, 2:2})", object.New([]interface{}{1, 2}))
+	})
 }
 
 func ParseEval(t *testing.T, input string) (object.Object, error) {
