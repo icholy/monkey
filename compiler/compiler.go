@@ -234,6 +234,11 @@ func (c *Compiler) Compile(node ast.Node) error {
 	case *ast.FunctionLiteral:
 		c.enterScope()
 
+		// make the parameters locals
+		for _, p := range node.Parameters {
+			c.symbols.Define(p.Name.Value)
+		}
+
 		if err := c.Compile(node.Body); err != nil {
 			return err
 		}

@@ -65,6 +65,9 @@ func TestRun(t *testing.T) {
 		{"let x = fn() { let one = 1; let two = 2; one + two }; let y = fn() { let three = 3; let four = 4; three + four }; x() + y()", object.New(10)},
 		{"let seed = 50; let minusOne = fn() { let x = 1; seed - x }()", object.New(49)},
 		{"let x = fn() { let x = 1; x }; let y = fn() { let x = 1; x }; x() + y()", object.New(2)},
+		{"fn(x) { x }(1)", object.New(1)},
+		{"let twice = fn(f, x) { f(f(x)) }; let double = fn(x) { x * 2 }; twice(double, 1)", object.New(4)},
+		{"let x = fn(x, y) { let x = 10; x + y }; x(1, 1)", object.New(11)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {

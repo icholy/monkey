@@ -175,12 +175,15 @@ func (vm *VM) Run() error {
 			index := frame.ReadUint8()
 			vm.push(vm.stack[frame.bp+index])
 		case code.OpCall:
-			_ = frame.ReadUint8() // num args
-			fn, ok := vm.peek().(*object.CompiledFunction)
+			nArgs := frame.ReadUint8() // num args
+			fn, ok := vm.stack[vm.sp-1-nArgs].(*object.CompiledFunction)
 			if !ok {
 				return fmt.Errorf("calling non-function")
 			}
-			frame = NewFrame(fn.Instructions, vm.sp)
+			if nArgs != fn.NumParameters {
+				return fmt.Errorf("wrong number of arguments: want %d, got %d", fn.NumParameters, nArgs)
+			}
+			frame = NewFrame(fn.Instructions, vm.sp-nArgs)
 			vm.pushFrame(frame)
 			vm.sp = frame.bp + fn.NumLocals
 		case code.OpReturn:
