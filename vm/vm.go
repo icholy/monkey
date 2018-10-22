@@ -185,7 +185,7 @@ func (vm *VM) Run() error {
 			case *object.Builtin:
 				args := make([]object.Object, nArgs)
 				for i := 0; i < nArgs; i++ {
-					args[i] = vm.pop()
+					args[nArgs-1-i] = vm.pop()
 				}
 				ret, err := fn.Fn(args...)
 				if err != nil {

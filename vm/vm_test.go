@@ -69,6 +69,7 @@ func TestRun(t *testing.T) {
 		{"let twice = fn(f, x) { f(f(x)) }; let double = fn(x) { x * 2 }; twice(double, 1)", object.New(4)},
 		{"let x = fn(x, y) { let x = 10; x + y }; x(1, 1)", object.New(11)},
 		{"len([])", object.New(0)},
+		{"append([], 1)", object.New([]interface{}{1})},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
