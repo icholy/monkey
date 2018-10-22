@@ -187,10 +187,7 @@ func (vm *VM) Run() error {
 
 			switch fn := fn.(type) {
 			case *object.Builtin:
-				args := make([]object.Object, nArgs)
-				for i := 0; i < nArgs; i++ {
-					args[nArgs-1-i] = vm.pop()
-				}
+				args := vm.stack[vm.sp-nArgs : vm.sp]
 				ret, err := fn.Fn(args...)
 				if err != nil {
 					return err
