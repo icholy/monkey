@@ -287,11 +287,13 @@ func (h *Hash) Inspect(depth int) string {
 }
 
 type CompiledFunction struct {
-	Instructions code.Instructions
-	NumLocals    int
-	NumArgs      int
+	Instructions  code.Instructions
+	NumLocals     int
+	NumParameters int
 }
 
-func (cf *CompiledFunction) Type() ObjectType         { return COMPILED_FUNCTION }
-func (cf *CompiledFunction) Inspect(depth int) string { return fmt.Sprintf("CompiledFunction[%p]", cf) }
-func (cf *CompiledFunction) KeyValue() KeyValue       { return cf }
+func (cf *CompiledFunction) Type() ObjectType { return COMPILED_FUNCTION }
+func (cf *CompiledFunction) Inspect(depth int) string {
+	return fmt.Sprintf("CompiledFunction(%d)", cf.NumParameters)
+}
+func (cf *CompiledFunction) KeyValue() KeyValue { return cf }

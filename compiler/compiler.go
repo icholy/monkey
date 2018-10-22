@@ -253,8 +253,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 
 		nLocals := c.symbols.Count
 		compiledFn := &object.CompiledFunction{
-			NumLocals:    nLocals,
-			Instructions: c.leaveScope(),
+			NumParameters: len(node.Parameters),
+			NumLocals:     nLocals,
+			Instructions:  c.leaveScope(),
 		}
 		c.emit(code.OpConstant, c.addConstant(compiledFn))
 	case *ast.ReturnStatement:
