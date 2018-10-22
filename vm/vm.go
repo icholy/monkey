@@ -174,6 +174,9 @@ func (vm *VM) Run() error {
 		case code.OpGetLocal:
 			index := frame.ReadUint8()
 			vm.push(vm.stack[frame.bp+index])
+		case code.OpGetBuiltin:
+			index := frame.ReadUint8()
+			vm.push(object.Builtins[index])
 		case code.OpCall:
 			nArgs := frame.ReadUint8() // num args
 			fn, ok := vm.stack[vm.sp-1-nArgs].(*object.CompiledFunction)
