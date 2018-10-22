@@ -9,15 +9,17 @@ import (
 type BuiltinFunc func(...Object) (Object, error)
 
 type Builtin struct {
-	Fn BuiltinFunc
+	Name string
+	Fn   BuiltinFunc
 }
 
 func (b *Builtin) KeyValue() KeyValue       { return b.Fn }
 func (b *Builtin) Inspect(depth int) string { return "<builtin function>" }
 func (b *Builtin) Type() ObjectType         { return BUILTIN }
 
-var Builtins = map[string]Object{
-	"len": &Builtin{
+var Builtins = []*Builtin{
+	&Builtin{
+		Name: "let",
 		Fn: func(args ...Object) (Object, error) {
 			if len(args) != 1 {
 				return nil, fmt.Errorf("len: wrong number of arguments")
@@ -34,11 +36,15 @@ var Builtins = map[string]Object{
 			}
 		},
 	},
-	"delete": MakeBuiltin(func(hash *Hash, key Object) (Object, error) {
-		hash.Delete(key)
-		return nil, nil
-	}),
-	"append": &Builtin{
+	&Builtin{
+		Name: "delete",
+		Fn: MakeBuiltinFunc(func(hash *Hash, key Object) (Object, error) {
+			hash.Delete(key)
+			return nil, nil
+		}),
+	},
+	&Builtin{
+		Name: "append",
 		Fn: func(args ...Object) (Object, error) {
 			if len(args) < 1 {
 				return nil, fmt.Errorf("append: at least one argument required")
@@ -51,21 +57,28 @@ var Builtins = map[string]Object{
 			return arr, nil
 		},
 	},
-	"first": MakeBuiltin(func(arr *Array) (Object, error) {
-		if len(arr.Elements) == 0 {
-			return nil, fmt.Errorf("first: cannot get first element of empty array")
-		}
-		return arr.Elements[0], nil
-	}),
-	"rest": MakeBuiltin(func(arr *Array) (Object, error) {
-		if len(arr.Elements) == 0 {
-			return &Array{}, nil
-		}
-		return &Array{
-			Elements: arr.Elements[1:],
-		}, nil
-	}),
-	"print": &Builtin{
+	&Builtin{
+		Name: "first",
+		Fn: MakeBuiltinFunc(func(arr *Array) (Object, error) {
+			if len(arr.Elements) == 0 {
+				return nil, fmt.Errorf("first: cannot get first element of empty array")
+			}
+			return arr.Elements[0], nil
+		}),
+	},
+	&Builtin{
+		Name: "rest",
+		Fn: MakeBuiltinFunc(func(arr *Array) (Object, error) {
+			if len(arr.Elements) == 0 {
+				return &Array{}, nil
+			}
+			return &Array{
+				Elements: arr.Elements[1:],
+			}, nil
+		}),
+	},
+	&Builtin{
+		Name: "print",
 		Fn: func(args ...Object) (Object, error) {
 			var values []interface{}
 			for _, a := range args {
@@ -75,46 +88,65 @@ var Builtins = map[string]Object{
 			return nil, nil
 		},
 	},
-	"read": MakeBuiltin(func(name *String) (Object, error) {
-		data, err := ioutil.ReadFile(name.Value)
-		if err != nil {
-			return nil, fmt.Errorf("read: %v", err)
-		}
-		return &String{
-			Value: string(data),
-		}, nil
-	}),
-	"keys": MakeBuiltin(func(hash *Hash) (Object, error) {
-		arr := &Array{}
-		for _, p := range hash.Pairs() {
-			arr.Elements = append(arr.Elements, p.Key)
-		}
-		return arr, nil
-	}),
-	"values": MakeBuiltin(func(hash *Hash) (Object, error) {
-		arr := &Array{}
-		for _, p := range hash.Pairs() {
-			arr.Elements = append(arr.Elements, p.Value)
-		}
-		return arr, nil
-	}),
-	"str": MakeBuiltin(func(v Object) (Object, error) {
-		if v.Type() == STRING {
-			return v, nil
-		}
-		return &String{Value: v.Inspect(0)}, nil
-	}),
-	"type": MakeBuiltin(func(v Object) (Object, error) {
-		return &String{Value: string(v.Type())}, nil
-	}),
+	&Builtin{
+		Name: "read",
+		Fn: MakeBuiltinFunc(func(name *String) (Object, error) {
+			data, err := ioutil.ReadFile(name.Value)
+			if err != nil {
+				return nil, fmt.Errorf("read: %v", err)
+			}
+			return &String{
+				Value: string(data),
+			}, nil
+		}),
+	},
+	&Builtin{
+		Name: "keys",
+		Fn: MakeBuiltinFunc(func(hash *Hash) (Object, error) {
+			arr := &Array{}
+			for _, p := range hash.Pairs() {
+				arr.Elements = append(arr.Elements, p.Key)
+			}
+			return arr, nil
+		}),
+	},
+	&Builtin{
+		Name: "values",
+		Fn: MakeBuiltinFunc(func(hash *Hash) (Object, error) {
+			arr := &Array{}
+			for _, p := range hash.Pairs() {
+				arr.Elements = append(arr.Elements, p.Value)
+			}
+			return arr, nil
+		}),
+	},
+	&Builtin{
+		Name: "str",
+		Fn: MakeBuiltinFunc(func(v Object) (Object, error) {
+			if v.Type() == STRING {
+				return v, nil
+			}
+			return &String{Value: v.Inspect(0)}, nil
+		}),
+	},
+	&Builtin{
+		Name: "type",
+		Fn: MakeBuiltinFunc(func(v Object) (Object, error) {
+			return &String{Value: string(v.Type())}, nil
+		}),
+	},
 }
 
-func LookupBuiltin(name string) (Object, bool) {
-	b, ok := Builtins[name]
-	return b, ok
+func LookupBuiltin(name string) *Builtin {
+	for _, b := range Builtins {
+		if b.Name == name {
+			return b
+		}
+	}
+	return nil
 }
 
-func MakeBuiltin(fn interface{}) *Builtin {
+func MakeBuiltinFunc(fn interface{}) BuiltinFunc {
 	var (
 		objectType = reflect.TypeOf((*Object)(nil)).Elem()
 		errorType  = reflect.TypeOf((*error)(nil)).Elem()
@@ -150,32 +182,30 @@ func MakeBuiltin(fn interface{}) *Builtin {
 		params = append(params, fnType.In(i))
 	}
 
-	return &Builtin{
-		Fn: func(args ...Object) (Object, error) {
-			// check the parameters
-			if len(args) != len(params) {
-				return nil, fmt.Errorf("wrong number of arguments")
-			}
+	return func(args ...Object) (Object, error) {
+		// check the parameters
+		if len(args) != len(params) {
+			return nil, fmt.Errorf("wrong number of arguments")
+		}
 
-			in := make([]reflect.Value, len(params))
-			for i, arg := range args {
-				value := reflect.ValueOf(arg)
-				if !value.Type().AssignableTo(params[i]) {
-					return nil, fmt.Errorf("invalid argument: %d %s", i, arg.Inspect(0))
-				}
-				in[i] = value
+		in := make([]reflect.Value, len(params))
+		for i, arg := range args {
+			value := reflect.ValueOf(arg)
+			if !value.Type().AssignableTo(params[i]) {
+				return nil, fmt.Errorf("invalid argument: %d %s", i, arg.Inspect(0))
 			}
-			out := fnValue.Call(in)
+			in[i] = value
+		}
+		out := fnValue.Call(in)
 
-			var result Object
-			if v := out[0]; !v.IsNil() {
-				result = v.Interface().(Object)
-			}
-			var err error
-			if v := out[1]; !v.IsNil() {
-				err = v.Interface().(error)
-			}
-			return result, err
-		},
+		var result Object
+		if v := out[0]; !v.IsNil() {
+			result = v.Interface().(Object)
+		}
+		var err error
+		if v := out[1]; !v.IsNil() {
+			err = v.Interface().(error)
+		}
+		return result, err
 	}
 }
