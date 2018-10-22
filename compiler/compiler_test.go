@@ -574,6 +574,24 @@ func TestIntegerArithmetic(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: "len([]); append([], 1)",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpGetBuiltin, object.FindBuiltin("len")),
+					code.Make(code.OpArray, 0),
+					code.Make(code.OpCall, 1),
+					code.Make(code.OpGetBuiltin, object.FindBuiltin("append")),
+					code.Make(code.OpArray, 0),
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpCall, 2),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(1),
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {

@@ -145,13 +145,13 @@ func BuiltinMap() map[string]*Builtin {
 	return m
 }
 
-func LookupBuiltin(name string) *Builtin {
-	for _, b := range Builtins {
+func FindBuiltin(name string) int {
+	for i, b := range Builtins {
 		if b.Name == name {
-			return b
+			return i
 		}
 	}
-	return nil
+	return -1
 }
 
 func MakeBuiltinFunc(fn interface{}) BuiltinFunc {
