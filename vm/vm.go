@@ -189,6 +189,7 @@ func (vm *VM) Run() error {
 			case *object.Builtin:
 				args := vm.stack[vm.sp-nArgs : vm.sp]
 				ret, err := fn.Fn(args...)
+				vm.sp = vm.sp - nArgs - 1
 				if err != nil {
 					return err
 				}
