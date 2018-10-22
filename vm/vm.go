@@ -179,16 +179,29 @@ func (vm *VM) Run() error {
 			vm.push(object.Builtins[index])
 		case code.OpCall:
 			nArgs := frame.ReadUint8() // num args
-			fn, ok := vm.stack[vm.sp-1-nArgs].(*object.CompiledFunction)
-			if !ok {
+			fn := vm.stack[vm.sp-1-nArgs]
+
+			switch fn := fn.(type) {
+			case *object.Builtin:
+				args := make([]object.Object, nArgs)
+				for i := 0; i < nArgs; i++ {
+					args[i] = vm.pop()
+				}
+				ret, err := fn.Fn(args...)
+				if err != nil {
+					return err
+				}
+				vm.push(ret)
+			case *object.CompiledFunction:
+				if nArgs != fn.NumParameters {
+					return fmt.Errorf("wrong number of arguments: want %d, got %d", fn.NumParameters, nArgs)
+				}
+				frame = NewFrame(fn.Instructions, vm.sp-nArgs)
+				vm.pushFrame(frame)
+				vm.sp = frame.bp + fn.NumLocals
+			default:
 				return fmt.Errorf("calling non-function")
 			}
-			if nArgs != fn.NumParameters {
-				return fmt.Errorf("wrong number of arguments: want %d, got %d", fn.NumParameters, nArgs)
-			}
-			frame = NewFrame(fn.Instructions, vm.sp-nArgs)
-			vm.pushFrame(frame)
-			vm.sp = frame.bp + fn.NumLocals
 		case code.OpReturn:
 			retVal := vm.pop()
 			vm.sp = vm.popFrame().bp - 1
