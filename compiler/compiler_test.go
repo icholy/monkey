@@ -529,6 +529,49 @@ func TestIntegerArithmetic(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: "fn(a) {}",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					&object.CompiledFunction{
+						NumLocals:     1,
+						NumParameters: 1,
+						Instructions: code.Concat(
+							code.Make(code.OpNull),
+							code.Make(code.OpReturn),
+						),
+					},
+				},
+			},
+		},
+		{
+			input: "let oneArg = fn(a) {}; oneArg(24)",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpSetGlobal, 0),
+					code.Make(code.OpGetGlobal, 0),
+					code.Make(code.OpConstant, 1),
+					code.Make(code.OpCall, 1),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					&object.CompiledFunction{
+						NumLocals:     1,
+						NumParameters: 1,
+						Instructions: code.Concat(
+							code.Make(code.OpNull),
+							code.Make(code.OpReturn),
+						),
+					},
+					object.New(24),
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
