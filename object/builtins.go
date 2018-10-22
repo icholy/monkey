@@ -67,6 +67,15 @@ var Builtins = []*Builtin{
 		}),
 	},
 	&Builtin{
+		Name: "last",
+		Fn: MakeBuiltinFunc(func(arr *Array) (Object, error) {
+			if len(arr.Elements) == 0 {
+				return nil, fmt.Errorf("last: cannot get last element of empty array")
+			}
+			return arr.Elements[len(arr.Elements)-1], nil
+		}),
+	},
+	&Builtin{
 		Name: "rest",
 		Fn: MakeBuiltinFunc(func(arr *Array) (Object, error) {
 			if len(arr.Elements) == 0 {

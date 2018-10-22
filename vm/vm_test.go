@@ -71,6 +71,8 @@ func TestRun(t *testing.T) {
 		{"len([])", object.New(0)},
 		{"append([], 1)", object.New([]interface{}{1})},
 		{"len([]); 1", object.New(1)},
+		{`len("hello world")`, object.New(11)},
+		{"last([1, 2, 3])", object.New(3)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
