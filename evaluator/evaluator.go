@@ -183,7 +183,11 @@ func typeCheck(typeName *ast.Identifier, val object.Object) error {
 
 func applyFunction(fn object.Object, args []object.Object) (object.Object, error) {
 	if builtin, ok := fn.(*object.Builtin); ok {
-		return builtin.Fn(args...)
+		ret, err := builtin.Fn(args...)
+		if ret == nil {
+			ret = NULL
+		}
+		return ret, err
 	}
 	function, ok := fn.(*object.Function)
 	if !ok {
@@ -431,7 +435,7 @@ func evalIdent(i *ast.Identifier, env *object.Env) (object.Object, error) {
 	if val, ok := env.Get(i.Value); ok {
 		return val, nil
 	}
-	if val, ok := builtins[i.Value]; ok {
+	if val, ok := object.LookupBuiltin(i.Value); ok {
 		return val, nil
 	}
 	return nil, fmt.Errorf("identifier not found: %s", i.Value)

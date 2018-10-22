@@ -91,16 +91,6 @@ func (o *TypedObject) Set(val Object) error {
 	return nil
 }
 
-type BuiltinFunc func(...Object) (Object, error)
-
-type Builtin struct {
-	Fn BuiltinFunc
-}
-
-func (b *Builtin) KeyValue() KeyValue       { return b.Fn }
-func (b *Builtin) Inspect(depth int) string { return "<builtin function>" }
-func (b *Builtin) Type() ObjectType         { return BUILTIN }
-
 type Integer struct {
 	Value int64
 }
