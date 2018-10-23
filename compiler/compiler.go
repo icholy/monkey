@@ -271,7 +271,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 			NumLocals:     nLocals,
 			Instructions:  c.leaveScope(),
 		}
-		c.emit(code.OpConstant, c.addConstant(compiledFn))
+		c.emit(code.OpClosure, c.addConstant(compiledFn), 0)
 	case *ast.ReturnStatement:
 		if node.ReturnValue != nil {
 			if err := c.Compile(node.ReturnValue); err != nil {

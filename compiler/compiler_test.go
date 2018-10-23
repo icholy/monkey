@@ -15,7 +15,7 @@ import (
 	"github.com/icholy/monkey/parser"
 )
 
-func TestIntegerArithmetic(t *testing.T) {
+func TestCompile(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected *Bytecode
@@ -304,7 +304,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			input: "fn() { return 5 + 10 }",
 			expected: &Bytecode{
 				Instructions: code.Concat(
-					code.Make(code.OpConstant, 2),
+					code.Make(code.OpClosure, 2, 0),
 					code.Make(code.OpPop),
 				),
 				Constants: []object.Object{
@@ -325,7 +325,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			input: "fn() { 5 + 10 }",
 			expected: &Bytecode{
 				Instructions: code.Concat(
-					code.Make(code.OpConstant, 2),
+					code.Make(code.OpClosure, 2, 0),
 					code.Make(code.OpPop),
 				),
 				Constants: []object.Object{
@@ -346,7 +346,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			input: "fn() {}",
 			expected: &Bytecode{
 				Instructions: code.Concat(
-					code.Make(code.OpConstant, 0),
+					code.Make(code.OpClosure, 0, 0),
 					code.Make(code.OpPop),
 				),
 				Constants: []object.Object{
@@ -363,7 +363,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			input: "fn() { return; }",
 			expected: &Bytecode{
 				Instructions: code.Concat(
-					code.Make(code.OpConstant, 0),
+					code.Make(code.OpClosure, 0, 0),
 					code.Make(code.OpPop),
 				),
 				Constants: []object.Object{
@@ -380,7 +380,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			input: "fn() { return 24; }()",
 			expected: &Bytecode{
 				Instructions: code.Concat(
-					code.Make(code.OpConstant, 1),
+					code.Make(code.OpClosure, 1, 0),
 					code.Make(code.OpCall, 0),
 					code.Make(code.OpPop),
 				),
@@ -399,7 +399,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			input: "let f = fn() { 24 }; f();",
 			expected: &Bytecode{
 				Instructions: code.Concat(
-					code.Make(code.OpConstant, 1),
+					code.Make(code.OpClosure, 1, 0),
 					code.Make(code.OpSetGlobal, 0),
 					code.Make(code.OpGetGlobal, 0),
 					code.Make(code.OpCall, 0),
@@ -420,7 +420,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			input: "let one = fn() { 1 }; one() + one()",
 			expected: &Bytecode{
 				Instructions: code.Concat(
-					code.Make(code.OpConstant, 1),
+					code.Make(code.OpClosure, 1, 0),
 					code.Make(code.OpSetGlobal, 0),
 					code.Make(code.OpGetGlobal, 0),
 					code.Make(code.OpCall, 0),
@@ -446,7 +446,7 @@ func TestIntegerArithmetic(t *testing.T) {
 				Instructions: code.Concat(
 					code.Make(code.OpConstant, 0),
 					code.Make(code.OpSetGlobal, 0),
-					code.Make(code.OpConstant, 1),
+					code.Make(code.OpClosure, 1, 0),
 					code.Make(code.OpPop),
 				),
 				Constants: []object.Object{
@@ -464,7 +464,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			input: "fn() { let num = 55; num }",
 			expected: &Bytecode{
 				Instructions: code.Concat(
-					code.Make(code.OpConstant, 1),
+					code.Make(code.OpClosure, 1, 0),
 					code.Make(code.OpPop),
 				),
 				Constants: []object.Object{
@@ -485,7 +485,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			input: "fn() { let a = 55; let b = 77; return a + b }",
 			expected: &Bytecode{
 				Instructions: code.Concat(
-					code.Make(code.OpConstant, 2),
+					code.Make(code.OpClosure, 2, 0),
 					code.Make(code.OpPop),
 				),
 				Constants: []object.Object{
@@ -511,7 +511,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			input: "fn(){}(1, 2)",
 			expected: &Bytecode{
 				Instructions: code.Concat(
-					code.Make(code.OpConstant, 0),
+					code.Make(code.OpClosure, 0, 0),
 					code.Make(code.OpConstant, 1),
 					code.Make(code.OpConstant, 2),
 					code.Make(code.OpCall, 2),
@@ -533,7 +533,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			input: "fn(a) {}",
 			expected: &Bytecode{
 				Instructions: code.Concat(
-					code.Make(code.OpConstant, 0),
+					code.Make(code.OpClosure, 0, 0),
 					code.Make(code.OpPop),
 				),
 				Constants: []object.Object{
@@ -552,7 +552,7 @@ func TestIntegerArithmetic(t *testing.T) {
 			input: "let oneArg = fn(a, b) { a + b }; oneArg(24)",
 			expected: &Bytecode{
 				Instructions: code.Concat(
-					code.Make(code.OpConstant, 0),
+					code.Make(code.OpClosure, 0, 0),
 					code.Make(code.OpSetGlobal, 0),
 					code.Make(code.OpGetGlobal, 0),
 					code.Make(code.OpConstant, 1),
