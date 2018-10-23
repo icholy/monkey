@@ -36,6 +36,7 @@ const (
 	OpIndex
 	OpCall
 	OpReturn
+	OpClosure
 )
 
 type Definition struct {
@@ -89,6 +90,7 @@ var definitions = map[Opcode]*Definition{
 	OpIndex:         {"OpIndex", []int{}},
 	OpCall:          {"OpCall", []int{1}},
 	OpReturn:        {"OpReturn", []int{}},
+	OpClosure:       {"OpClosure", []int{2, 1}},
 }
 
 type Instructions []byte

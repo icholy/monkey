@@ -16,6 +16,7 @@ func TestMake(t *testing.T) {
 		{OpConstant, []int{65534}, []byte{byte(OpConstant), 255, 254}},
 		{OpAdd, []int{}, []byte{byte(OpAdd)}},
 		{OpGetLocal, []int{255}, []byte{byte(OpGetLocal), 255}},
+		{OpClosure, []int{65534, 255}, []byte{byte(OpClosure), 255, 254, 255}},
 	}
 
 	for _, tt := range tests {
@@ -31,6 +32,7 @@ func TestInstructionsString(t *testing.T) {
 		Make(OpConstant, 65535),
 		Make(OpAdd),
 		Make(OpSetLocal, 255),
+		Make(OpClosure, 12, 255),
 	)
 
 	expected := strings.Join([]string{
@@ -39,6 +41,7 @@ func TestInstructionsString(t *testing.T) {
 		"0006 OpConstant 65535",
 		"0009 OpAdd",
 		"0010 OpSetLocal 255",
+		"0012 OpClosure 12 255",
 	}, "\n")
 
 	assert.Equal(t, instructions.String(), expected)
@@ -52,6 +55,7 @@ func TestReadOperands(t *testing.T) {
 	}{
 		{OpConstant, []int{65535}, 2},
 		{OpAdd, []int{}, 0},
+		{OpClosure, []int{65534, 225}, 3},
 	}
 
 	for _, tt := range tests {
