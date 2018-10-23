@@ -294,6 +294,6 @@ type Closure struct {
 	Free []Object
 }
 
-func (c *Closure) Type() ObjectType   { return CLOSURE }
-func (c *Closure) Inspect() string    { return fmt.Sprintf("Closure(%d)", c.Fn.NumParameters) }
-func (c *Closure) KeyValue() KeyValue { return c }
+func (c *Closure) Type() ObjectType         { return CLOSURE }
+func (c *Closure) Inspect(depth int) string { return fmt.Sprintf("Closure(%d)", c.Fn.NumParameters) }
+func (c *Closure) KeyValue() KeyValue       { return c }

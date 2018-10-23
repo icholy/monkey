@@ -34,8 +34,11 @@ type VM struct {
 
 func New(bytecode *compiler.Bytecode) *VM {
 
+	fn := &object.CompiledFunction{Instructions: bytecode.Instructions}
+	closure := &object.Closure{Fn: fn}
+
 	frames := make([]*Frame, MaxFrames)
-	frames[0] = NewFrame(bytecode.Instructions, 0)
+	frames[0] = NewFrame(closure, 0)
 
 	return &VM{
 		constants: bytecode.Constants,
@@ -183,26 +186,36 @@ func (vm *VM) Run() error {
 			}
 		case code.OpCall:
 			nArgs := frame.ReadUint8() // num args
-			fn := vm.stack[vm.sp-1-nArgs]
+			callee := vm.stack[vm.sp-1-nArgs]
 
-			switch fn := fn.(type) {
+			switch callee := callee.(type) {
 			case *object.Builtin:
 				args := vm.stack[vm.sp-nArgs : vm.sp]
-				ret, err := fn.Fn(args...)
+				ret, err := callee.Fn(args...)
 				vm.sp = vm.sp - nArgs - 1
 				if err != nil {
 					return err
 				}
 				vm.push(ret)
-			case *object.CompiledFunction:
-				if nArgs != fn.NumParameters {
-					return fmt.Errorf("wrong number of arguments: want %d, got %d", fn.NumParameters, nArgs)
+			case *object.Closure:
+				if nArgs != callee.Fn.NumParameters {
+					return fmt.Errorf("wrong number of arguments: want %d, got %d", callee.Fn.NumParameters, nArgs)
 				}
-				frame = NewFrame(fn.Instructions, vm.sp-nArgs)
+				frame = NewFrame(callee, vm.sp-nArgs)
 				vm.pushFrame(frame)
-				vm.sp = frame.bp + fn.NumLocals
+				vm.sp = frame.bp + callee.Fn.NumLocals
 			default:
 				return fmt.Errorf("calling non-function")
+			}
+		case code.OpClosure:
+			index := frame.ReadUint16()
+			_ = frame.ReadUint8() // nFree
+			fn, ok := vm.constants[index].(*object.CompiledFunction)
+			if !ok {
+				return fmt.Errorf("closure: not a function")
+			}
+			if err := vm.push(&object.Closure{Fn: fn}); err != nil {
+				return err
 			}
 		case code.OpReturn:
 			retVal := vm.pop()

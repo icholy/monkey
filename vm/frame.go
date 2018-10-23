@@ -2,16 +2,23 @@ package vm
 
 import (
 	"github.com/icholy/monkey/code"
+	"github.com/icholy/monkey/object"
 )
 
 type Frame struct {
 	instructions code.Instructions
+	cl           *object.Closure
 	ip           int
 	bp           int
 }
 
-func NewFrame(ins code.Instructions, bp int) *Frame {
-	return &Frame{instructions: ins, ip: -1, bp: bp}
+func NewFrame(cl *object.Closure, bp int) *Frame {
+	return &Frame{
+		instructions: cl.Fn.Instructions,
+		cl:           cl,
+		ip:           -1,
+		bp:           bp,
+	}
 }
 
 func (f *Frame) next() bool {
