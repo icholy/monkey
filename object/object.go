@@ -23,6 +23,7 @@ const (
 	ARRAY             = "ARRAY"
 	HASH              = "HASH"
 	COMPILED_FUNCTION = "COMPILED_FUNCTION"
+	CLOSURE           = "CLOSURE"
 )
 
 var MaxDepth = 10
@@ -287,3 +288,12 @@ func (cf *CompiledFunction) Inspect(depth int) string {
 	return fmt.Sprintf("CompiledFunction(%d)", cf.NumParameters)
 }
 func (cf *CompiledFunction) KeyValue() KeyValue { return cf }
+
+type Closure struct {
+	Fn   *CompiledFunction
+	Free []Object
+}
+
+func (c *Closure) Type() ObjectType   { return CLOSURE }
+func (c *Closure) Inspect() string    { return fmt.Sprintf("Closure(%d)", c.Fn.NumParameters) }
+func (c *Closure) KeyValue() KeyValue { return c }
