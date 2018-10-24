@@ -655,6 +655,69 @@ func TestCompile(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: `
+				let global = 55;
+				fn() {
+					let a = 66;
+					fn() {
+						let b = 77;
+						fn() {
+							let c = 88;
+
+							global + a + b + c;
+						}
+					}					
+				}
+			`,
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpSetGlobal, 0),
+					code.Make(code.OpClosure, 6, 0),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					object.New(55),
+					object.New(66),
+					object.New(77),
+					object.New(88),
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpConstant, 3),
+							code.Make(code.OpSetLocal, 0),
+							code.Make(code.OpGetGlobal, 0),
+							code.Make(code.OpGetFree, 0),
+							code.Make(code.OpAdd),
+							code.Make(code.OpGetFree, 1),
+							code.Make(code.OpAdd),
+							code.Make(code.OpGetLocal, 0),
+							code.Make(code.OpAdd),
+							code.Make(code.OpReturn),
+						),
+					},
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpConstant, 2),
+							code.Make(code.OpSetLocal, 0),
+							code.Make(code.OpGetFree, 0),
+							code.Make(code.OpGetLocal, 0),
+							code.Make(code.OpClosure, 4, 2),
+							code.Make(code.OpReturn),
+						),
+					},
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpConstant, 1),
+							code.Make(code.OpSetLocal, 0),
+							code.Make(code.OpGetLocal, 0),
+							code.Make(code.OpClosure, 5, 1),
+							code.Make(code.OpReturn),
+						),
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
