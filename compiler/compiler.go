@@ -222,15 +222,8 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if !ok {
 			return fmt.Errorf("invalid identifier: %s", node.Value)
 		}
-		switch symbol.Scope {
-		case GlobalScope:
-			c.emit(code.OpGetGlobal, symbol.Index)
-		case LocalScope:
-			c.emit(code.OpGetLocal, symbol.Index)
-		case BuiltinScope:
-			c.emit(code.OpGetBuiltin, symbol.Index)
-		default:
-			return fmt.Errorf("invalid symbol scope: %s", symbol.Scope)
+		if err := c.loadSymbol(symbol); err != nil {
+			return err
 		}
 	case *ast.IndexExpression:
 		if err := c.Compile(node.Value); err != nil {
@@ -265,13 +258,23 @@ func (c *Compiler) Compile(node ast.Node) error {
 			scope.emit(code.OpReturn)
 		}
 
+		free := c.symbols.Free
 		nLocals := c.symbols.Count
+		instructions := c.leaveScope()
+
+		// load the free symbols
+		for _, s := range free {
+			if err := c.loadSymbol(s); err != nil {
+				return err
+			}
+		}
+
 		compiledFn := &object.CompiledFunction{
 			NumParameters: len(node.Parameters),
 			NumLocals:     nLocals,
-			Instructions:  c.leaveScope(),
+			Instructions:  instructions,
 		}
-		c.emit(code.OpClosure, c.addConstant(compiledFn), 0)
+		c.emit(code.OpClosure, c.addConstant(compiledFn), len(free))
 	case *ast.ReturnStatement:
 		if node.ReturnValue != nil {
 			if err := c.Compile(node.ReturnValue); err != nil {
@@ -293,6 +296,22 @@ func (c *Compiler) Compile(node ast.Node) error {
 		c.emit(code.OpCall, len(node.Arguments))
 	case *ast.NullExpression:
 		c.emit(code.OpNull)
+	}
+	return nil
+}
+
+func (c *Compiler) loadSymbol(s Symbol) error {
+	switch s.Scope {
+	case GlobalScope:
+		c.emit(code.OpGetGlobal, s.Index)
+	case LocalScope:
+		c.emit(code.OpGetLocal, s.Index)
+	case BuiltinScope:
+		c.emit(code.OpGetBuiltin, s.Index)
+	case FreeScope:
+		c.emit(code.OpGetFree, s.Index)
+	default:
+		return fmt.Errorf("invalid symbol scope: %s", s.Scope)
 	}
 	return nil
 }

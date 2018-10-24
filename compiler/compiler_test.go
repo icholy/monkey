@@ -602,6 +602,8 @@ func TestCompile(t *testing.T) {
 				),
 				Constants: []object.Object{
 					&object.CompiledFunction{
+						NumLocals:     1,
+						NumParameters: 1,
 						Instructions: code.Concat(
 							code.Make(code.OpGetFree, 0),
 							code.Make(code.OpGetLocal, 0),
@@ -610,6 +612,8 @@ func TestCompile(t *testing.T) {
 						),
 					},
 					&object.CompiledFunction{
+						NumLocals:     1,
+						NumParameters: 1,
 						Instructions: code.Concat(
 							code.Make(code.OpGetLocal, 0),
 							code.Make(code.OpClosure, 0, 1),
@@ -628,6 +632,8 @@ func TestCompile(t *testing.T) {
 				),
 				Constants: []object.Object{
 					&object.CompiledFunction{
+						NumLocals:     1,
+						NumParameters: 1,
 						Instructions: code.Concat(
 							code.Make(code.OpGetFree, 0),
 							code.Make(code.OpGetFree, 1),
@@ -638,6 +644,8 @@ func TestCompile(t *testing.T) {
 						),
 					},
 					&object.CompiledFunction{
+						NumLocals:     1,
+						NumParameters: 1,
 						Instructions: code.Concat(
 							code.Make(code.OpGetFree, 0),
 							code.Make(code.OpGetLocal, 0),
@@ -646,6 +654,8 @@ func TestCompile(t *testing.T) {
 						),
 					},
 					&object.CompiledFunction{
+						NumLocals:     1,
+						NumParameters: 1,
 						Instructions: code.Concat(
 							code.Make(code.OpGetLocal, 0),
 							code.Make(code.OpClosure, 1, 1),
@@ -683,6 +693,7 @@ func TestCompile(t *testing.T) {
 					object.New(77),
 					object.New(88),
 					&object.CompiledFunction{
+						NumLocals: 1,
 						Instructions: code.Concat(
 							code.Make(code.OpConstant, 3),
 							code.Make(code.OpSetLocal, 0),
@@ -697,6 +708,7 @@ func TestCompile(t *testing.T) {
 						),
 					},
 					&object.CompiledFunction{
+						NumLocals: 1,
 						Instructions: code.Concat(
 							code.Make(code.OpConstant, 2),
 							code.Make(code.OpSetLocal, 0),
@@ -707,6 +719,7 @@ func TestCompile(t *testing.T) {
 						),
 					},
 					&object.CompiledFunction{
+						NumLocals: 1,
 						Instructions: code.Concat(
 							code.Make(code.OpConstant, 1),
 							code.Make(code.OpSetLocal, 0),
