@@ -31,6 +31,7 @@ const (
 	OpGetBuiltin
 	OpSetLocal
 	OpGetLocal
+	OpGetFree
 	OpArray
 	OpHash
 	OpIndex
@@ -91,6 +92,7 @@ var definitions = map[Opcode]*Definition{
 	OpCall:          {"OpCall", []int{1}},
 	OpReturn:        {"OpReturn", []int{}},
 	OpClosure:       {"OpClosure", []int{2, 1}},
+	OpGetFree:       {"OpGetFree", []int{1}},
 }
 
 type Instructions []byte

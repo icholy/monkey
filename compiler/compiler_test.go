@@ -593,6 +593,68 @@ func TestCompile(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: "fn(a) { fn(b) { a + b } }",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpClosure, 1, 0),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpGetFree, 0),
+							code.Make(code.OpGetLocal, 0),
+							code.Make(code.OpAdd),
+							code.Make(code.OpReturn),
+						),
+					},
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpGetLocal, 0),
+							code.Make(code.OpClosure, 0, 1),
+							code.Make(code.OpReturn),
+						),
+					},
+				},
+			},
+		},
+		{
+			input: "fn(a) { fn(b) { fn(c) { a + b + c} } }",
+			expected: &Bytecode{
+				Instructions: code.Concat(
+					code.Make(code.OpClosure, 2, 0),
+					code.Make(code.OpPop),
+				),
+				Constants: []object.Object{
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpGetFree, 0),
+							code.Make(code.OpGetFree, 1),
+							code.Make(code.OpAdd),
+							code.Make(code.OpGetLocal, 0),
+							code.Make(code.OpAdd),
+							code.Make(code.OpReturn),
+						),
+					},
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpGetFree, 0),
+							code.Make(code.OpGetLocal, 0),
+							code.Make(code.OpClosure, 0, 2),
+							code.Make(code.OpReturn),
+						),
+					},
+					&object.CompiledFunction{
+						Instructions: code.Concat(
+							code.Make(code.OpGetLocal, 0),
+							code.Make(code.OpClosure, 1, 1),
+							code.Make(code.OpReturn),
+						),
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
