@@ -74,6 +74,7 @@ func TestRun(t *testing.T) {
 		{`len("hello world")`, object.New(11)},
 		{"last([1, 2, 3])", object.New(3)},
 		{"let x = len([1, 2, 3]); let y = len([1, 2, 3]); y + x", object.New(6)},
+		{"let make = fn(a) { fn() {a} }; make(1)()", object.New(1)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {

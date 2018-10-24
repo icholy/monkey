@@ -184,6 +184,11 @@ func (vm *VM) Run() error {
 			if err := vm.push(object.Builtins[index]); err != nil {
 				return err
 			}
+		case code.OpGetFree:
+			index := frame.ReadUint8()
+			if err := vm.push(frame.cl.Free[index]); err != nil {
+				return err
+			}
 		case code.OpCall:
 			nArgs := frame.ReadUint8() // num args
 			callee := vm.stack[vm.sp-1-nArgs]
@@ -209,12 +214,20 @@ func (vm *VM) Run() error {
 			}
 		case code.OpClosure:
 			index := frame.ReadUint16()
-			_ = frame.ReadUint8() // nFree
+			nFree := frame.ReadUint8()
 			fn, ok := vm.constants[index].(*object.CompiledFunction)
 			if !ok {
 				return fmt.Errorf("closure: not a function")
 			}
-			if err := vm.push(&object.Closure{Fn: fn}); err != nil {
+
+			// push the free variables onto the stack
+			free := make([]object.Object, nFree)
+			for i := 0; i < nFree; i++ {
+				free[i] = vm.stack[vm.sp-nFree+i]
+			}
+			vm.sp -= nFree
+
+			if err := vm.push(&object.Closure{Fn: fn, Free: free}); err != nil {
 				return err
 			}
 		case code.OpReturn:
